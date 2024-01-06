@@ -1,2 +1,17 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { createScene } from '$lib/viewer';
+
+	let el:HTMLCanvasElement;
+
+	onMount(() => {
+		createScene(el);
+	});
+</script>
+
+<svelte:head>
+	<title>Three.js Sveltekit</title>
+	<meta name="description" content="SiteVisor App" />
+</svelte:head>
+
+<canvas bind:this={el} />

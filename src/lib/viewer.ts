@@ -1,28 +1,20 @@
 import {
-    BoxGeometry,
     DirectionalLight,
     HemisphereLight,
-    Mesh,
-    MeshStandardMaterial,
     PerspectiveCamera,
     Scene,
     WebGLRenderer
   } from 'three';
+import { Room } from './Room';
   
 const scene = new Scene();
 
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 5;
 
-const geometry = new BoxGeometry();
+const mainRoom = new Room(0x00ff00, 0.5);
 
-const material = new MeshStandardMaterial({
-    color: 0x00ff00,
-    metalness: 0.13
-});
-
-const cube = new Mesh(geometry, material);
-scene.add(cube);
+scene.add(mainRoom);
 
 const directionalLight = new DirectionalLight(0x9090aa);
 directionalLight.position.set(-10, 10, -10).normalize();
@@ -36,8 +28,8 @@ let renderer:WebGLRenderer;
 
 const animate = () => {
   requestAnimationFrame(animate);
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  mainRoom.rotation.x += 0.01;
+  mainRoom.rotation.y += 0.01;
   renderer.render(scene, camera);
 };
 

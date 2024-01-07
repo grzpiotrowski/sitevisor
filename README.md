@@ -27,3 +27,4 @@ You can preview the production build with `npm run preview`.
 - [Jason Sturges - 3D with Svelte and Three.js](https://javascript.plainenglish.io/3d-with-svelte-and-three-js-f4366f342f9f)
 - [github.com/jasonsturges - Starter Svelte + Three.js project template](https://github.com/jasonsturges/threejs-sveltekit/tree/main)
 - [TypeScript types for three.js](https://github.com/three-types/three-ts-types)
+- [Typescript Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html)

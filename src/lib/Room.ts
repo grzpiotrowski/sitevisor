@@ -8,18 +8,26 @@ export class Room extends Mesh {
   material: MeshStandardMaterial;
   geometry: BoxGeometry;
 
-  constructor(color: number, opacity: number) {
+  constructor(color: number, opacity: number, name: string, level: number) {
     super();
     this.geometry = new BoxGeometry();
-    const material = this.setMaterial(color, opacity);
-    this.material = material;
+    this.material = new MeshStandardMaterial({
+      color: color,
+      opacity: opacity,
+      transparent: true
+    });
+
+    // Custom object properties
+    this.userData = {
+      name: name,
+      level: level
+    };
   }
 
   setMaterial(color: number, opacity: number) {
     this.material = new MeshStandardMaterial({
       color: color,
       opacity: opacity,
-      transparent: true
     });
     return this.material;
   }

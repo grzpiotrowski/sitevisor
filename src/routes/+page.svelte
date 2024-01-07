@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { createScene } from '$lib/viewer';
+    import { onMount } from 'svelte';
+    import { Viewer } from '$lib/Viewer';
 
-	let el:HTMLCanvasElement;
+    let el: HTMLCanvasElement;
+    let viewer: Viewer;
 
-	onMount(() => {
-		createScene(el);
-	});
+    onMount(() => {
+        viewer = new Viewer();
+        viewer.init(el);
+    });
 </script>
 
 <svelte:head>

@@ -9,51 +9,64 @@ import {
 import { Room } from './Room';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ReferencePlane } from './ReferencePlane';
-  
-const scene = new Scene();
 
-const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(3, 3, 5);
+export class Viewer {
+  private scene: Scene;
+  private camera: PerspectiveCamera;
+  private renderer: WebGLRenderer;
+  private controls: OrbitControls;
+  private mainRoom: Room;
 
-const mainRoom = new Room(0x00ff00, 0.5);
-scene.add(mainRoom);
+  constructor() {
+    this.scene = new Scene();
+    this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera.position.set(3, 3, 5);
+  }
 
-const referencePlane = new ReferencePlane();
-scene.add(referencePlane);
+  init(canvasElement: HTMLCanvasElement) {
+    this.renderer = new WebGLRenderer({ antialias: true, canvas: canvasElement });
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
-const axesHelper = new AxesHelper( 5 );
-scene.add( axesHelper );
+    this.initializeLights();
+    this.initializeObjects();
 
-const directionalLight = new DirectionalLight(0x9090aa);
-directionalLight.position.set(-10, 10, -10).normalize();
-scene.add(directionalLight);
+    window.addEventListener('resize', this.resize.bind(this));
+    this.resize();
+    this.animate();
+  }
 
-const hemisphereLight = new HemisphereLight(0xffffff, 0x444444);
-hemisphereLight.position.set(1, 1, 1);
-scene.add(hemisphereLight);
+  private initializeLights() {
+    const directionalLight = new DirectionalLight(0x9090aa);
+    directionalLight.position.set(-10, 10, -10).normalize();
+    this.scene.add(directionalLight);
 
-let renderer:WebGLRenderer;
-let controls:OrbitControls
+    const hemisphereLight = new HemisphereLight(0xffffff, 0x444444);
+    hemisphereLight.position.set(1, 1, 1);
+    this.scene.add(hemisphereLight);
+  }
 
-const animate = () => {
-  requestAnimationFrame(animate);
-  mainRoom.rotation.x += 0.01;
-  mainRoom.rotation.y += 0.01;
-  controls.update();
-  renderer.render(scene, camera);
-};
+  private initializeObjects() {
+    this.mainRoom = new Room(0x00ff00, 0.5);
+    this.scene.add(this.mainRoom);
 
-const resize = () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-};
+    const referencePlane = new ReferencePlane();
+    this.scene.add(referencePlane);
 
-export const createScene = (el:HTMLCanvasElement) => {
-  renderer = new WebGLRenderer({ antialias: true, canvas: el });
-  controls = new OrbitControls( camera, renderer.domElement );
-  controls.update();
-  resize();
-  animate();
-};
+    const axesHelper = new AxesHelper(5);
+    this.scene.add(axesHelper);
+  }
 
-window.addEventListener('resize', resize);
+  private animate = () => {
+    requestAnimationFrame(this.animate);
+    this.mainRoom.rotation.x += 0.01;
+    this.mainRoom.rotation.y += 0.01;
+    this.controls.update();
+    this.renderer.render(this.scene, this.camera);
+  };
+
+  private resize = () => {
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.updateProjectionMatrix();
+  };
+}

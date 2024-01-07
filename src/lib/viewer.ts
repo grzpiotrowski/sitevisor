@@ -1,11 +1,12 @@
 import {
-    DirectionalLight,
-    HemisphereLight,
-    PerspectiveCamera,
-    Scene,
-    WebGLRenderer
-  } from 'three';
+  DirectionalLight,
+  HemisphereLight,
+  PerspectiveCamera,
+  Scene,
+  WebGLRenderer
+} from 'three';
 import { Room } from './Room';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   
 const scene = new Scene();
 
@@ -13,7 +14,6 @@ const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight,
 camera.position.z = 5;
 
 const mainRoom = new Room(0x00ff00, 0.5);
-
 scene.add(mainRoom);
 
 const directionalLight = new DirectionalLight(0x9090aa);
@@ -25,11 +25,13 @@ hemisphereLight.position.set(1, 1, 1);
 scene.add(hemisphereLight);
 
 let renderer:WebGLRenderer;
+let controls:OrbitControls
 
 const animate = () => {
   requestAnimationFrame(animate);
   mainRoom.rotation.x += 0.01;
   mainRoom.rotation.y += 0.01;
+  controls.update();
   renderer.render(scene, camera);
 };
 
@@ -41,6 +43,8 @@ const resize = () => {
 
 export const createScene = (el:HTMLCanvasElement) => {
   renderer = new WebGLRenderer({ antialias: true, canvas: el });
+  controls = new OrbitControls( camera, renderer.domElement );
+  controls.update();
   resize();
   animate();
 };

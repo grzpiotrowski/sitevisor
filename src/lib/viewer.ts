@@ -3,18 +3,26 @@ import {
   HemisphereLight,
   PerspectiveCamera,
   Scene,
-  WebGLRenderer
+  WebGLRenderer,
+  AxesHelper,
 } from 'three';
 import { Room } from './Room';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { ReferencePlane } from './ReferencePlane';
   
 const scene = new Scene();
 
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
+camera.position.set(3, 3, 5);
 
 const mainRoom = new Room(0x00ff00, 0.5);
 scene.add(mainRoom);
+
+const referencePlane = new ReferencePlane();
+scene.add(referencePlane);
+
+const axesHelper = new AxesHelper( 5 );
+scene.add( axesHelper );
 
 const directionalLight = new DirectionalLight(0x9090aa);
 directionalLight.position.set(-10, 10, -10).normalize();
@@ -38,7 +46,6 @@ const animate = () => {
 const resize = () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
 };
 
 export const createScene = (el:HTMLCanvasElement) => {

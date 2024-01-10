@@ -28,3 +28,4 @@ You can preview the production build with `npm run preview`.
 - [github.com/jasonsturges - Starter Svelte + Three.js project template](https://github.com/jasonsturges/threejs-sveltekit/tree/main)
 - [TypeScript types for three.js](https://github.com/three-types/three-ts-types)
 - [Typescript Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html)
+- [Refactoring Guru - Design Patterns - Factory Method](https://refactoring.guru/design-patterns/factory-method)

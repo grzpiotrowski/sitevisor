@@ -82,6 +82,18 @@ export class Viewer {
     this.scene.add(this.pointerHelper);
   }
 
+  public toggleRoomInsertionMode() {
+    this.roomInsertionMode = !this.roomInsertionMode;
+    if (this.roomInsertionMode) {
+      this.pointerHelper.setCreateMode(this.roomInsertionMode);
+      this.roomInsertionPoints = [];
+      console.log("Room insertion mode activated");
+    } else {
+      this.pointerHelper.setCreateMode(this.roomInsertionMode);
+      console.log("Room insertion mode deactivated");
+    }
+  }
+
   private checkPointerIntersection() {
     this.raycaster.setFromCamera( this.pointer, this.camera );
     const intersects = this.raycaster.intersectObjects( this.scene.children, false );
@@ -128,15 +140,7 @@ private setPointerPosition(event: MouseEvent) {
 
   private onKeyPress(event: KeyboardEvent) {
     if (event.key === 'n' || event.key === 'N') {
-      this.roomInsertionMode = !this.roomInsertionMode;
-      if (this.roomInsertionMode) {
-        this.pointerHelper.setCreateMode(this.roomInsertionMode);
-        this.roomInsertionPoints = [];
-        console.log("Room insertion mode activated");
-      } else {
-        this.pointerHelper.setCreateMode(this.roomInsertionMode);
-        console.log("Room insertion mode deactivated");
-      }
+      this.toggleRoomInsertionMode();
     }
   }
 

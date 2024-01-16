@@ -1,9 +1,11 @@
-<script>
-    export let onToggleRoomInsertion;
+<script lang="ts">
+    export let onToggleRoomInsertion: any;
+    export let onToggleSensorInsertion: any;
 </script>
 
 <aside>
-    <button on:click={onToggleRoomInsertion}>Create Room</button>
+    <button on:click={onToggleRoomInsertion}>Add Room</button>
+    <button on:click={onToggleSensorInsertion}>Add Sensor</button>
 </aside>
 
 <style>

@@ -14,6 +14,10 @@
     function toggleRoomInsertion() {
         viewer.toggleRoomInsertionMode();
     }
+
+    function toggleSensorInsertion() {
+        viewer.toggleSensorInsertionMode();
+    }
 </script>
 
 <svelte:head>
@@ -21,5 +25,8 @@
     <meta name="description" content="SiteVisor App" />
 </svelte:head>
 
-<Sidebar onToggleRoomInsertion={toggleRoomInsertion} />
+<Sidebar
+    onToggleRoomInsertion={toggleRoomInsertion}
+    onToggleSensorInsertion={toggleSensorInsertion}
+/>
 <canvas bind:this={el} />

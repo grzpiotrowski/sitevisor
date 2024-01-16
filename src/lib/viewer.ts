@@ -29,6 +29,7 @@ export class Viewer {
 
   private objectFactory: ObjectFactory;
   private roomInsertionMode: boolean = false;
+  private sensorInsertionMode: boolean = false;
   private roomInsertionPoints: Vector3[] = [];
 
   constructor() {
@@ -94,6 +95,17 @@ export class Viewer {
     }
   }
 
+  public toggleSensorInsertionMode() {
+    this.sensorInsertionMode = !this.sensorInsertionMode;
+    if (this.sensorInsertionMode) {
+      this.pointerHelper.setCreateMode(this.sensorInsertionMode);
+      console.log("Sensor insertion mode activated");
+    } else {
+      this.pointerHelper.setCreateMode(this.sensorInsertionMode);
+      console.log("Sensor insertion mode deactivated");
+    }
+  }
+
   private checkPointerIntersection() {
     this.raycaster.setFromCamera( this.pointer, this.camera );
     const intersects = this.raycaster.intersectObjects( this.scene.children, false );
@@ -133,6 +145,9 @@ private setPointerPosition(event: MouseEvent) {
             this.pointerHelper.setCreateMode(this.roomInsertionMode);
             this.roomInsertionPoints = [];
           }
+        }
+        if (this.sensorInsertionMode) {
+          this.objectFactory.createSensorAtPoint(intersection.clone())
         }
       }
     }

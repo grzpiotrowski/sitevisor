@@ -1,7 +1,8 @@
 import { Scene, Vector3 } from 'three';
 import { Room } from '../assets/Room';
+import { Sensor } from '$lib/assets/Sensor';
 import type { IRoom } from '../common/interfaces/IRoom';
-
+import type { ISensor } from '$lib/common/interfaces/ISensor';
 
 /**
  * ObjectFactory is a class responsible for creating various objects in the scene.
@@ -37,6 +38,22 @@ export class ObjectFactory {
     };
 
     return this.createRoom(options);
+  }
+
+  createSensor(options: ISensor): Sensor {
+    const sensor = new Sensor(options.name, options.level, options.position);
+    this.scene.add(sensor);
+    return sensor;
+  }
+
+  createSensorAtPoint(sensorPosition: Vector3): Sensor {
+    const options: ISensor = {
+      name: "New Sensor",
+      level: 0,
+      position: sensorPosition,
+    };
+
+    return this.createSensor(options);
   }
 
   private getRandomHexColor(): number {

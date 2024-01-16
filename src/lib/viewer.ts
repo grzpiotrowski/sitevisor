@@ -8,12 +8,12 @@ import {
   Raycaster,
   Vector2,
   Vector3,
-  Mesh,
 } from 'three';
 import { Room } from './assets/Room';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ReferencePlane } from './assets/ReferencePlane';
 import { PointerHelper } from './assets/PointerHelper';
+import { ObjectFactory } from './utils/ObjectFactory';
 
 export class Viewer {
   private canvasElement: HTMLCanvasElement;
@@ -25,7 +25,12 @@ export class Viewer {
   private pointer: Vector2;
   private referencePlane: ReferencePlane;
   private mainRoom: Room;
-  private pointerHelper: Mesh;
+  private pointerHelper: PointerHelper;
+
+  private objectFactory: ObjectFactory;
+  private roomInsertionMode: boolean = false;
+  private sensorInsertionMode: boolean = false;
+  private roomInsertionPoints: Vector3[] = [];
 
   constructor() {
     this.scene = new Scene();
@@ -33,6 +38,8 @@ export class Viewer {
     this.camera.position.set(-6, 6, -2.5);
     this.raycaster = new Raycaster();
     this.pointer = new Vector2();
+
+    this.objectFactory = new ObjectFactory(this.scene);
   }
 
   init(canvasElement: HTMLCanvasElement) {
@@ -46,6 +53,7 @@ export class Viewer {
     window.addEventListener('resize', this.resize.bind(this));
     canvasElement.addEventListener('mousemove', this.setPointerPosition.bind(this));
     canvasElement.addEventListener('click', this.onCanvasClick.bind(this));
+    window.addEventListener('keypress', this.onKeyPress.bind(this));
 
     this.resize();
     this.animate();
@@ -73,6 +81,29 @@ export class Viewer {
     this.scene.add(axesHelper);
     this.pointerHelper = new PointerHelper();
     this.scene.add(this.pointerHelper);
+  }
+
+  public toggleRoomInsertionMode() {
+    this.roomInsertionMode = !this.roomInsertionMode;
+    if (this.roomInsertionMode) {
+      this.pointerHelper.setCreateMode(this.roomInsertionMode);
+      this.roomInsertionPoints = [];
+      console.log("Room insertion mode activated");
+    } else {
+      this.pointerHelper.setCreateMode(this.roomInsertionMode);
+      console.log("Room insertion mode deactivated");
+    }
+  }
+
+  public toggleSensorInsertionMode() {
+    this.sensorInsertionMode = !this.sensorInsertionMode;
+    if (this.sensorInsertionMode) {
+      this.pointerHelper.setCreateMode(this.sensorInsertionMode);
+      console.log("Sensor insertion mode activated");
+    } else {
+      this.pointerHelper.setCreateMode(this.sensorInsertionMode);
+      console.log("Sensor insertion mode deactivated");
+    }
   }
 
   private checkPointerIntersection() {
@@ -105,7 +136,26 @@ private setPointerPosition(event: MouseEvent) {
       if (intersection) {
         console.log(`Intersection at: ${intersection.x}, ${intersection.y}, ${intersection.z}`);
         this.pointerHelper.position.copy( intersection );
+
+        if (this.roomInsertionMode) {
+          this.roomInsertionPoints.push(intersection.clone());
+          if (this.roomInsertionPoints.length === 2) {
+            this.objectFactory.createRoomFromPoints(this.roomInsertionPoints);
+            this.roomInsertionMode = false;
+            this.pointerHelper.setCreateMode(this.roomInsertionMode);
+            this.roomInsertionPoints = [];
+          }
+        }
+        if (this.sensorInsertionMode) {
+          this.objectFactory.createSensorAtPoint(intersection.clone())
+        }
       }
+    }
+  }
+
+  private onKeyPress(event: KeyboardEvent) {
+    if (event.key === 'n' || event.key === 'N') {
+      this.toggleRoomInsertionMode();
     }
   }
 

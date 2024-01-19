@@ -7,8 +7,9 @@ repo_url: https://github.com/grzpiotrowski/sitevisor
 edit_uri: blob/main/docs/
 
 nav:
-  - Home: index.md
+  - Overview: index.md
   - User Guide: user-guide/
   - Developer Guide: dev-guide/
 
-theme: readthedocs
+theme:
+  name: material

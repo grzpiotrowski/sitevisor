@@ -24,8 +24,16 @@ You can preview the production build with `npm run preview`.
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
 
 # Resources
+
+## Front-end
 - [Jason Sturges - 3D with Svelte and Three.js](https://javascript.plainenglish.io/3d-with-svelte-and-three-js-f4366f342f9f)
 - [github.com/jasonsturges - Starter Svelte + Three.js project template](https://github.com/jasonsturges/threejs-sveltekit/tree/main)
 - [TypeScript types for three.js](https://github.com/three-types/three-ts-types)
 - [Typescript Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html)
 - [Refactoring Guru - Design Patterns - Factory Method](https://refactoring.guru/design-patterns/factory-method)
+
+## Documentation
+- [MkDocs - static site generator for project documentation](https://www.mkdocs.org/)
+- [Material for MkDocs - documentation framework on top of MkDocs](https://squidfunk.github.io/mkdocs-material/)
+- [Material for MkDocs - Publishing your site - GitHub Pages](https://squidfunk.github.io/mkdocs-material/publishing-your-site/#with-github-actions)
+- [GitHub Docs - Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)

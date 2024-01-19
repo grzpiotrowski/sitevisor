@@ -1,0 +1,15 @@
+site_name: SiteVisor
+site_url: https://example.com/
+site_description: Digital Twin application
+site_author: Grzegorz Piotrowski
+
+repo_url: https://github.com/grzpiotrowski/sitevisor
+edit_uri: blob/main/docs/
+
+nav:
+  - Overview: index.md
+  - User Guide: user-guide/
+  - Developer Guide: dev-guide/
+
+theme:
+  name: material

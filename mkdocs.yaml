@@ -9,7 +9,12 @@ edit_uri: blob/main/docs/
 nav:
   - Overview: index.md
   - User Guide: user-guide/
-  - Developer Guide: dev-guide/
+  - Developer Guide:
+    - Local deployment: dev-guide/local-deployment.md
+    - Docker deployment: dev-guide/docker-deployment.md
+    - Kind deployment: dev-guide/kind-deployment.md
 
 theme:
   name: material
+  features:
+    - navigation.expand

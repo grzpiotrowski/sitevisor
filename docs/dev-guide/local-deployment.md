@@ -1,5 +1,10 @@
 # Developer Guide
 
+This section describes how to set up and run the application in a local development environment. This is ideal for development and testing purposes.
+
+## Prerequisites
+Ensure [Node.js](https://nodejs.org/en) is installed on your system.
+
 ## Local deployment
 
 Install dependencies with:

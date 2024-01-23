@@ -13,6 +13,7 @@ nav:
     - Local deployment: dev-guide/local-deployment.md
     - Docker deployment: dev-guide/docker-deployment.md
     - Kind deployment: dev-guide/kind-deployment.md
+    - Kafka Websocket Proxy deployment: dev-guide/kafka-websocket-proxy-deployment.md
   - Architecture:
     - Architecture Overview: architecture/architecture-overview.md
     - Frontend Overview: architecture/architecture-frontend.md

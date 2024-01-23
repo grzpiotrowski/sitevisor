@@ -4,6 +4,7 @@
 - Docker: Ensure **Docker** is installed on your system. You can download and install Docker from [Docker's official website](https://www.docker.com/get-started/).
 - Kind: Install **kind** on your machine. Follow the installation instructions on the [kind website](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
 
+## Kind deployment
 **Create the Kind cluster:**
 ```bash
 kind create cluster

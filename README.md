@@ -1,5 +1,5 @@
 # SiteVisor
-SiteVisor is a Digital Twin ApplicaƟon for building monitoring and asset management, particularly for offices and industrial sites. The web applicatioon will simulate real world objects through a 3D digital twin, enabling users to see the site conditions, manage assets, and streamline maintenance tasks effectively.
+SiteVisor is a Digital Twin Application for building monitoring and asset management, particularly for offices and industrial sites. The web applicatioon will simulate real world objects through a 3D digital twin, enabling users to see the site conditions, manage assets, and streamline maintenance tasks effectively.
 Check the [documentation](https://grzpiotrowski.github.io/sitevisor/) to learn more.
 
 ## Developing
@@ -44,3 +44,6 @@ You can preview the production build with `npm run preview`.
 ## Deployment
 - [Loic Joachim - Dockerize SvelteKit with Node.js - Medium](https://medium.com/@loic.joachim/dockerize-sveltekit-with-node-adapter-62c5dc6fc15a)
 - [Kind - Kubernetes in Docker - Documentation](https://kind.sigs.k8s.io/)
+
+## Kafka
+- [Sergio Sánchez Sánchez - IoT Event Streaming Architecture - Medium](https://sanchezsanchezsergio418.medium.com/iot-event-streaming-architecture-fb790c634c2f)

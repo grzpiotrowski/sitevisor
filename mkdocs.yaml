@@ -15,6 +15,7 @@ nav:
     - Kind deployment: dev-guide/kind-deployment.md
   - Architecture:
     - Architecture Overview: architecture/architecture-overview.md
+    - Frontend Overview: architecture/architecture-frontend.md
 
 theme:
   name: material

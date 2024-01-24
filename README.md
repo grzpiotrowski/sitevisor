@@ -39,6 +39,7 @@ You can preview the production build with `npm run preview`.
 - [Material for MkDocs - documentation framework on top of MkDocs](https://squidfunk.github.io/mkdocs-material/)
 - [Material for MkDocs - Publishing your site - GitHub Pages](https://squidfunk.github.io/mkdocs-material/publishing-your-site/#with-github-actions)
 - [GitHub Docs - Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
+- [yEd - graph editor](https://www.yworks.com/products/yed)
 
 ## Deployment
 - [Loic Joachim - Dockerize SvelteKit with Node.js - Medium](https://medium.com/@loic.joachim/dockerize-sveltekit-with-node-adapter-62c5dc6fc15a)

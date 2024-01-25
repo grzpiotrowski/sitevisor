@@ -4,7 +4,19 @@ site_description: Digital Twin application
 site_author: Grzegorz Piotrowski
 
 repo_url: https://github.com/grzpiotrowski/sitevisor
-edit_uri: blob/main/docs/
+edit_uri: edit/main/docs/
+
+plugins:
+  - search
+  - multirepo:
+      cleanup: true
+      keep_docs_dir: true
+      nav_repos:
+        - name: sitevisor-backend
+          import_url: 'https://github.com/grzpiotrowski/sitevisor-backend/'
+          imports: [
+            /docs/*
+            ]
 
 nav:
   - Overview: index.md
@@ -13,7 +25,9 @@ nav:
     - Local deployment: dev-guide/local-deployment.md
     - Docker deployment: dev-guide/docker-deployment.md
     - Kind deployment: dev-guide/kind-deployment.md
-    - Kafka Websocket Proxy deployment: dev-guide/kafka-websocket-proxy-deployment.md
+    - Backend Kind deployment: sitevisor-backend/docs/deployment/kind-deployment.md
+    - Kafka deployment: sitevisor-backend/docs/deployment/kafka-deployment.md
+    - Kafka Websocket Proxy deployment: sitevisor-backend/docs/deployment/kafka-websocket-proxy-deployment.md
   - Architecture:
     - Architecture Overview: architecture/architecture-overview.md
     - Frontend Overview: architecture/architecture-frontend.md

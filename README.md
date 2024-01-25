@@ -37,6 +37,7 @@ You can preview the production build with `npm run preview`.
 ## Documentation
 - [MkDocs - static site generator for project documentation](https://www.mkdocs.org/)
 - [Material for MkDocs - documentation framework on top of MkDocs](https://squidfunk.github.io/mkdocs-material/)
+- [MkDocs: mkdocs-multirepo-plugin](https://github.com/jdoiro3/mkdocs-multirepo-plugin)
 - [Material for MkDocs - Publishing your site - GitHub Pages](https://squidfunk.github.io/mkdocs-material/publishing-your-site/#with-github-actions)
 - [GitHub Docs - Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 - [yEd - graph editor](https://www.yworks.com/products/yed)

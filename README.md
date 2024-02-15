@@ -1,5 +1,5 @@
 # SiteVisor
-SiteVisor is a Digital Twin ApplicaƟon for building monitoring and asset management, particularly for offices and industrial sites. The web applicatioon will simulate real world objects through a 3D digital twin, enabling users to see the site conditions, manage assets, and streamline maintenance tasks effectively.
+SiteVisor is a Digital Twin Application for building monitoring and asset management, particularly for offices and industrial sites. The web applicatioon will simulate real world objects through a 3D digital twin, enabling users to see the site conditions, manage assets, and streamline maintenance tasks effectively.
 Check the [documentation](https://grzpiotrowski.github.io/sitevisor/) to learn more.
 
 ## Developing
@@ -37,6 +37,7 @@ You can preview the production build with `npm run preview`.
 ## Documentation
 - [MkDocs - static site generator for project documentation](https://www.mkdocs.org/)
 - [Material for MkDocs - documentation framework on top of MkDocs](https://squidfunk.github.io/mkdocs-material/)
+- [MkDocs: mkdocs-multirepo-plugin](https://github.com/jdoiro3/mkdocs-multirepo-plugin)
 - [Material for MkDocs - Publishing your site - GitHub Pages](https://squidfunk.github.io/mkdocs-material/publishing-your-site/#with-github-actions)
 - [GitHub Docs - Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 - [yEd - graph editor](https://www.yworks.com/products/yed)
@@ -44,3 +45,6 @@ You can preview the production build with `npm run preview`.
 ## Deployment
 - [Loic Joachim - Dockerize SvelteKit with Node.js - Medium](https://medium.com/@loic.joachim/dockerize-sveltekit-with-node-adapter-62c5dc6fc15a)
 - [Kind - Kubernetes in Docker - Documentation](https://kind.sigs.k8s.io/)
+
+## Kafka
+- [Sergio Sánchez Sánchez - IoT Event Streaming Architecture - Medium](https://sanchezsanchezsergio418.medium.com/iot-event-streaming-architecture-fb790c634c2f)

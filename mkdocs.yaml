@@ -13,7 +13,7 @@ plugins:
       keep_docs_dir: true
       nav_repos:
         - name: sitevisor-backend
-          import_url: 'https://github.com/grzpiotrowski/sitevisor-backend/'
+          import_url: 'https://github.com/grzpiotrowski/sitevisor-backend?branch=main&edit_uri=/blob/main/'
           imports: [
             /docs/*
             ]

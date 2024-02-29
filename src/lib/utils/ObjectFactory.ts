@@ -23,7 +23,7 @@ export class ObjectFactory {
   /**
    * Creates a Room object from two points and adds it to the scene.
    */
-  createRoomFromPoints(roomInsertionPoints: Vector3[]): Room {
+  createRoomFromPoints(roomInsertionPoints: Vector3[]): IRoom {
     if (roomInsertionPoints.length !== 2) {
       throw new Error("createRoomFromPoints requires exactly two points");
     }
@@ -37,7 +37,8 @@ export class ObjectFactory {
       point2: roomInsertionPoints[1]
     };
 
-    return this.createRoom(options);
+    this.createRoom(options);
+    return options;
   }
 
   createSensor(options: ISensor): Sensor {
@@ -46,14 +47,14 @@ export class ObjectFactory {
     return sensor;
   }
 
-  createSensorAtPoint(sensorPosition: Vector3): Sensor {
+  createSensorAtPoint(sensorPosition: Vector3): ISensor {
     const options: ISensor = {
       name: "New Sensor",
       level: 0,
       position: sensorPosition,
     };
-
-    return this.createSensor(options);
+    this.createSensor(options);
+    return options;
   }
 
   private getRandomHexColor(): number {

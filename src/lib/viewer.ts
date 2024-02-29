@@ -1,4 +1,5 @@
 import {
+  Color,
   DirectionalLight,
   HemisphereLight,
   PerspectiveCamera,
@@ -10,10 +11,13 @@ import {
   Vector3,
 } from 'three';
 import { Room } from './assets/Room';
+import { Sensor } from './assets/Sensor';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ReferencePlane } from './assets/ReferencePlane';
 import { PointerHelper } from './assets/PointerHelper';
 import { ObjectFactory } from './utils/ObjectFactory';
+
+import { SitevisorService } from '../services/sitevisor-service';
 
 export class Viewer {
   private canvasElement: HTMLCanvasElement;
@@ -42,6 +46,23 @@ export class Viewer {
     this.objectFactory = new ObjectFactory(this.scene);
   }
 
+  async loadObjects() {
+    const rooms = await SitevisorService.getRooms();
+    rooms.forEach((room) => {
+      const newRoom = new Room(room.color, room.opacity, room.name, room.level,
+        new Vector3(room.point1.x, room.point1.y, room.point1.z),
+        new Vector3(room.point2.x, room.point2.y, room.point2.z));
+      this.scene.add(newRoom);
+    });
+    const sensors = await SitevisorService.getSensors();
+    sensors.forEach((sensor) => {
+      const newSensor = new Sensor(sensor.name,
+        sensor.level,
+        new Vector3(sensor.position.x, sensor.position.y, sensor.position.z));
+      this.scene.add(newSensor);
+    });
+  }
+
   init(canvasElement: HTMLCanvasElement) {
     this.canvasElement = canvasElement;
     this.renderer = new WebGLRenderer({ antialias: true, canvas: canvasElement });
@@ -49,6 +70,7 @@ export class Viewer {
 
     this.initializeLights();
     this.initializeObjects();
+    this.scene.background = new Color( 0x72898a );
 
     window.addEventListener('resize', this.resize.bind(this));
     canvasElement.addEventListener('mousemove', this.setPointerPosition.bind(this));
@@ -70,10 +92,6 @@ export class Viewer {
   }
 
   private initializeObjects() {
-    this.mainRoom = new Room(0x00ff00, 0.5, "Main room", 0, new Vector3(-4, 0, 4.23), new Vector3(0.89, 0, -2.62));
-    this.scene.add(this.mainRoom);
-    this.scene.add(new Room(0x8000ff, 0.5, "Secondary room", 0, new Vector3(0.89, 0, -2.62), new Vector3(3.45, 0, 2.55)))
-
     this.referencePlane = new ReferencePlane();
     this.scene.add(this.referencePlane);
 
@@ -81,6 +99,7 @@ export class Viewer {
     this.scene.add(axesHelper);
     this.pointerHelper = new PointerHelper();
     this.scene.add(this.pointerHelper);
+    this.loadObjects();
   }
 
   public toggleRoomInsertionMode() {
@@ -140,14 +159,18 @@ private setPointerPosition(event: MouseEvent) {
         if (this.roomInsertionMode) {
           this.roomInsertionPoints.push(intersection.clone());
           if (this.roomInsertionPoints.length === 2) {
-            this.objectFactory.createRoomFromPoints(this.roomInsertionPoints);
+            const room = this.objectFactory.createRoomFromPoints(this.roomInsertionPoints);
+            SitevisorService.createRoom(room);
             this.roomInsertionMode = false;
             this.pointerHelper.setCreateMode(this.roomInsertionMode);
             this.roomInsertionPoints = [];
           }
         }
         if (this.sensorInsertionMode) {
-          this.objectFactory.createSensorAtPoint(intersection.clone())
+          const sensor = this.objectFactory.createSensorAtPoint(intersection.clone());
+          SitevisorService.createSensor(sensor);
+          this.sensorInsertionMode = false;
+          this.pointerHelper.setCreateMode(this.sensorInsertionMode);
         }
       }
     }

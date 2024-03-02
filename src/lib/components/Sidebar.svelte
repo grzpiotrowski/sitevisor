@@ -4,8 +4,8 @@
 </script>
 
 <aside>
-    <button on:click={onToggleRoomInsertion}>Add Room</button>
-    <button on:click={onToggleSensorInsertion}>Add Sensor</button>
+    <button class="btn" on:click={onToggleRoomInsertion}>Add Room</button>
+    <button class="btn" on:click={onToggleSensorInsertion}>Add Sensor</button>
 </aside>
 
 <style>

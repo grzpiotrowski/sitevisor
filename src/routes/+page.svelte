@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { Viewer } from '$lib/viewer';
     import Sidebar from '../lib/components/Sidebar.svelte';
+	import Header from '$lib/components/Header.svelte';
 
     let el: HTMLCanvasElement;
     let viewer: Viewer;
@@ -43,9 +44,11 @@
 </script>
 
 <svelte:head>
-    <title>Three.js Sveltekit</title>
+    <title>SiteVisor</title>
     <meta name="description" content="SiteVisor App" />
 </svelte:head>
+
+<Header />
 
 <Sidebar
     onToggleRoomInsertion={toggleRoomInsertion}

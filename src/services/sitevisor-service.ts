@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { ISensor } from "../lib/common/interfaces/ISensor";
 import type { IRoom } from "../lib/common/interfaces/IRoom";
+import { loggedInUser } from "../stores";
 
 export const SitevisorService = {
 	baseUrl: "http://localhost:4000",
@@ -52,4 +53,17 @@ export const SitevisorService = {
 			console.error("Error creating a Sensor", error);
 		}
 	  },
+
+	  async register(username: string, password: string): Promise<boolean> {
+		try {
+			const userDetails = {
+				username: username,
+				password: password
+			};
+			await axios.post(this.baseUrl + "/api/register/", userDetails);
+			return true;
+		} catch (error) {
+			return false;
+		}
+	},
 };

@@ -21,6 +21,7 @@ import { SitevisorService } from '../services/sitevisor-service';
 
 export class Viewer {
   private canvasElement: HTMLCanvasElement;
+  private containerElement: HTMLElement;
   private scene: Scene;
   private camera: PerspectiveCamera;
   private renderer: WebGLRenderer;
@@ -63,8 +64,9 @@ export class Viewer {
     });
   }
 
-  init(canvasElement: HTMLCanvasElement) {
+  init(canvasElement: HTMLCanvasElement, containerElement: HTMLElement) {
     this.canvasElement = canvasElement;
+    this.containerElement = containerElement;
     this.renderer = new WebGLRenderer({ antialias: true, canvas: canvasElement });
     this.controls = new OrbitControls(this.camera, this.canvasElement);
 
@@ -194,8 +196,10 @@ private setPointerPosition(event: MouseEvent) {
   }
 
   private resize = () => {
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    const width = this.containerElement.clientWidth;
+    const height = this.containerElement.clientHeight;
+    this.renderer.setSize(width, height);
+    this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
   };
 }

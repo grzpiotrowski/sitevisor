@@ -1,6 +1,8 @@
 import axios from "axios";
 import type { ISensor } from "../lib/common/interfaces/ISensor";
 import type { IRoom } from "../lib/common/interfaces/IRoom";
+import { loggedInUser } from "../stores";
+import { browser } from '$app/environment';
 
 export const SitevisorService = {
 	baseUrl: "http://localhost:4000",
@@ -52,4 +54,64 @@ export const SitevisorService = {
 			console.error("Error creating a Sensor", error);
 		}
 	  },
+
+	  async register(username: string, password: string): Promise<boolean> {
+		try {
+			const userDetails = {
+				username: username,
+				password: password
+			};
+			await axios.post(this.baseUrl + "/api/register/", userDetails);
+			return true;
+		} catch (error) {
+			return false;
+		}
+	},
+
+	async login(username: string, password: string): Promise<boolean> {
+		try {
+			const response = await axios.post(`${this.baseUrl}/api/login/`, { username, password });
+			axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
+			if (response.data){
+				loggedInUser.set({
+					username: username,
+					token: response.data.access,
+					_id: response.data.id
+				});
+				localStorage.sitevisor = JSON.stringify({ username: username, token: response.data.access, _id: response.data.id });
+				return true;
+			}
+			return false;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
+	},
+
+	async logout() {
+		loggedInUser.set({
+			username: "",
+			token: "",
+			_id: ""
+		});
+		axios.defaults.headers.common["Authorization"] = "";
+		if (browser) {
+			localStorage.removeItem("sitevisor");
+		}
+	},
+
+	checkPageRefresh() {
+		if (!axios.defaults.headers.common["Authorization"]) {
+			const sitevisorCredentials = localStorage.sitevisor;
+			if (sitevisorCredentials) {
+				const savedUser = JSON.parse(sitevisorCredentials);
+				loggedInUser.set({
+					username: savedUser.username,
+					token: savedUser.token,
+					_id: savedUser._id
+				});
+				axios.defaults.headers.common["Authorization"] = "Bearer " + savedUser.token;
+			}
+		}
+	},
 };

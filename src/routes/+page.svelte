@@ -2,14 +2,16 @@
     import { onMount } from 'svelte';
     import { Viewer } from '$lib/viewer';
     import Sidebar from '../lib/components/Sidebar.svelte';
+	import Header from '$lib/components/Header.svelte';
 
     let el: HTMLCanvasElement;
     let viewer: Viewer;
+    let viewerContainer: HTMLElement;
     let socket: WebSocket;
 
     onMount(() => {
         viewer = new Viewer();
-        viewer.init(el);
+        viewer.init(el, viewerContainer);
 
         // WebSocket connection
         socket = new WebSocket('ws://localhost:8078/socket/out?clientId=console_consumer&topic=my-topic');
@@ -43,12 +45,23 @@
 </script>
 
 <svelte:head>
-    <title>Three.js Sveltekit</title>
+    <title>SiteVisor</title>
     <meta name="description" content="SiteVisor App" />
 </svelte:head>
 
-<Sidebar
-    onToggleRoomInsertion={toggleRoomInsertion}
-    onToggleSensorInsertion={toggleSensorInsertion}
-/>
-<canvas bind:this={el} />
+<div class="flex flex-col h-screen">
+    <Header />
+    <div class="flex flex-1 overflow-hidden">
+        <div class="drawer lg:drawer-open">
+            <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+            <div class="drawer-content flex flex-col items-center justify-center" bind:this={viewerContainer}>
+                <canvas bind:this={el} />
+            </div> 
+
+            <Sidebar
+                onToggleRoomInsertion={toggleRoomInsertion}
+                onToggleSensorInsertion={toggleSensorInsertion}
+            />
+        </div>
+    </div>
+</div>

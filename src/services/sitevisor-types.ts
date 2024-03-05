@@ -12,3 +12,7 @@ export interface LoggedInUser {
 	_id: string;
 }
 
+export interface IProject {
+	name: string;
+	id: string;
+}

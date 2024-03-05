@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { ISensor } from "../lib/common/interfaces/ISensor";
 import type { IRoom } from "../lib/common/interfaces/IRoom";
+import type { IProject } from "../services/sitevisor-types";
 import { loggedInUser } from "../stores";
 import { browser } from '$app/environment';
 
@@ -33,7 +34,7 @@ export const SitevisorService = {
 		}
 	  },
 
-	  async getSensors(): Promise<ISensor[]> {
+	async getSensors(): Promise<ISensor[]> {
 		try {
 			const response = await axios.get(this.baseUrl + "/api/sensors");
 			return response.data;
@@ -54,6 +55,15 @@ export const SitevisorService = {
 			console.error("Error creating a Sensor", error);
 		}
 	  },
+
+	async getProjects(): Promise<IProject[]> {
+		try {
+			const response = await axios.get(this.baseUrl + "/api/projects");
+			return response.data;
+		} catch (error) {
+			return [];
+		}
+	},
 
 	  async register(username: string, password: string): Promise<boolean> {
 		try {

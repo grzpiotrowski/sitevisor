@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { Viewer } from '$lib/viewer';
-    import Sidebar from '../lib/components/Sidebar.svelte';
+    import Sidebar from '../../lib/components/Sidebar.svelte';
 	import Header from '$lib/components/Header.svelte';
 
     let el: HTMLCanvasElement;

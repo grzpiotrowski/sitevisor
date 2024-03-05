@@ -4,6 +4,7 @@
     </div>
     <div class="flex-none">
       <ul class="menu menu-horizontal px-1">
+        <li><a href="/viewer">Digital Twin</a></li>
         <li><a href="/logout">Logout</a></li>
       </ul>
     </div>

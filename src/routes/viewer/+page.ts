@@ -1,4 +1,4 @@
-import { SitevisorService } from '../services/sitevisor-service';
+import { SitevisorService } from '../../services/sitevisor-service';
 
 export const ssr = false;
 

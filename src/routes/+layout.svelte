@@ -3,6 +3,6 @@
 	import "../app.css"
 </script>
 
-<main>
+<main data-theme="cupcake">
 	<slot />
 </main>

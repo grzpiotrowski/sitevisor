@@ -9,7 +9,7 @@
 	async function login() {
 		let success = await SitevisorService.login(username, password);
 		if (success) {
-			goto("/");
+			goto("/projects");
 		} else {
 			username = "";
 			password = "";

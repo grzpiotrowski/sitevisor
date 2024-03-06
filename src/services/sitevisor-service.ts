@@ -65,6 +65,16 @@ export const SitevisorService = {
 		}
 	},
 
+	async getProjectById(id: string): Promise<IProject> {
+		try {
+			const response = await axios.get(this.baseUrl + "/api/projects/" + id);
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			throw error;
+		}
+	},
+
 	  async register(username: string, password: string): Promise<boolean> {
 		try {
 			const userDetails = {

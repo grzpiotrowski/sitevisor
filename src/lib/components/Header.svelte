@@ -1,4 +1,4 @@
-<header class="navbar bg-base-100">
+<header class="navbar bg-base-00">
     <div class="flex-1">
       <a class="btn btn-ghost text-xl" href="/">SiteVisor</a>
     </div>

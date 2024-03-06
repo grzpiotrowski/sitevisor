@@ -21,8 +21,8 @@
           <div class="card-body">
             <h2 class="card-title">{project.name}</h2>
             <div class="card-actions justify-end">
-              <a class="btn btn-primary" href="/projects/{project.id}">Open</a>
-              <button class="btn btn-secondary">Manage</button>
+              <a class="btn btn-primary" href="/viewer">Open</a>
+              <a class="btn btn-secondary" href="/projects/{project.id}">Manage</a>
             </div>
           </div>
         </div>

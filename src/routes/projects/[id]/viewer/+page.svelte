@@ -1,8 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { Viewer } from '$lib/viewer';
-    import Sidebar from '../../lib/components/Sidebar.svelte';
+    import Sidebar from '$lib/components/Sidebar.svelte';
 	import Header from '$lib/components/Header.svelte';
+    import type { PageData } from "../$types";
+    import type { IProject } from "../../../../services/sitevisor-types";
+	export let data: PageData;
+
+    const project: IProject = data.project;
 
     let el: HTMLCanvasElement;
     let viewer: Viewer;
@@ -11,7 +16,7 @@
 
     onMount(() => {
         viewer = new Viewer();
-        viewer.init(el, viewerContainer);
+        viewer.init(el, viewerContainer, project.id.toString());
 
         // WebSocket connection
         socket = new WebSocket('ws://localhost:8078/socket/out?clientId=console_consumer&topic=my-topic');

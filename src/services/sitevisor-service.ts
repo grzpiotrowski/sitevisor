@@ -8,16 +8,17 @@ import { browser } from '$app/environment';
 export const SitevisorService = {
 	baseUrl: "http://localhost:4000",
 
-	async getRooms(): Promise<IRoom[]> {
+	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {
-			const response = await axios.get(this.baseUrl + "/api/rooms");
+			const response = await axios.get(this.baseUrl + `/api/rooms/?project_id=${projectId}`);
+			console.log(response.data)
 			return response.data;
 		} catch (error) {
 			return [];
 		}
 	},
 
-	async createRoom(room: IRoom) {
+	async createRoom(room: IRoom, projectId: string) {
 		try {
             const roomData = {
                 name: room.name,
@@ -26,7 +27,8 @@ export const SitevisorService = {
                 opacity: room.opacity,
                 point1: { x: room.point1.x, y: room.point1.y, z: room.point1.z },
                 point2: { x: room.point2.x, y: room.point2.y, z: room.point2.z },
-                height: 3.0
+                height: 3.0,
+				project: projectId
             };
             await axios.post(`${this.baseUrl}/api/rooms/`, roomData);
 		} catch (error) {
@@ -34,21 +36,22 @@ export const SitevisorService = {
 		}
 	  },
 
-	async getSensors(): Promise<ISensor[]> {
+	async getSensors(projectId: string): Promise<ISensor[]> {
 		try {
-			const response = await axios.get(this.baseUrl + "/api/sensors");
+			const response = await axios.get(this.baseUrl + `/api/sensors/?project_id=${projectId}`);
 			return response.data;
 		} catch (error) {
 			return [];
 		}
 	},
 
-	async createSensor(sensor: ISensor) {
+	async createSensor(sensor: ISensor, projectId: string) {
 		try {
             const sensorData = {
                 name: sensor.name,
                 level: sensor.level,
                 position: { x: sensor.position.x, y: sensor.position.y, z: sensor.position.z },
+				project: projectId
             };
             await axios.post(`${this.baseUrl}/api/sensors/`, sensorData);
 		} catch (error) {

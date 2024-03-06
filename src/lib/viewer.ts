@@ -20,6 +20,7 @@ import { ObjectFactory } from './utils/ObjectFactory';
 import { SitevisorService } from '../services/sitevisor-service';
 
 export class Viewer {
+  private projectId: string;
   private canvasElement: HTMLCanvasElement;
   private containerElement: HTMLElement;
   private scene: Scene;
@@ -29,7 +30,6 @@ export class Viewer {
   private raycaster: Raycaster;
   private pointer: Vector2;
   private referencePlane: ReferencePlane;
-  private mainRoom: Room;
   private pointerHelper: PointerHelper;
 
   private objectFactory: ObjectFactory;
@@ -48,14 +48,14 @@ export class Viewer {
   }
 
   async loadObjects() {
-    const rooms = await SitevisorService.getRooms();
+    const rooms = await SitevisorService.getRooms(this.projectId);
     rooms.forEach((room) => {
       const newRoom = new Room(room.color, room.opacity, room.name, room.level,
         new Vector3(room.point1.x, room.point1.y, room.point1.z),
         new Vector3(room.point2.x, room.point2.y, room.point2.z));
       this.scene.add(newRoom);
     });
-    const sensors = await SitevisorService.getSensors();
+    const sensors = await SitevisorService.getSensors(this.projectId);
     sensors.forEach((sensor) => {
       const newSensor = new Sensor(sensor.name,
         sensor.level,
@@ -64,7 +64,8 @@ export class Viewer {
     });
   }
 
-  init(canvasElement: HTMLCanvasElement, containerElement: HTMLElement) {
+  init(canvasElement: HTMLCanvasElement, containerElement: HTMLElement, projectId: string) {
+    this.projectId = projectId;
     this.canvasElement = canvasElement;
     this.containerElement = containerElement;
     this.renderer = new WebGLRenderer({ antialias: true, canvas: canvasElement });
@@ -162,7 +163,7 @@ private setPointerPosition(event: MouseEvent) {
           this.roomInsertionPoints.push(intersection.clone());
           if (this.roomInsertionPoints.length === 2) {
             const room = this.objectFactory.createRoomFromPoints(this.roomInsertionPoints);
-            SitevisorService.createRoom(room);
+            SitevisorService.createRoom(room, this.projectId);
             this.roomInsertionMode = false;
             this.pointerHelper.setCreateMode(this.roomInsertionMode);
             this.roomInsertionPoints = [];
@@ -170,7 +171,7 @@ private setPointerPosition(event: MouseEvent) {
         }
         if (this.sensorInsertionMode) {
           const sensor = this.objectFactory.createSensorAtPoint(intersection.clone());
-          SitevisorService.createSensor(sensor);
+          SitevisorService.createSensor(sensor, this.projectId);
           this.sensorInsertionMode = false;
           this.pointerHelper.setCreateMode(this.sensorInsertionMode);
         }

@@ -36,8 +36,8 @@
           <div class="card-body">
             <h2 class="card-title">{project.name}</h2>
             <div class="card-actions justify-end">
-              <a class="btn btn-primary" href="/viewer">Open</a>
-              <a class="btn btn-secondary" href="/projects/{project.id}">Manage</a>
+              <a class="btn btn-primary" href="/projects/{project.id}/viewer">Open</a>
+              <a class="btn btn-secondary" href="/projects/{project.id}/manage">Manage</a>
             </div>
           </div>
         </div>

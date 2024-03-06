@@ -1,7 +1,7 @@
 <script lang="ts">
     import Header from "$lib/components/Header.svelte";
-    import type { PageData } from "./$types";
-    import type { IProject } from "../../../services/sitevisor-types";
+    import type { PageData } from "../$types";
+    import type { IProject } from "../../../../services/sitevisor-types";
 	export let data: PageData;
 
     const project: IProject = data.project;

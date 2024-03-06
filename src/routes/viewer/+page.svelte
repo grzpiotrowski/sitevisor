@@ -54,7 +54,7 @@
     <div class="flex flex-1 overflow-hidden">
         <div class="drawer lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
-            <div class="drawer-content flex flex-col items-center justify-center" bind:this={viewerContainer}>
+            <div class="drawer-content flex flex-col items-center justify-center h-[calc(100vh-70px)]" bind:this={viewerContainer}>
                 <canvas bind:this={el} />
             </div> 
 

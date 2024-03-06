@@ -75,7 +75,15 @@ export const SitevisorService = {
 		}
 	},
 
-	  async register(username: string, password: string): Promise<boolean> {
+	async createProject(project: IProject) {
+		try {
+			await axios.post(`${this.baseUrl}/api/projects/`, project);
+		} catch (error) {
+			console.error("Error creating a Project", error);
+		}
+	},
+
+	async register(username: string, password: string): Promise<boolean> {
 		try {
 			const userDetails = {
 				username: username,
@@ -96,7 +104,7 @@ export const SitevisorService = {
 				loggedInUser.set({
 					username: username,
 					token: response.data.access,
-					_id: response.data.id
+					id: response.data.id
 				});
 				localStorage.sitevisor = JSON.stringify({ username: username, token: response.data.access, _id: response.data.id });
 				return true;
@@ -112,7 +120,7 @@ export const SitevisorService = {
 		loggedInUser.set({
 			username: "",
 			token: "",
-			_id: ""
+			id: ""
 		});
 		axios.defaults.headers.common["Authorization"] = "";
 		if (browser) {
@@ -128,7 +136,7 @@ export const SitevisorService = {
 				loggedInUser.set({
 					username: savedUser.username,
 					token: savedUser.token,
-					_id: savedUser._id
+					id: savedUser._id
 				});
 				axios.defaults.headers.common["Authorization"] = "Bearer " + savedUser.token;
 			}

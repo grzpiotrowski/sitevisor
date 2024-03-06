@@ -5,7 +5,6 @@
 	export let data: PageData;
 
     const project: IProject = data.project;
-    console.log(project);
 </script>
 
 <Header />

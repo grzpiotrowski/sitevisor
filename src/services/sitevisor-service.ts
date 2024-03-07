@@ -70,11 +70,20 @@ export const SitevisorService = {
 
 	async getProjectById(id: string): Promise<IProject> {
 		try {
-			const response = await axios.get(this.baseUrl + "/api/projects/" + id);
+			const response = await axios.get(this.baseUrl + `/api/projects/${id}`);
 			return response.data;
 		} catch (error) {
 			console.log(error);
 			throw error;
+		}
+	},
+
+	async deleteProject(id: string): Promise<void> {
+		try {
+			await axios.delete(`${this.baseUrl}/api/projects/${id}`);
+		} catch (error) {
+			console.error(`Error deleting Project with id ${id}`, error);
+			return;
 		}
 	},
 

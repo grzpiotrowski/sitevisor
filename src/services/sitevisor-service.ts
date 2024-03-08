@@ -116,9 +116,8 @@ export const SitevisorService = {
 				loggedInUser.set({
 					username: username,
 					token: response.data.access,
-					id: response.data.id
 				});
-				localStorage.sitevisor = JSON.stringify({ username: username, token: response.data.access, _id: response.data.id });
+				localStorage.sitevisor = JSON.stringify({ username: username, token: response.data.access });
 				return true;
 			}
 			return false;
@@ -131,8 +130,7 @@ export const SitevisorService = {
 	async logout() {
 		loggedInUser.set({
 			username: "",
-			token: "",
-			id: ""
+			token: ""
 		});
 		axios.defaults.headers.common["Authorization"] = "";
 		if (browser) {
@@ -147,8 +145,7 @@ export const SitevisorService = {
 				const savedUser = JSON.parse(sitevisorCredentials);
 				loggedInUser.set({
 					username: savedUser.username,
-					token: savedUser.token,
-					id: savedUser._id
+					token: savedUser.token
 				});
 				axios.defaults.headers.common["Authorization"] = "Bearer " + savedUser.token;
 			}

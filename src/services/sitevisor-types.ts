@@ -3,13 +3,11 @@ import type { ISensor } from "$lib/common/interfaces/ISensor";
 
 export interface IUser {
 	username: string;
-	id: string;
 }
 
 export interface LoggedInUser {
 	username: string;
 	token: string;
-	id: string;
 }
 
 export interface IProject {

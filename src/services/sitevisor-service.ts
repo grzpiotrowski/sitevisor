@@ -1,22 +1,24 @@
 import axios from "axios";
 import type { ISensor } from "../lib/common/interfaces/ISensor";
 import type { IRoom } from "../lib/common/interfaces/IRoom";
+import type { IProject } from "../services/sitevisor-types";
 import { loggedInUser } from "../stores";
 import { browser } from '$app/environment';
 
 export const SitevisorService = {
 	baseUrl: "http://localhost:4000",
 
-	async getRooms(): Promise<IRoom[]> {
+	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {
-			const response = await axios.get(this.baseUrl + "/api/rooms");
+			const response = await axios.get(this.baseUrl + `/api/rooms/?project_id=${projectId}`);
+			console.log(response.data)
 			return response.data;
 		} catch (error) {
 			return [];
 		}
 	},
 
-	async createRoom(room: IRoom) {
+	async createRoom(room: IRoom, projectId: string) {
 		try {
             const roomData = {
                 name: room.name,
@@ -25,7 +27,8 @@ export const SitevisorService = {
                 opacity: room.opacity,
                 point1: { x: room.point1.x, y: room.point1.y, z: room.point1.z },
                 point2: { x: room.point2.x, y: room.point2.y, z: room.point2.z },
-                height: 3.0
+                height: 3.0,
+				project: projectId
             };
             await axios.post(`${this.baseUrl}/api/rooms/`, roomData);
 		} catch (error) {
@@ -33,21 +36,22 @@ export const SitevisorService = {
 		}
 	  },
 
-	  async getSensors(): Promise<ISensor[]> {
+	async getSensors(projectId: string): Promise<ISensor[]> {
 		try {
-			const response = await axios.get(this.baseUrl + "/api/sensors");
+			const response = await axios.get(this.baseUrl + `/api/sensors/?project_id=${projectId}`);
 			return response.data;
 		} catch (error) {
 			return [];
 		}
 	},
 
-	async createSensor(sensor: ISensor) {
+	async createSensor(sensor: ISensor, projectId: string) {
 		try {
             const sensorData = {
                 name: sensor.name,
                 level: sensor.level,
                 position: { x: sensor.position.x, y: sensor.position.y, z: sensor.position.z },
+				project: projectId
             };
             await axios.post(`${this.baseUrl}/api/sensors/`, sensorData);
 		} catch (error) {
@@ -55,7 +59,43 @@ export const SitevisorService = {
 		}
 	  },
 
-	  async register(username: string, password: string): Promise<boolean> {
+	async getProjects(): Promise<IProject[]> {
+		try {
+			const response = await axios.get(this.baseUrl + "/api/projects");
+			return response.data;
+		} catch (error) {
+			return [];
+		}
+	},
+
+	async getProjectById(id: string): Promise<IProject> {
+		try {
+			const response = await axios.get(this.baseUrl + `/api/projects/${id}`);
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			throw error;
+		}
+	},
+
+	async deleteProject(id: string): Promise<void> {
+		try {
+			await axios.delete(`${this.baseUrl}/api/projects/${id}`);
+		} catch (error) {
+			console.error(`Error deleting Project with id ${id}`, error);
+			return;
+		}
+	},
+
+	async createProject(project: IProject) {
+		try {
+			await axios.post(`${this.baseUrl}/api/projects/`, project);
+		} catch (error) {
+			console.error("Error creating a Project", error);
+		}
+	},
+
+	async register(username: string, password: string): Promise<boolean> {
 		try {
 			const userDetails = {
 				username: username,
@@ -76,9 +116,8 @@ export const SitevisorService = {
 				loggedInUser.set({
 					username: username,
 					token: response.data.access,
-					_id: response.data.id
 				});
-				localStorage.sitevisor = JSON.stringify({ username: username, token: response.data.access, _id: response.data.id });
+				localStorage.sitevisor = JSON.stringify({ username: username, token: response.data.access });
 				return true;
 			}
 			return false;
@@ -91,8 +130,7 @@ export const SitevisorService = {
 	async logout() {
 		loggedInUser.set({
 			username: "",
-			token: "",
-			_id: ""
+			token: ""
 		});
 		axios.defaults.headers.common["Authorization"] = "";
 		if (browser) {
@@ -107,8 +145,7 @@ export const SitevisorService = {
 				const savedUser = JSON.parse(sitevisorCredentials);
 				loggedInUser.set({
 					username: savedUser.username,
-					token: savedUser.token,
-					_id: savedUser._id
+					token: savedUser.token
 				});
 				axios.defaults.headers.common["Authorization"] = "Bearer " + savedUser.token;
 			}

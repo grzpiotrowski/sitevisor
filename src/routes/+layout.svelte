@@ -3,6 +3,6 @@
 	import "../app.css"
 </script>
 
-<main>
+<main data-theme="cupcake" class="min-h-screen">
 	<slot />
 </main>

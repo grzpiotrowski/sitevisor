@@ -9,7 +9,7 @@
 	async function signup() {
 		let success = await SitevisorService.register(username, password);
 		if (success) {
-			goto("/");
+			goto("/login");
 		} else {
 			errorMessage = "Error trying to register";
 		}

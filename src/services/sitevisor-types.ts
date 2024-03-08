@@ -1,14 +1,19 @@
-export interface User {
-	firstName: string;
-	lastName: string;
-	email: string;
-	password: string;
-	_id: string;
+import type { IRoom } from "$lib/common/interfaces/IRoom";
+import type { ISensor } from "$lib/common/interfaces/ISensor";
+
+export interface IUser {
+	username: string;
 }
 
 export interface LoggedInUser {
 	username: string;
 	token: string;
-	_id: string;
 }
 
+export interface IProject {
+    id: number;
+    name: string;
+    owner: IUser;
+    rooms: IRoom[];
+    sensors: ISensor[];
+}

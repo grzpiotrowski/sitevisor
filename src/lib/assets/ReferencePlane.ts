@@ -11,7 +11,7 @@ export class ReferencePlane extends Plane {
     const geometry = new PlaneGeometry( size, size );
     geometry.rotateX( - Math.PI / 2 );
     super(geometry, new MeshBasicMaterial( { visible: false } ));
-    const gridHelper = new GridHelper(size, size, 0x888888, 0x444444);
+    const gridHelper = new GridHelper(size, size, 0x444444, 0x444444);
     this.add(gridHelper);
   }
 }

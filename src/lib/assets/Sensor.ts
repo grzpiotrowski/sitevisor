@@ -4,10 +4,12 @@ import {
     Vector3,
   } from 'three';
   import { Point3D } from './BaseTypes/Point3D';
+import { SensorLabel } from './SensorLabel';
   
 export class Sensor extends Point3D {
   material: MeshStandardMaterial;
   geometry: BoxGeometry;
+  label: SensorLabel;
 
   constructor(name: string, level: number, position: Vector3) {
     super(position);
@@ -24,5 +26,11 @@ export class Sensor extends Point3D {
       name: name,
       level: level
     };
+
+    this.label = new SensorLabel(this.position, this);
+  }
+
+  public update() {
+    this.label.update();
   }
 }

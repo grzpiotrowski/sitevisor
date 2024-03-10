@@ -10,6 +10,7 @@ import {
   Vector2,
   Vector3,
 } from 'three';
+import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { Room } from './assets/Room';
 import { Sensor } from './assets/Sensor';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -26,6 +27,7 @@ export class Viewer {
   private scene: Scene;
   private camera: PerspectiveCamera;
   private renderer: WebGLRenderer;
+  private labelRenderer: CSS2DRenderer;
   private controls: OrbitControls;
   private raycaster: Raycaster;
   private pointer: Vector2;
@@ -36,6 +38,9 @@ export class Viewer {
   private roomInsertionMode: boolean = false;
   private sensorInsertionMode: boolean = false;
   private roomInsertionPoints: Vector3[] = [];
+
+  private sensors: Sensor[] = [];
+  private rooms: Room[] = [];
 
   constructor() {
     this.scene = new Scene();
@@ -54,6 +59,7 @@ export class Viewer {
         new Vector3(room.point1.x, room.point1.y, room.point1.z),
         new Vector3(room.point2.x, room.point2.y, room.point2.z));
       this.scene.add(newRoom);
+      this.rooms.push(newRoom);
     });
     const sensors = await SitevisorService.getSensors(this.projectId);
     sensors.forEach((sensor) => {
@@ -61,6 +67,8 @@ export class Viewer {
         sensor.level,
         new Vector3(sensor.position.x, sensor.position.y, sensor.position.z));
       this.scene.add(newSensor);
+      this.scene.add(newSensor.label)
+      this.sensors.push(newSensor);
     });
   }
 
@@ -69,15 +77,20 @@ export class Viewer {
     this.canvasElement = canvasElement;
     this.containerElement = containerElement;
     this.renderer = new WebGLRenderer({ antialias: true, canvas: canvasElement });
-    this.controls = new OrbitControls(this.camera, this.canvasElement);
+    this.labelRenderer = new CSS2DRenderer();
+    this.labelRenderer.setSize(this.containerElement.clientWidth, this.containerElement.clientHeight);
+    this.labelRenderer.domElement.style.position = 'absolute';
+    this.labelRenderer.domElement.style.top = '0px';
+    this.containerElement.appendChild(this.labelRenderer.domElement);
+    this.controls = new OrbitControls(this.camera, this.labelRenderer.domElement);
 
     this.initializeLights();
     this.initializeObjects();
     this.scene.background = new Color( 0x72898a );
 
     window.addEventListener('resize', this.resize.bind(this));
-    canvasElement.addEventListener('mousemove', this.setPointerPosition.bind(this));
-    canvasElement.addEventListener('click', this.onCanvasClick.bind(this));
+    this.labelRenderer.domElement.addEventListener('mousemove', this.setPointerPosition.bind(this));
+    this.labelRenderer.domElement.addEventListener('click', this.onCanvasClick.bind(this));
     window.addEventListener('keypress', this.onKeyPress.bind(this));
 
     this.resize();
@@ -117,7 +130,7 @@ export class Viewer {
     }
   }
 
-  public toggleSensorInsertionMode() {
+  public toggleSensorInsertionMode(): boolean {
     this.sensorInsertionMode = !this.sensorInsertionMode;
     if (this.sensorInsertionMode) {
       this.pointerHelper.setCreateMode(this.sensorInsertionMode);
@@ -126,6 +139,7 @@ export class Viewer {
       this.pointerHelper.setCreateMode(this.sensorInsertionMode);
       console.log("Sensor insertion mode deactivated");
     }
+    return this.sensorInsertionMode;
   }
 
   private checkPointerIntersection() {
@@ -189,7 +203,14 @@ private setPointerPosition(event: MouseEvent) {
     requestAnimationFrame(this.animate);
     this.controls.update();
     this.checkPointerIntersection();
-    this.render()
+
+    const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
+    if (intersection) {
+      this.pointerHelper.position.copy( intersection );
+    }
+    
+    this.render();
+    this.labelRenderer.render( this.scene, this.camera );
   };
 
   private render = () => {
@@ -200,6 +221,7 @@ private setPointerPosition(event: MouseEvent) {
     const width = this.containerElement.clientWidth;
     const height = this.containerElement.clientHeight;
     this.renderer.setSize(width, height);
+    this.labelRenderer.setSize(width, height);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
   };

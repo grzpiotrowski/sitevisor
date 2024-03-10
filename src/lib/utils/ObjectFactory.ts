@@ -44,6 +44,7 @@ export class ObjectFactory {
   createSensor(options: ISensor): Sensor {
     const sensor = new Sensor(options.name, options.level, options.position);
     this.scene.add(sensor);
+    this.scene.add(sensor.label);
     return sensor;
   }
 

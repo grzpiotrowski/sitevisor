@@ -142,6 +142,18 @@ export class Viewer {
     return this.sensorInsertionMode;
   }
 
+  public setSensorInsertionMode(mode: boolean): boolean {
+    this.sensorInsertionMode = mode;
+    if (this.sensorInsertionMode) {
+      this.pointerHelper.setCreateMode(this.sensorInsertionMode);
+      console.log("Sensor insertion mode activated");
+    } else {
+      this.pointerHelper.setCreateMode(this.sensorInsertionMode);
+      console.log("Sensor insertion mode deactivated");
+    }
+    return this.sensorInsertionMode;
+  }
+
   private checkPointerIntersection() {
     this.raycaster.setFromCamera( this.pointer, this.camera );
     const intersects = this.raycaster.intersectObjects( this.scene.children, false );
@@ -170,7 +182,7 @@ private setPointerPosition(event: MouseEvent) {
     if (event.button === 0) { // Left mouse button clicked
       const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
       if (intersection) {
-        console.log(`Intersection at: ${intersection.x}, ${intersection.y}, ${intersection.z}`);
+        // console.log(`Intersection at: ${intersection.x}, ${intersection.y}, ${intersection.z}`);
         this.pointerHelper.position.copy( intersection );
 
         if (this.roomInsertionMode) {

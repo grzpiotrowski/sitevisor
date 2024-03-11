@@ -3,6 +3,7 @@
     import { Viewer } from '$lib/viewer';
     import Sidebar from '$lib/components/Sidebar.svelte';
 	import Header from '$lib/components/Header.svelte';
+    import AddSensorDialog from '$lib/components/AddSensorDialog.svelte';
     import type { PageData } from "../$types";
     import type { IProject } from "../../../../services/sitevisor-types";
 	export let data: PageData;
@@ -13,6 +14,8 @@
     let viewer: Viewer;
     let viewerContainer: HTMLElement;
     let socket: WebSocket;
+    let addSensorDialogVisible: boolean = false
+    let sensorCreationMode: boolean;
 
     onMount(() => {
         viewer = new Viewer();
@@ -45,7 +48,11 @@
     }
 
     function toggleSensorInsertion() {
-        viewer.toggleSensorInsertionMode();
+        const sensorInsertionMode: boolean = viewer.toggleSensorInsertionMode();
+        if (sensorInsertionMode) {
+            addSensorDialogVisible = true;
+        }
+        console.log("Add Sensor button pressed.")
     }
 </script>
 
@@ -70,3 +77,13 @@
         </div>
     </div>
 </div>
+
+<!--
+Best will be to bind the insertion mode change to the form buttons.
+If the button Add is pressed - follow through with adding the object.
+If Close button is clicked - turn insertion mode to false.
+-->
+<AddSensorDialog
+    bind:isDialogOpen={addSensorDialogVisible}
+    bind:viewer={viewer}
+    />

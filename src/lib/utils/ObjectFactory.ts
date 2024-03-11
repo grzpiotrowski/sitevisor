@@ -41,21 +41,21 @@ export class ObjectFactory {
     return options;
   }
 
-  createSensor(options: ISensor): Sensor {
-    const sensor = new Sensor(options.name, options.level, options.position);
-    this.scene.add(sensor);
-    this.scene.add(sensor.label);
-    return sensor;
+  createSensor(options: ISensor): Sensor | undefined{
+    if (options.position != null) {
+      const sensor = new Sensor(options.name, options.level, options.position);
+      this.scene.add(sensor);
+      this.scene.add(sensor.label);
+      return sensor;
+    }
+    return undefined;
+    
   }
 
-  createSensorAtPoint(sensorPosition: Vector3): ISensor {
-    const options: ISensor = {
-      name: "New Sensor",
-      level: 0,
-      position: sensorPosition,
-    };
-    this.createSensor(options);
-    return options;
+  createSensorAtPoint(sensorPosition: Vector3, sensorData: ISensor): ISensor {
+    sensorData.position = sensorPosition;
+    this.createSensor(sensorData);
+    return sensorData;
   }
 
   private getRandomHexColor(): number {

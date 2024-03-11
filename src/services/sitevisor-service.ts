@@ -50,7 +50,7 @@ export const SitevisorService = {
             const sensorData = {
                 name: sensor.name,
                 level: sensor.level,
-                position: { x: sensor.position.x, y: sensor.position.y, z: sensor.position.z },
+                position: { x: sensor.position?.x, y: sensor.position?.y, z: sensor.position?.z },
 				project: projectId
             };
             await axios.post(`${this.baseUrl}/api/sensors/`, sensorData);

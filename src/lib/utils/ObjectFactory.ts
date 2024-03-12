@@ -1,7 +1,7 @@
 import { Scene, Vector3 } from 'three';
 import { Room } from '../assets/Room';
 import { Sensor } from '$lib/assets/Sensor';
-import { newSensor } from '../../stores';
+import { newSensor, newRoom } from '../../stores';
 import { get } from "svelte/store";
 import type { IRoom } from '../common/interfaces/IRoom';
 import type { ISensor } from '$lib/common/interfaces/ISensor';
@@ -16,10 +16,13 @@ export class ObjectFactory {
     this.scene = scene;
   }
 
-  createRoom(options: IRoom): Room {
-    const room = new Room(options.color, options.opacity, options.name, options.level, options.point1, options.point2);
-    this.scene.add(room);
-    return room;
+  createRoom(options: IRoom): Room | undefined {
+    if (options.point1 != null && options.point2 != null) {
+      const room = new Room(options.color, options.opacity, options.name, options.level, options.point1, options.point2);
+      this.scene.add(room);
+      return room;
+    }
+    return undefined;
   }
 
   /**
@@ -29,21 +32,16 @@ export class ObjectFactory {
     if (roomInsertionPoints.length !== 2) {
       throw new Error("createRoomFromPoints requires exactly two points");
     }
+    const roomData: IRoom = get(newRoom);
+    roomData.point1 = roomInsertionPoints[0];
+    roomData.point2 = roomInsertionPoints[1];
+    roomData.color = this.getRandomHexColor(),
 
-    const options: IRoom = {
-      color: this.getRandomHexColor(),
-      opacity: 0.5,
-      name: "New Room",
-      level: 0,
-      point1: roomInsertionPoints[0],
-      point2: roomInsertionPoints[1]
-    };
-
-    this.createRoom(options);
-    return options;
+    this.createRoom(roomData);
+    return roomData;
   }
 
-  createSensor(options: ISensor): Sensor | undefined{
+  createSensor(options: ISensor): Sensor | undefined {
     if (options.position != null) {
       const sensor = new Sensor(options.name, options.level, options.position);
       this.scene.add(sensor);

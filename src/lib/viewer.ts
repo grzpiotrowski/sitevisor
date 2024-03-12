@@ -55,11 +55,13 @@ export class Viewer {
   async loadObjects() {
     const rooms = await SitevisorService.getRooms(this.projectId);
     rooms.forEach((room) => {
-      const newRoom = new Room(room.color, room.opacity, room.name, room.level,
-        new Vector3(room.point1.x, room.point1.y, room.point1.z),
-        new Vector3(room.point2.x, room.point2.y, room.point2.z));
-      this.scene.add(newRoom);
-      this.rooms.push(newRoom);
+      if (room.point1 != null && room.point2 != null) {
+        const newRoom = new Room(room.color, room.opacity, room.name, room.level,
+          new Vector3(room.point1.x, room.point1.y, room.point1.z),
+          new Vector3(room.point2.x, room.point2.y, room.point2.z));
+        this.scene.add(newRoom);
+        this.rooms.push(newRoom);
+      }
     });
     const sensors = await SitevisorService.getSensors(this.projectId);
     sensors.forEach((sensor) => {
@@ -118,7 +120,7 @@ export class Viewer {
     this.loadObjects();
   }
 
-  public toggleRoomInsertionMode() {
+  public toggleRoomInsertionMode(): boolean {
     this.roomInsertionMode = !this.roomInsertionMode;
     if (this.roomInsertionMode) {
       this.pointerHelper.setCreateMode(this.roomInsertionMode);
@@ -128,6 +130,20 @@ export class Viewer {
       this.pointerHelper.setCreateMode(this.roomInsertionMode);
       console.log("Room insertion mode deactivated");
     }
+    return this.roomInsertionMode;
+  }
+
+  public setRoomInsertionMode(mode: boolean): boolean {
+    this.roomInsertionMode = mode;
+    if (this.roomInsertionMode) {
+      this.pointerHelper.setCreateMode(this.roomInsertionMode);
+      this.roomInsertionPoints = [];
+      console.log("Room insertion mode activated");
+    } else {
+      this.pointerHelper.setCreateMode(this.roomInsertionMode);
+      console.log("Room insertion mode deactivated");
+    }
+    return this.roomInsertionMode;
   }
 
   public toggleSensorInsertionMode(): boolean {

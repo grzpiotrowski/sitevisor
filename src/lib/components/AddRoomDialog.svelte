@@ -1,11 +1,20 @@
 <script lang="ts">
     import { Viewer } from '$lib/viewer';
     import { newRoom } from '../../stores';
+    import { getRandomHexColor } from '$lib/utils/helpers';
+    import ColorPicker from 'svelte-awesome-color-picker';
 	export let isDialogOpen: boolean;
     export let viewer: Viewer;
 
+
+    let hex = "#eab507";
+    $: if (isDialogOpen) {
+        hex = "#" + getRandomHexColor().toString(16);
+    }
+
     let roomDetails = {
-        name: ''
+        name: '',
+        color: 0,
     };
 
     function handleAddRoomSubmit() {
@@ -13,12 +22,14 @@
         newRoom.update(() => (
             { name: roomDetails.name,
                 level: 0,
-                color: 0,
+                color: parseInt(hex.replace("#", ""), 16),
                 opacity: 0.5,
                 point1: null,
                 point2: null
             }
             ));
+        console.log(hex);
+        console.log(roomDetails.color);
         isDialogOpen = false;
         viewer.setRoomInsertionMode(true);
         console.log("Form submitted");
@@ -32,8 +43,11 @@
 </script>
 
 <div class="modal" class:modal-open={isDialogOpen}>
-  <div class="modal-box">
-    <h3 class="font-bold text-lg">Add Room</h3>
+  <div class="modal-box min-h-96">
+    <h3 class="font-bold text-lg">
+        <ColorPicker bind:hex isAlpha={false} label=""/>
+        Add Room
+    </h3>
     <form on:submit|preventDefault={handleAddRoomSubmit}>
         <div class="form-control">
             <label class="label" for="roomName">Room Name</label>

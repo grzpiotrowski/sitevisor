@@ -35,7 +35,6 @@ export class ObjectFactory {
     const roomData: IRoom = get(newRoom);
     roomData.point1 = roomInsertionPoints[0];
     roomData.point2 = roomInsertionPoints[1];
-    roomData.color = this.getRandomHexColor(),
 
     this.createRoom(roomData);
     return roomData;
@@ -57,10 +56,6 @@ export class ObjectFactory {
     sensorData.position = sensorPosition;
     this.createSensor(sensorData);
     return sensorData;
-  }
-
-  private getRandomHexColor(): number {
-    return Math.floor(Math.random() * 16777215);
   }
   
 }

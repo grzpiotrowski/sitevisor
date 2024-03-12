@@ -1,6 +1,8 @@
 import { Scene, Vector3 } from 'three';
 import { Room } from '../assets/Room';
 import { Sensor } from '$lib/assets/Sensor';
+import { newSensor } from '../../stores';
+import { get } from "svelte/store";
 import type { IRoom } from '../common/interfaces/IRoom';
 import type { ISensor } from '$lib/common/interfaces/ISensor';
 
@@ -52,7 +54,8 @@ export class ObjectFactory {
     
   }
 
-  createSensorAtPoint(sensorPosition: Vector3, sensorData: ISensor): ISensor {
+  createSensorAtPoint(sensorPosition: Vector3): ISensor {
+    const sensorData: ISensor = get(newSensor);
     sensorData.position = sensorPosition;
     this.createSensor(sensorData);
     return sensorData;

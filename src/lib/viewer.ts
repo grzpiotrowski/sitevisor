@@ -17,8 +17,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ReferencePlane } from './assets/ReferencePlane';
 import { PointerHelper } from './assets/PointerHelper';
 import { ObjectFactory } from './utils/ObjectFactory';
-import { newSensor } from '../stores';
-import { get } from "svelte/store";
 
 import { SitevisorService } from '../services/sitevisor-service';
 
@@ -198,8 +196,7 @@ private setPointerPosition(event: MouseEvent) {
           }
         }
         if (this.sensorInsertionMode) {
-          const sensorData = get(newSensor);
-          const sensor = this.objectFactory.createSensorAtPoint(intersection.clone(), sensorData);
+          const sensor = this.objectFactory.createSensorAtPoint(intersection.clone());
           SitevisorService.createSensor(sensor, this.projectId);
           this.sensorInsertionMode = false;
           this.pointerHelper.setCreateMode(this.sensorInsertionMode);

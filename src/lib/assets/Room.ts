@@ -6,6 +6,12 @@ import {
 import { Volume } from './BaseTypes/Volume';
 
 export class Room extends Volume {
+  private sizeX: number;
+  private sizeZ: number;
+  private height: number;
+  private geometryMode: string;
+  private flatHeight: number;
+
   constructor(color: number, opacity: number, name: string, level: number, point1: Vector3, point2: Vector3) {
 
     const sizeX = Math.abs(point2.x - point1.x);
@@ -23,10 +29,40 @@ export class Room extends Volume {
 
     super(geometry, material, position);
 
+    this.sizeX = sizeX;
+    this.sizeZ = sizeZ;
+    this.height = height;
+    this.geometryMode = "3D";
+    this.flatHeight = 0.01;
+    
     // Custom object properties
     this.userData = {
       name: name,
       level: level
     };
+  }
+  
+  public toggleGeometryMode() {
+    if (this.geometryMode === "3D") {
+      this.geometry = new BoxGeometry(this.sizeX, this.flatHeight, this.sizeZ);
+      this.position.setY(this.position.y - this.height/2 + this.flatHeight/2);
+      this.geometryMode = "2D";
+    } else {
+      this.geometry = new BoxGeometry(this.sizeX, this.height, this.sizeZ);
+      this.position.setY(this.position.y + this.height/2 - this.flatHeight/2);
+      this.geometryMode = "3D";
+    }
+  }
+
+  public setGeometryMode(geometryMode: string) {
+    if (geometryMode === "2D" && this.geometryMode != "2D") {
+      this.geometry = new BoxGeometry(this.sizeX, this.flatHeight, this.sizeZ);
+      this.position.setY(this.position.y - this.height/2 + this.flatHeight/2);
+      this.geometryMode = "2D";
+    } else if (geometryMode === "3D" && this.geometryMode != "3D") {
+      this.geometry = new BoxGeometry(this.sizeX, this.height, this.sizeZ);
+      this.position.setY(this.position.y + this.height/2 - this.flatHeight/2);
+      this.geometryMode = "3D";
+    }
   }
 }

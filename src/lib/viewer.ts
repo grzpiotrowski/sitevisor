@@ -39,8 +39,8 @@ export class Viewer {
   private sensorInsertionMode: boolean = false;
   private roomInsertionPoints: Vector3[] = [];
 
-  private sensors: Sensor[] = [];
-  private rooms: Room[] = [];
+  public sensors: Sensor[] = [];
+  public rooms: Room[] = [];
 
   constructor() {
     this.scene = new Scene();
@@ -49,7 +49,7 @@ export class Viewer {
     this.raycaster = new Raycaster();
     this.pointer = new Vector2();
 
-    this.objectFactory = new ObjectFactory(this.scene);
+    this.objectFactory = new ObjectFactory(this, this.scene);
   }
 
   async loadObjects() {
@@ -125,10 +125,10 @@ export class Viewer {
     if (this.roomInsertionMode) {
       this.pointerHelper.setCreateMode(this.roomInsertionMode);
       this.roomInsertionPoints = [];
-      console.log("Room insertion mode activated");
+      this.toggleRoomsGeometryMode();
     } else {
       this.pointerHelper.setCreateMode(this.roomInsertionMode);
-      console.log("Room insertion mode deactivated");
+      this.toggleRoomsGeometryMode();
     }
     return this.roomInsertionMode;
   }
@@ -138,10 +138,10 @@ export class Viewer {
     if (this.roomInsertionMode) {
       this.pointerHelper.setCreateMode(this.roomInsertionMode);
       this.roomInsertionPoints = [];
-      console.log("Room insertion mode activated");
+      this.setRoomsGeometryMode("2D");
     } else {
       this.pointerHelper.setCreateMode(this.roomInsertionMode);
-      console.log("Room insertion mode deactivated");
+      this.setRoomsGeometryMode("3D");
     }
     return this.roomInsertionMode;
   }
@@ -150,10 +150,8 @@ export class Viewer {
     this.sensorInsertionMode = !this.sensorInsertionMode;
     if (this.sensorInsertionMode) {
       this.pointerHelper.setCreateMode(this.sensorInsertionMode);
-      console.log("Sensor insertion mode activated");
     } else {
       this.pointerHelper.setCreateMode(this.sensorInsertionMode);
-      console.log("Sensor insertion mode deactivated");
     }
     return this.sensorInsertionMode;
   }
@@ -162,10 +160,8 @@ export class Viewer {
     this.sensorInsertionMode = mode;
     if (this.sensorInsertionMode) {
       this.pointerHelper.setCreateMode(this.sensorInsertionMode);
-      console.log("Sensor insertion mode activated");
     } else {
       this.pointerHelper.setCreateMode(this.sensorInsertionMode);
-      console.log("Sensor insertion mode deactivated");
     }
     return this.sensorInsertionMode;
   }
@@ -206,25 +202,37 @@ private setPointerPosition(event: MouseEvent) {
           if (this.roomInsertionPoints.length === 2) {
             const room = this.objectFactory.createRoomFromPoints(this.roomInsertionPoints);
             SitevisorService.createRoom(room, this.projectId);
-            this.roomInsertionMode = false;
-            this.pointerHelper.setCreateMode(this.roomInsertionMode);
+            this.setRoomInsertionMode(false);
             this.roomInsertionPoints = [];
           }
         }
         if (this.sensorInsertionMode) {
           const sensor = this.objectFactory.createSensorAtPoint(intersection.clone());
           SitevisorService.createSensor(sensor, this.projectId);
-          this.sensorInsertionMode = false;
-          this.pointerHelper.setCreateMode(this.sensorInsertionMode);
+          this.setSensorInsertionMode(false);
         }
       }
     }
   }
 
+  public toggleRoomsGeometryMode() {
+    this.rooms.forEach((room) => {
+      room.toggleGeometryMode();
+    });
+  }
+
+  public setRoomsGeometryMode(geometryMode: string) {
+    this.rooms.forEach((room) => {
+      room.setGeometryMode(geometryMode);
+    });
+  }
+
   private onKeyPress(event: KeyboardEvent) {
-    if (event.key === 'n' || event.key === 'N') {
-      this.toggleRoomInsertionMode();
-    }
+      if (event.key === 'n' || event.key === 'N') {
+        console.log("N key pressed");
+        // Key presses are active when a modal window is opened.
+        // This may cause potential bugs when user is typing into an input field.
+      }
   }
 
   private animate = () => {

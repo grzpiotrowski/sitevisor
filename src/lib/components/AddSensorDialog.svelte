@@ -18,13 +18,11 @@
             ));
         isDialogOpen = false;
         viewer.setSensorInsertionMode(true);
-        console.log("Form submitted");
     }
 
     function handleAddSensorCancelled() {
         isDialogOpen = false;
         viewer.setSensorInsertionMode(false);
-        console.log("Form cancelled");
     }
 </script>
 

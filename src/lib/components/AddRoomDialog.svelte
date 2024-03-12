@@ -28,17 +28,13 @@
                 point2: null
             }
             ));
-        console.log(hex);
-        console.log(roomDetails.color);
         isDialogOpen = false;
         viewer.setRoomInsertionMode(true);
-        console.log("Form submitted");
     }
 
     function handleAddRoomCancelled() {
         isDialogOpen = false;
         viewer.setRoomInsertionMode(false);
-        console.log("Form cancelled");
     }
 </script>
 

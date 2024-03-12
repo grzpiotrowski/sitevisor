@@ -6,5 +6,5 @@ import { Vector3 } from "three";
 export interface ISensor {
   name: string;
   level: number;
-  position: Vector3;
+  position: Vector3 | null;
 }

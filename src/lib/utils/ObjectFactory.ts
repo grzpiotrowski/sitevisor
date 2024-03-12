@@ -1,23 +1,32 @@
 import { Scene, Vector3 } from 'three';
 import { Room } from '../assets/Room';
 import { Sensor } from '$lib/assets/Sensor';
+import { newSensor, newRoom } from '../../stores';
+import { get } from "svelte/store";
 import type { IRoom } from '../common/interfaces/IRoom';
 import type { ISensor } from '$lib/common/interfaces/ISensor';
+import type { Viewer } from '$lib/viewer';
 
 /**
  * ObjectFactory is a class responsible for creating various objects in the scene.
  */
 export class ObjectFactory {
+  private viewer: Viewer;
   private scene: Scene;
 
-  constructor(scene: Scene) {
+  constructor(viewer: Viewer, scene: Scene) {
+    this.viewer = viewer;
     this.scene = scene;
   }
 
-  createRoom(options: IRoom): Room {
-    const room = new Room(options.color, options.opacity, options.name, options.level, options.point1, options.point2);
-    this.scene.add(room);
-    return room;
+  createRoom(options: IRoom): Room | undefined {
+    if (options.point1 != null && options.point2 != null) {
+      const room = new Room(options.color, options.opacity, options.name, options.level, options.point1, options.point2);
+      this.scene.add(room);
+      this.viewer.rooms.push(room);
+      return room;
+    }
+    return undefined;
   }
 
   /**
@@ -27,38 +36,31 @@ export class ObjectFactory {
     if (roomInsertionPoints.length !== 2) {
       throw new Error("createRoomFromPoints requires exactly two points");
     }
+    const roomData: IRoom = get(newRoom);
+    roomData.point1 = roomInsertionPoints[0];
+    roomData.point2 = roomInsertionPoints[1];
 
-    const options: IRoom = {
-      color: this.getRandomHexColor(),
-      opacity: 0.5,
-      name: "New Room",
-      level: 0,
-      point1: roomInsertionPoints[0],
-      point2: roomInsertionPoints[1]
-    };
-
-    this.createRoom(options);
-    return options;
+    this.createRoom(roomData);
+    return roomData;
   }
 
-  createSensor(options: ISensor): Sensor {
-    const sensor = new Sensor(options.name, options.level, options.position);
-    this.scene.add(sensor);
-    return sensor;
+  createSensor(options: ISensor): Sensor | undefined {
+    if (options.position != null) {
+      const sensor = new Sensor(options.name, options.level, options.position);
+      this.scene.add(sensor);
+      this.scene.add(sensor.label);
+      this.viewer.sensors.push(sensor);
+      return sensor;
+    }
+    return undefined;
+    
   }
 
   createSensorAtPoint(sensorPosition: Vector3): ISensor {
-    const options: ISensor = {
-      name: "New Sensor",
-      level: 0,
-      position: sensorPosition,
-    };
-    this.createSensor(options);
-    return options;
-  }
-
-  private getRandomHexColor(): number {
-    return Math.floor(Math.random() * 16777215);
+    const sensorData: ISensor = get(newSensor);
+    sensorData.position = sensorPosition;
+    this.createSensor(sensorData);
+    return sensorData;
   }
   
 }

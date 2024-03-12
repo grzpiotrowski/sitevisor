@@ -33,6 +33,7 @@ You can preview the production build with `npm run preview`.
 - [TypeScript types for three.js](https://github.com/three-types/three-ts-types)
 - [Typescript Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html)
 - [Refactoring Guru - Design Patterns - Factory Method](https://refactoring.guru/design-patterns/factory-method)
+- [Svelte-awesome-color-picker](https://svelte-awesome-color-picker.vercel.app/)
 
 ## Documentation
 - [MkDocs - static site generator for project documentation](https://www.mkdocs.org/)

@@ -8,6 +8,6 @@ export interface IRoom {
   level: number;
   color: number;
   opacity: number;
-  point1: Vector3;
-  point2: Vector3;
+  point1: Vector3 | null;
+  point2: Vector3 | null;
 }

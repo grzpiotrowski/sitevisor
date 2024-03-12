@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Header from "$lib/components/Header.svelte";
     import { SitevisorService } from "../../services/sitevisor-service";
-	import type { IProject } from "../../services/sitevisor-types";
-	import { loggedInUser } from "../../stores";
+    import type { IProject } from "../../services/sitevisor-types";
+    import { loggedInUser } from "../../stores";
     import type { PageData } from "./$types";
     export let data: PageData;
     import { get } from "svelte/store";

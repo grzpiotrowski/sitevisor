@@ -25,8 +25,8 @@ export const SitevisorService = {
                 level: room.level,
 				color: room.color,
                 opacity: room.opacity,
-                point1: { x: room.point1.x, y: room.point1.y, z: room.point1.z },
-                point2: { x: room.point2.x, y: room.point2.y, z: room.point2.z },
+                point1: { x: room.point1?.x, y: room.point1?.y, z: room.point1?.z },
+                point2: { x: room.point2?.x, y: room.point2?.y, z: room.point2?.z },
                 height: 3.0,
 				project: projectId
             };
@@ -50,7 +50,7 @@ export const SitevisorService = {
             const sensorData = {
                 name: sensor.name,
                 level: sensor.level,
-                position: { x: sensor.position.x, y: sensor.position.y, z: sensor.position.z },
+                position: { x: sensor.position?.x, y: sensor.position?.y, z: sensor.position?.z },
 				project: projectId
             };
             await axios.post(`${this.baseUrl}/api/sensors/`, sensorData);

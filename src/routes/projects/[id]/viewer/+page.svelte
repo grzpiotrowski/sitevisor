@@ -3,6 +3,8 @@
     import { Viewer } from '$lib/viewer';
     import Sidebar from '$lib/components/Sidebar.svelte';
 	import Header from '$lib/components/Header.svelte';
+    import AddSensorDialog from '$lib/components/AddSensorDialog.svelte';
+    import AddRoomDialog from '$lib/components/AddRoomDialog.svelte';
     import type { PageData } from "../$types";
     import type { IProject } from "../../../../services/sitevisor-types";
 	export let data: PageData;
@@ -13,6 +15,9 @@
     let viewer: Viewer;
     let viewerContainer: HTMLElement;
     let socket: WebSocket;
+    let addSensorDialogVisible: boolean = false
+    let addRoomDialogVisible: boolean = false
+    let sensorCreationMode: boolean;
 
     onMount(() => {
         viewer = new Viewer();
@@ -41,11 +46,19 @@
     });
 
     function toggleRoomInsertion() {
-        viewer.toggleRoomInsertionMode();
+        const roomInsertionMode: boolean = viewer.toggleRoomInsertionMode();
+        if (roomInsertionMode) {
+            addRoomDialogVisible = true;
+        }
+        console.log("Add Room button pressed.")
     }
 
     function toggleSensorInsertion() {
-        viewer.toggleSensorInsertionMode();
+        const sensorInsertionMode: boolean = viewer.toggleSensorInsertionMode();
+        if (sensorInsertionMode) {
+            addSensorDialogVisible = true;
+        }
+        console.log("Add Sensor button pressed.")
     }
 </script>
 
@@ -70,3 +83,13 @@
         </div>
     </div>
 </div>
+
+<AddSensorDialog
+    bind:isDialogOpen={addSensorDialogVisible}
+    bind:viewer={viewer}
+    />
+
+<AddRoomDialog 
+    bind:isDialogOpen={addRoomDialogVisible}
+    bind:viewer={viewer}
+/>

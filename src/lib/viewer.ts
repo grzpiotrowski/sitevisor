@@ -19,6 +19,7 @@ import { PointerHelper } from './assets/PointerHelper';
 import { ObjectFactory } from './utils/ObjectFactory';
 
 import { SitevisorService } from '../services/sitevisor-service';
+import { RoomPreview } from './assets/RoomPreview';
 
 export class Viewer {
   private projectId: string;
@@ -41,6 +42,8 @@ export class Viewer {
 
   public sensors: Sensor[] = [];
   public rooms: Room[] = [];
+
+  private tempRoomPreview: RoomPreview | null = null;
 
   constructor() {
     this.scene = new Scene();
@@ -199,10 +202,16 @@ private setPointerPosition(event: MouseEvent) {
 
         if (this.roomInsertionMode) {
           this.roomInsertionPoints.push(intersection.clone());
+          // Create a Room Preview
+          if (this.roomInsertionPoints.length == 1) {
+            this.createTempRoomPreview(intersection);
+          }
+          // Second point should be at (intersection)
           if (this.roomInsertionPoints.length === 2) {
             const room = this.objectFactory.createRoomFromPoints(this.roomInsertionPoints);
             SitevisorService.createRoom(room, this.projectId);
             this.setRoomInsertionMode(false);
+            this.removeTempRoomPreview();
             this.roomInsertionPoints = [];
           }
         }
@@ -212,6 +221,25 @@ private setPointerPosition(event: MouseEvent) {
           this.setSensorInsertionMode(false);
         }
       }
+    }
+  }
+
+  private updateTempRoomPreview() {
+    if (this.tempRoomPreview) {
+        this.tempRoomPreview.update(this.pointerHelper.position)
+    }
+  }
+
+  private createTempRoomPreview(startPoint: Vector3) {
+    this.tempRoomPreview = new RoomPreview(startPoint);
+    this.scene.add(this.tempRoomPreview);
+  }
+
+  private removeTempRoomPreview() {
+    if (this.tempRoomPreview) {
+        this.tempRoomPreview.geometry.dispose();
+        this.scene.remove(this.tempRoomPreview);
+        this.tempRoomPreview = null;
     }
   }
 
@@ -243,6 +271,10 @@ private setPointerPosition(event: MouseEvent) {
     const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
     if (intersection) {
       this.pointerHelper.position.copy( intersection );
+    }
+
+    if (this.roomInsertionMode) {
+      this.updateTempRoomPreview();
     }
     
     this.render();

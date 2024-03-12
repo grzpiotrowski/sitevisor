@@ -198,7 +198,7 @@ private setPointerPosition(event: MouseEvent) {
       const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
       if (intersection) {
         // console.log(`Intersection at: ${intersection.x}, ${intersection.y}, ${intersection.z}`);
-        this.pointerHelper.position.copy( intersection );
+        this.pointerHelper.position.copy( intersection.clone() );
 
         if (this.roomInsertionMode) {
           this.roomInsertionPoints.push(intersection.clone());
@@ -226,18 +226,20 @@ private setPointerPosition(event: MouseEvent) {
 
   private updateTempRoomPreview() {
     if (this.tempRoomPreview) {
-        this.tempRoomPreview.update(this.pointerHelper.position)
+        this.tempRoomPreview.update(this.pointerHelper.position.clone());
     }
   }
 
   private createTempRoomPreview(startPoint: Vector3) {
     this.tempRoomPreview = new RoomPreview(startPoint);
     this.scene.add(this.tempRoomPreview);
+    this.scene.add(this.tempRoomPreview.label);
   }
 
   private removeTempRoomPreview() {
     if (this.tempRoomPreview) {
         this.tempRoomPreview.geometry.dispose();
+        this.scene.remove(this.tempRoomPreview.label);
         this.scene.remove(this.tempRoomPreview);
         this.tempRoomPreview = null;
     }

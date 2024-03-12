@@ -50,16 +50,6 @@
             <input type="text" id="roomName" class="input input-bordered" required
             bind:value={roomDetails.name}>
         </div>
-        <div class="form-control">
-            <!-- TODO: Room fields -->
-            <label class="label" for="roomType">Room Type</label>
-            <select id="roomType" class="select select-bordered" required
-            >
-                <option value="" disabled selected>Select type</option>
-                <option value="temperature">Temperature</option>
-                <option value="humidity">Humidity</option>
-            </select>
-        </div>
         <div class="modal-action">
             <button type="submit" class="btn">Place Room</button>
             <button type="button" class="btn" on:click={handleAddRoomCancelled}>Close</button>

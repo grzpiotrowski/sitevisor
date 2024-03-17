@@ -6,7 +6,7 @@ import { loggedInUser } from "../stores";
 import { browser } from '$app/environment';
 
 export const SitevisorService = {
-	baseUrl: "http://localhost:4000",
+	baseUrl: "http://sitevisor.local:8080",
 
 	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {

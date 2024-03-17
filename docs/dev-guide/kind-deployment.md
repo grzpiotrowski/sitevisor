@@ -3,6 +3,7 @@
 ## Prerequisites
 - Docker: Ensure **Docker** is installed on your system. You can download and install Docker from [Docker's official website](https://www.docker.com/get-started/).
 - Kind: Install **kind** on your machine. Follow the installation instructions on the [kind website](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
+- Added `127.0.0.1 sitevisor.local` ìn `/etc/hosts`
 
 ## Kind deployment
 **Create the Kind cluster:**
@@ -28,7 +29,7 @@ kind: Deployment
 metadata:
   name: sitevisor-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: sitevisor
@@ -41,7 +42,7 @@ spec:
       - name: sitevisor
         image: sitevisor:dev
         ports:
-        - containerPort: 8080
+        - containerPort: 3000
 " | kubectl apply -f -
 ```
 
@@ -51,26 +52,44 @@ echo "
 apiVersion: v1
 kind: Service
 metadata:
-  name: sitevisor-service
+  name: sitevisor-frontend-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: sitevisor
   ports:
     - protocol: TCP
       port: 3000
-      targetPort: 8080
+      targetPort: 3000
 " | kubectl apply -f -
 ```
 
-**Set up port forwarding to access the service in Kind cluster:**
+**Ingress for SiteVisor frontend:**
 ```bash
-kubectl port-forward service/sitevisor-service 3000:3000
+echo "
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sitevisor-frontend-ingress
+spec:
+  rules:
+  - host: sitevisor.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: sitevisor-frontend-service
+            port:
+              number: 3000
+  ingressClassName: nginx
+" | kubectl apply -f -
 ```
 
 **Access the application:**
 
-Open your browser and go to http://localhost:3000.
+Open your browser and go to http://sitevisor.local:8080.
 
 **Cleanup**
 ```bash

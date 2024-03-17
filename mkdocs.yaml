@@ -24,10 +24,13 @@ nav:
   - Developer Guide:
     - Local deployment: dev-guide/local-deployment.md
     - Docker deployment: dev-guide/docker-deployment.md
-    - Kind deployment: dev-guide/kind-deployment.md
-    - Backend Kind deployment: sitevisor-backend/docs/deployment/kind-deployment.md
-    - Kafka deployment: sitevisor-backend/docs/deployment/kafka-deployment.md
-    - Kafka Websocket Proxy deployment: sitevisor-backend/docs/deployment/kafka-websocket-proxy-deployment.md
+    - Kind deployment:
+      - Kind Cluster: sitevisor-backend/docs/deployment/kind-cluster.md
+      - PostgreSQL deployment: sitevisor-backend/docs/deployment/postgres-deployment.md
+      - Backend deployment: sitevisor-backend/docs/deployment/kind-deployment.md
+      - Frontend deployment: dev-guide/kind-deployment.md
+      - Kafka deployment: sitevisor-backend/docs/deployment/kafka-deployment.md
+      - Kafka Websocket Proxy deployment: sitevisor-backend/docs/deployment/kafka-websocket-proxy-deployment.md
   - Architecture:
     - Architecture Overview: architecture/architecture-overview.md
     - Frontend Overview: architecture/architecture-frontend.md

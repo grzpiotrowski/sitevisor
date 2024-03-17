@@ -24,7 +24,7 @@
         viewer.init(el, viewerContainer, project.id.toString());
 
         // WebSocket connection
-        socket = new WebSocket('ws://localhost:8078/socket/out?clientId=console_consumer&topic=my-topic');
+        socket = new WebSocket('ws://sitevisor.local:8080/socket/out?clientId=console_consumer&topic=my-topic');
 
         // WebSocket event listeners
         socket.addEventListener('open', (event) => {

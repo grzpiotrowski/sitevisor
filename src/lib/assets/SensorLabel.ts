@@ -15,21 +15,20 @@ export class SensorLabel extends CSS2DObject {
     this.sensor = sensor;
     this.element.style.marginTop = '-1em';
     this.sensorName = sensor.userData.name;
-    this.element.className = 'label';
-    this.element.id = "labelDivID";
+    this.element.className = 'sitevisor-sensor-label';
+    this.element.id = `sensor-label-${sensor.userData.device_id}`;
     this.element.innerHTML = `
                 <b> ${this.sensorName} </b>
                 `;
-                this.element.style.marginTop = '-1em';
-    
     this.position.set(position.x, position.y+0.7, position.z);
     this.layers.set(0);
   }
 
   public update() {
     this.element.innerHTML = `
-                <b> ${this.sensor.userData.name} </b>
-                `;
+        <b> ${this.sensor.userData.name} </b><br>
+        <b> ${this.sensor.userData.data.value} </b>
+`;
   } 
 
 }

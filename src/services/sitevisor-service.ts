@@ -8,6 +8,17 @@ import { browser } from '$app/environment';
 export const SitevisorService = {
 	baseUrl: import.meta.env.VITE_BASE_URL || "http://localhost:8080",
 
+	async getTopics(): Promise<string[]> {
+		try {
+			const response = await axios.get(this.baseUrl + `/api/kafka-proxy`);
+			//const response = await axios.get("http://localhost:8080" + `/topics`);
+			console.log(response.data)
+			return response.data;
+		} catch (error) {
+			return [];
+		}
+	},
+
 	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {
 			const response = await axios.get(this.baseUrl + `/api/rooms/?project_id=${projectId}`);
@@ -49,6 +60,7 @@ export const SitevisorService = {
 		try {
             const sensorData = {
                 name: sensor.name,
+				device_id: sensor.device_id,
                 level: sensor.level,
                 position: { x: sensor.position?.x, y: sensor.position?.y, z: sensor.position?.z },
 				project: projectId

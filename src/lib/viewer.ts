@@ -40,7 +40,7 @@ export class Viewer {
   private sensorInsertionMode: boolean = false;
   private roomInsertionPoints: Vector3[] = [];
 
-  public sensors: Sensor[] = [];
+  public sensors: Map<string, Sensor> = new Map();
   public rooms: Room[] = [];
 
   private tempRoomPreview: RoomPreview | null = null;
@@ -69,11 +69,12 @@ export class Viewer {
     const sensors = await SitevisorService.getSensors(this.projectId);
     sensors.forEach((sensor) => {
       const newSensor = new Sensor(sensor.name,
+        sensor.device_id,
         sensor.level,
         new Vector3(sensor.position?.x, sensor.position?.y, sensor.position?.z));
       this.scene.add(newSensor);
       this.scene.add(newSensor.label)
-      this.sensors.push(newSensor);
+      this.sensors.set(newSensor.userData.device_id, newSensor);
     });
   }
 

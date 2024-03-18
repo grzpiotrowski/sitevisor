@@ -5,6 +5,7 @@ import { Vector3 } from "three";
  */
 export interface ISensor {
   name: string;
+  device_id: string;
   level: number;
   position: Vector3 | null;
 }

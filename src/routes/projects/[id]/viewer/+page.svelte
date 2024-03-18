@@ -33,8 +33,11 @@
         });
 
         socket.addEventListener('message', (event) => {
-            const message = event.data;
-            console.log('WebSocket message:', message);
+            const message = JSON.parse(event.data);
+            const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
+            updateSensorData(sensorData.sensor_id, sensorData.data);
+
+            //console.log('WebSocket message:', message);
         });
 
         socket.addEventListener('close', (event) => {
@@ -45,6 +48,16 @@
             console.error('WebSocket error:', event);
         });
     });
+
+    function updateSensorData(device_id: string, newData: any) {
+    const sensor = viewer.sensors.get(device_id);
+    //console.log(sensor)
+    if (sensor) {
+        //sensor.userData.data = newData;
+        sensor.update(newData);
+        //console.log(sensor.userData.data);
+    }
+}
 
     function toggleRoomInsertion() {
         const roomInsertionMode: boolean = viewer.toggleRoomInsertionMode();

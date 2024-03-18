@@ -22,9 +22,10 @@
     onMount(() => {
         viewer = new Viewer();
         viewer.init(el, viewerContainer, project.id.toString());
-
+        
         // WebSocket connection
-        socket = new WebSocket('ws://sitevisor.local:8080/socket/out?clientId=console_consumer&topic=my-topic');
+        const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=console_consumer&topic=my-topic`;
+        socket = new WebSocket(wsUrl);
 
         // WebSocket event listeners
         socket.addEventListener('open', (event) => {

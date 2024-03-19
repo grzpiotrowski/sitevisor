@@ -14,47 +14,98 @@
     let el: HTMLCanvasElement;
     let viewer: Viewer;
     let viewerContainer: HTMLElement;
-    let socket: WebSocket;
-    let addSensorDialogVisible: boolean = false
-    let addRoomDialogVisible: boolean = false
-    let sensorCreationMode: boolean;
+    let sockets: Map<string, WebSocket> = new Map();
+    let socketsStatus: Map<string, boolean> = new Map();
+    let overallWsStatus = 'red'; // red, yellow, green
+    let showWsStatuses: boolean = false;
+    let addSensorDialogVisible: boolean = false;
+    let addRoomDialogVisible: boolean = false;
+    
+    function getTopicNamesArray() {
+        return project.kafka_topics ? project.kafka_topics.split(',') : [];
+    }
 
-    let wsConnected = false;
-
-    function reconnectWebSocket() {
-        console.log(socket);
+    function reconnectWebSocket(topic: string) {
+        let socket: WebSocket | undefined = sockets.get(topic);
         if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close();
+            socket.close(); // This alone won't update the UI
         }
 
+        // Triggers Svelte reactivity
+        sockets.delete(topic);
+        socketsStatus.set(topic, false);
+        socketsStatus = new Map(socketsStatus);
+
         setTimeout(() => {
-            initializeWebSocket();
+            let newSocket = initializeWebSocket(topic);
+            if (newSocket) {
+                sockets.set(topic, newSocket);
+            }
+            updateOverallWsStatus();
         }, 1000);
     }
 
-    function initializeWebSocket() {
-        const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=console_consumer&topic=${project.kafka_topics}`;
-        socket = new WebSocket(wsUrl);
+    function updateOverallWsStatus() {
+        const statuses = Array.from(socketsStatus.values());
+        if (statuses.every(status => status)) {
+            overallWsStatus = 'green';
+        } else if (statuses.some(status => status)) {
+            overallWsStatus = 'yellow';
+        } else {
+            overallWsStatus = 'red';
+        }
+    }
 
-        socket.addEventListener('open', (event) => {
-            console.log('WebSocket connection opened:', event);
-            wsConnected = true;
-        });
+    function initializeWebSocket(topic: string): WebSocket | undefined {
+        try {
+            const uniqueClientId = `sitevisor_consumer_${Date.now()}_${topic}`;
+            const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=${uniqueClientId}&topic=${topic}`;
+            
+            let socket = new WebSocket(wsUrl);
 
-        socket.addEventListener('message', (event) => {
-            const message = JSON.parse(event.data);
-            const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
-            updateSensorData(sensorData.sensor_id, sensorData.data);
-        });
+            socket.addEventListener('open', (event) => {
+                console.log(`WebSocket connection to topic: "${topic}" opened:`, event);
+                // Triggers Svelte reactivity
+                sockets.delete(topic);
+                socketsStatus.set(topic, true);
+                socketsStatus = new Map(socketsStatus);
+                updateOverallWsStatus();
+            });
 
-        socket.addEventListener('close', (event) => {
-            console.log('WebSocket connection closed:', event);
-            wsConnected = false;
-        });
+            socket.addEventListener('message', (event) => {
+                const message = JSON.parse(event.data);
+                const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
+                updateSensorData(sensorData.sensor_id, sensorData.data);
+            });
 
-        socket.addEventListener('error', (event) => {
-            console.error('WebSocket error:', event);
-            wsConnected = false;
+            socket.addEventListener('close', (event) => {
+                console.log(`WebSocket connection to topic: "${topic}" closed:`, event);
+                socketsStatus.set(topic, false);
+                updateOverallWsStatus();
+            });
+
+            socket.addEventListener('error', (event) => {
+                console.error(`WebSocket "${topic}" error:`, event);
+                socketsStatus.set(topic, false);
+                updateOverallWsStatus();
+            });
+            return socket;
+        }
+        catch (error) {
+            console.log(`Unable to connect to topic: ${topic}`);
+            return undefined;
+        }
+    }
+
+    function initializeWebSockets() {
+        if (!project.kafka_topics) {
+            console.log("No topics configured.");
+            return;
+        }
+        const topics = getTopicNamesArray();
+        topics.forEach((topic) => {
+            let socket = initializeWebSocket(topic);
+            if (socket) { sockets.set(topic, socket); }
         });
     }
 
@@ -62,7 +113,7 @@
         viewer = new Viewer();
         viewer.init(el, viewerContainer, project.id.toString());
         
-        initializeWebSocket();
+        initializeWebSockets();
     });
 
     function updateSensorData(device_id: string, newData: any) {
@@ -109,12 +160,35 @@
             />
         </div>
     </div>
-    <button 
-        class={`btn bg-base-100/20 border-base-100/30 absolute bottom-5 right-5`} 
-        on:click={reconnectWebSocket}>
-        <span class={`badge ${wsConnected ? 'badge-success' : 'badge-error'} border-base-300`}></span>
-        Realtime Data Status
-    </button>
+    <div class="absolute bottom-5 right-5 flex flex-col items-end">
+        <div class="w-full">
+            {#if showWsStatuses}
+            <div class="mb-2 p-4 bg-base-100 shadow-lg rounded-lg w-full">
+                {#if socketsStatus.size > 0}
+                {#each Array.from(socketsStatus.entries()) as [topic, status]}
+                    <button class="flex justify-between w-full text-left p-2 hover:bg-gray-100 rounded-md"
+                            on:click={() => reconnectWebSocket(topic)}>
+                        <span class="mr-2">{topic}</span>
+                        <span class={status ? 'text-green-500' : 'text-red-500'}>
+                            {status ? 'Connected' : 'Disconnected'}
+                        </span>
+                    </button>
+                {/each}
+                {:else}
+                    <div class="text-center">
+                        No connections configured
+                    </div>
+                {/if}
+            </div>
+            {/if}
+        </div>
+        <button 
+            class={`btn bg-base-100/20 border-base-100/30`}  
+            on:click={() => showWsStatuses = !showWsStatuses}>
+            <span class={`badge ${overallWsStatus === 'green' ? 'badge-success' : overallWsStatus === 'yellow' ? 'badge-warning' : 'badge-error'}`}></span>
+            Realtime Data Status
+        </button>
+    </div>
 </div>
 
 <AddSensorDialog

@@ -19,45 +19,58 @@
     let addRoomDialogVisible: boolean = false
     let sensorCreationMode: boolean;
 
-    onMount(() => {
-        viewer = new Viewer();
-        viewer.init(el, viewerContainer, project.id.toString());
-        
-        // WebSocket connection
+    let wsConnected = false;
+
+    function reconnectWebSocket() {
+        console.log(socket);
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+        }
+
+        setTimeout(() => {
+            initializeWebSocket();
+        }, 1000);
+    }
+
+    function initializeWebSocket() {
         const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=console_consumer&topic=${project.kafka_topics}`;
         socket = new WebSocket(wsUrl);
 
-        // WebSocket event listeners
         socket.addEventListener('open', (event) => {
             console.log('WebSocket connection opened:', event);
+            wsConnected = true;
         });
 
         socket.addEventListener('message', (event) => {
             const message = JSON.parse(event.data);
             const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
             updateSensorData(sensorData.sensor_id, sensorData.data);
-
-            //console.log('WebSocket message:', message);
         });
 
         socket.addEventListener('close', (event) => {
             console.log('WebSocket connection closed:', event);
+            wsConnected = false;
         });
 
         socket.addEventListener('error', (event) => {
             console.error('WebSocket error:', event);
+            wsConnected = false;
         });
+    }
+
+    onMount(() => {
+        viewer = new Viewer();
+        viewer.init(el, viewerContainer, project.id.toString());
+        
+        initializeWebSocket();
     });
 
     function updateSensorData(device_id: string, newData: any) {
-    const sensor = viewer.sensors.get(device_id);
-    //console.log(sensor)
-    if (sensor) {
-        //sensor.userData.data = newData;
-        sensor.update(newData);
-        //console.log(sensor.userData.data);
+        const sensor = viewer.sensors.get(device_id);
+        if (sensor) {
+            sensor.update(newData);
+        }
     }
-}
 
     function toggleRoomInsertion() {
         const roomInsertionMode: boolean = viewer.toggleRoomInsertionMode();
@@ -96,6 +109,12 @@
             />
         </div>
     </div>
+    <button 
+        class={`btn bg-base-100/20 border-base-100/30 absolute bottom-5 right-5`} 
+        on:click={reconnectWebSocket}>
+        <span class={`badge ${wsConnected ? 'badge-success' : 'badge-error'} border-base-300`}></span>
+        Realtime Data Status
+    </button>
 </div>
 
 <AddSensorDialog

@@ -16,6 +16,7 @@
         const project: IProject = {
             id: -1,
             name: newProjectName,
+            kafka_topics: '',
             owner: user,
             rooms: [],
             sensors: []

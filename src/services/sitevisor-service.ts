@@ -6,7 +6,18 @@ import { loggedInUser } from "../stores";
 import { browser } from '$app/environment';
 
 export const SitevisorService = {
-	baseUrl: "http://localhost:4000",
+	baseUrl: import.meta.env.VITE_BASE_URL || "http://localhost:8080",
+
+	async getTopics(): Promise<string[]> {
+		try {
+			const response = await axios.get(this.baseUrl + `/api/kafka-proxy`);
+			//const response = await axios.get("http://localhost:8080" + `/topics`);
+			console.log(response.data)
+			return response.data;
+		} catch (error) {
+			return [];
+		}
+	},
 
 	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {
@@ -49,6 +60,7 @@ export const SitevisorService = {
 		try {
             const sensorData = {
                 name: sensor.name,
+				device_id: sensor.device_id,
                 level: sensor.level,
                 position: { x: sensor.position?.x, y: sensor.position?.y, z: sensor.position?.z },
 				project: projectId
@@ -84,6 +96,17 @@ export const SitevisorService = {
 		} catch (error) {
 			console.error(`Error deleting Project with id ${id}`, error);
 			return;
+		}
+	},
+
+	async updateProject(id: string, updatedProjectData: Partial<IProject>): Promise<void> {
+		try {
+			const url = `${this.baseUrl}/api/projects/${id}/`;
+			await axios.put(url, updatedProjectData);
+	
+			console.log("Project updated successfully");
+		} catch (error) {
+			console.error(`Error updating Project with id: ${id}`, error);
 		}
 	},
 

@@ -14,6 +14,7 @@ export interface IProject {
     id: number;
     name: string;
     owner: IUser;
+    kafka_topics: string;
     rooms: IRoom[];
     sensors: ISensor[];
 }

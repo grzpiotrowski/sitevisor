@@ -11,7 +11,7 @@ export class Sensor extends Point3D {
   geometry: BoxGeometry;
   label: SensorLabel;
 
-  constructor(name: string, level: number, position: Vector3) {
+  constructor(name: string, device_id: string, level: number, position: Vector3) {
     super(position);
 
     this.geometry = new BoxGeometry(0.5, 0.5, 0.5);
@@ -24,13 +24,16 @@ export class Sensor extends Point3D {
     // Custom object properties
     this.userData = {
       name: name,
-      level: level
+      device_id: device_id,
+      level: level,
+      data: null
     };
 
     this.label = new SensorLabel(this.position, this);
   }
 
-  public update() {
+  public update(sensorData: { value: number, unit: string } = { value: 0, unit: '' }) {
+    this.userData.data = sensorData;
     this.label.update();
   }
 }

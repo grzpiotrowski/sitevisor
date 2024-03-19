@@ -13,6 +13,7 @@ import {
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { Room } from './assets/Room';
 import { Sensor } from './assets/Sensor';
+import { selectedSensorStore } from '../stores';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ReferencePlane } from './assets/ReferencePlane';
 import { PointerHelper } from './assets/PointerHelper';
@@ -179,6 +180,9 @@ export class Viewer {
     if (sensorIntersect) {
       const sensorObject = sensorIntersect.object as Sensor;
       sensorObject.label.element.style.visibility = 'visible';
+      this.handleSensorSelection(sensorObject);
+    } else {
+      this.handleSensorSelection(null);
     }
   }
 
@@ -225,6 +229,10 @@ private setPointerPosition(event: MouseEvent) {
         }
       }
     }
+  }
+
+  private handleSensorSelection(sensor: Sensor | null) {
+    selectedSensorStore.set(sensor);
   }
 
   private updateTempRoomPreview() {

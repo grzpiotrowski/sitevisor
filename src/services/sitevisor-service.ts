@@ -99,6 +99,17 @@ export const SitevisorService = {
 		}
 	},
 
+	async updateProject(id: string, updatedProjectData: Partial<IProject>): Promise<void> {
+		try {
+			const url = `${this.baseUrl}/api/projects/${id}/`;
+			await axios.put(url, updatedProjectData);
+	
+			console.log("Project updated successfully");
+		} catch (error) {
+			console.error(`Error updating Project with id: ${id}`, error);
+		}
+	},
+
 	async createProject(project: IProject) {
 		try {
 			await axios.post(`${this.baseUrl}/api/projects/`, project);

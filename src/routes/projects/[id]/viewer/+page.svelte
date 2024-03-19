@@ -24,7 +24,7 @@
         viewer.init(el, viewerContainer, project.id.toString());
         
         // WebSocket connection
-        const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=console_consumer&topic=my-topic`;
+        const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=console_consumer&topic=${project.kafka_topics}`;
         socket = new WebSocket(wsUrl);
 
         // WebSocket event listeners

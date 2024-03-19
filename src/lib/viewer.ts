@@ -174,9 +174,11 @@ export class Viewer {
     this.raycaster.setFromCamera( this.pointer, this.camera );
     const intersects = this.raycaster.intersectObjects( this.scene.children, false );
 
-    if ( intersects.length > 0 ) {
-      const intersected = intersects[0].object;
-      //console.log(intersected);
+    const sensorIntersect = intersects.find(intersect => intersect.object instanceof Sensor);
+
+    if (sensorIntersect) {
+      const sensorObject = sensorIntersect.object as Sensor;
+      sensorObject.label.element.style.visibility = 'visible';
     }
   }
 
@@ -269,6 +271,9 @@ private setPointerPosition(event: MouseEvent) {
   private animate = () => {
     requestAnimationFrame(this.animate);
     this.controls.update();
+    for (const [_, sensor] of this.sensors) {
+      sensor.label.element.style.visibility = 'hidden';
+    }
     this.checkPointerIntersection();
 
     const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);

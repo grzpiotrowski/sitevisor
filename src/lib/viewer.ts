@@ -25,6 +25,8 @@ import { ObjectFactory } from './utils/ObjectFactory';
 import { SitevisorService } from '../services/sitevisor-service';
 import { RoomPreview } from './assets/RoomPreview';
 import { get } from 'svelte/store';
+import { newSensor } from '../stores';
+import type { ISensor } from './common/interfaces/ISensor';
 
 export class Viewer {
   private projectId: string;
@@ -74,7 +76,9 @@ export class Viewer {
     });
     const sensors = await SitevisorService.getSensors(this.projectId);
     sensors.forEach((sensor) => {
-      const newSensor = new Sensor(sensor.name,
+      const newSensor = new Sensor(
+        sensor.id,
+        sensor.name,
         sensor.device_id,
         sensor.level,
         new Vector3(sensor.position?.x, sensor.position?.y, sensor.position?.z));
@@ -230,8 +234,20 @@ export class Viewer {
           }
         }
         if (this.sensorInsertionMode) {
-          const sensor = this.objectFactory.createSensorAtPoint(intersection.clone());
-          SitevisorService.createSensor(sensor, this.projectId);
+          // Create a sensor in the backend and then in the scene
+          const sensorData: ISensor = get(newSensor);
+          sensorData.position = intersection.clone();
+          SitevisorService.createSensor(sensorData, this.projectId)
+          .then(createdSensor => {
+              if (createdSensor) {
+                sensorData.id = createdSensor.id;
+                this.objectFactory.createSensor(sensorData);
+              }
+          })
+          .catch(error => {
+              console.error("Failed to create sensor in backend", error);
+          });
+
           this.setSensorInsertionMode(false);
         }
       }
@@ -247,6 +263,19 @@ export class Viewer {
       sensor.setIsSelected(true);
     }
     selectedSensorStore.set(sensor);
+  }
+
+  public removeSensorFromScene(device_id: string): void {
+    const sensor = this.sensors.get(device_id);
+    if (sensor) {
+      this.scene.remove(sensor);
+      this.scene.remove(sensor.label);
+  
+      if (sensor.geometry) sensor.geometry.dispose();
+      if (sensor.material) sensor.material.dispose();
+  
+      this.sensors.delete(device_id);
+    }
   }
 
   private updateTempRoomPreview() {

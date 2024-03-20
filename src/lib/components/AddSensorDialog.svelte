@@ -24,7 +24,8 @@
     function handleAddSensorSubmit() {
         // Update details in store but temporarily set position to null
         newSensor.update(() => (
-            {
+            {   
+                id: '',
                 name: sensorDetails.name,
                 device_id: sensorDetails.device_id,
                 level: 0,

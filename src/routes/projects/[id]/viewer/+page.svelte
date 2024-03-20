@@ -160,7 +160,7 @@
 <div class="flex flex-col h-screen">
     <Header />
     {#if selectedSensor}
-        <SensorDetails selectedSensor={selectedSensor}/>
+        <SensorDetails on:removeSensor={e => viewer.removeSensorFromScene(e.detail.device_id)} selectedSensor={selectedSensor}/>
     {/if}
     <div class="flex flex-1 overflow-hidden">
         <div class="drawer lg:drawer-open">

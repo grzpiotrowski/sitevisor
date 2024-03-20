@@ -3,7 +3,7 @@ import {
     MeshStandardMaterial,
     Vector3,
   } from 'three';
-  import { Point3D } from './BaseTypes/Point3D';
+import { Point3D } from './BaseTypes/Point3D';
 import { SensorLabel } from './SensorLabel';
   
 export class Sensor extends Point3D {

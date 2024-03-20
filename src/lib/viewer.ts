@@ -186,7 +186,7 @@ export class Viewer {
     }
   }
 
-private setPointerPosition(event: MouseEvent) {
+  private setPointerPosition(event: MouseEvent) {
     const pos = this.getCanvasRelativePosition(event);
     this.pointer.x = (pos.x / this.canvasElement.clientWidth ) *  2 - 1;
     this.pointer.y = (pos.y / this.canvasElement.clientHeight) * -2 + 1;

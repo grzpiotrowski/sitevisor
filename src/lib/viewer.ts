@@ -9,6 +9,9 @@ import {
   Raycaster,
   Vector2,
   Vector3,
+  Object3D,
+  type Intersection,
+  type Object3DEventMap,
 } from 'three';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { Room } from './assets/Room';
@@ -33,6 +36,7 @@ export class Viewer {
   private controls: OrbitControls;
   private raycaster: Raycaster;
   private pointer: Vector2;
+  private pointerIntersection: Intersection<Object3D<Object3DEventMap>>[];
   private referencePlane: ReferencePlane;
   private pointerHelper: PointerHelper;
 
@@ -173,9 +177,11 @@ export class Viewer {
 
   private checkPointerIntersection() {
     this.raycaster.setFromCamera( this.pointer, this.camera );
-    const intersects = this.raycaster.intersectObjects( this.scene.children, false );
+    this.pointerIntersection = this.raycaster.intersectObjects( this.scene.children, false );
+  }
 
-    const sensorIntersect = intersects.find(intersect => intersect.object instanceof Sensor);
+  private getIntersectedSensor() {
+    const sensorIntersect = this.pointerIntersection.find(intersect => intersect.object instanceof Sensor);
 
     if (sensorIntersect) {
       const sensorObject = sensorIntersect.object as Sensor;
@@ -183,7 +189,7 @@ export class Viewer {
       this.handleSensorSelection(sensorObject);
     } else {
       this.handleSensorSelection(null);
-    }
+    }  
   }
 
   private setPointerPosition(event: MouseEvent) {
@@ -283,6 +289,7 @@ export class Viewer {
       sensor.label.element.style.visibility = 'hidden';
     }
     this.checkPointerIntersection();
+    this.getIntersectedSensor();
 
     const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
     if (intersection) {

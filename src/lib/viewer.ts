@@ -181,16 +181,15 @@ export class Viewer {
     this.pointerIntersection = this.raycaster.intersectObjects( this.scene.children, false );
   }
 
-  private getIntersectedSensor() {
+  private getIntersectedSensor(): Sensor | null {
     const sensorIntersect = this.pointerIntersection.find(intersect => intersect.object instanceof Sensor);
 
     if (sensorIntersect) {
       const sensorObject = sensorIntersect.object as Sensor;
-      sensorObject.label.element.style.visibility = 'visible';
-      this.handleSensorSelection(sensorObject);
+      return sensorObject;
     } else {
-      this.handleSensorSelection(null);
-    }  
+      return null;
+    }
   }
 
   private setPointerPosition(event: MouseEvent) {
@@ -238,13 +237,16 @@ export class Viewer {
       }
 
       // Handle interaction with Sensors
-      this.getIntersectedSensor();
+      const clickedSensor = this.getIntersectedSensor();
+      this.handleSensorSelection(clickedSensor);
     }
   }
 
   private handleSensorSelection(sensor: Sensor | null) {
+    if (sensor) {
+      sensor.setIsSelected(true);
+    }
     selectedSensorStore.set(sensor);
-    sensor?.setIsSelected(true);
   }
 
   private updateTempRoomPreview() {
@@ -292,6 +294,8 @@ export class Viewer {
     requestAnimationFrame(this.animate);
     this.controls.update();
 
+    this.checkPointerIntersection();
+
     // Update not selected sensors
     for (const [_, sensor] of this.sensors) {
       if (sensor != get(selectedSensorStore)){
@@ -299,7 +303,9 @@ export class Viewer {
       }
     }
 
-    this.checkPointerIntersection();
+    // Check Sensor mouseover
+    const sensorHoveredOver = this.getIntersectedSensor();
+    sensorHoveredOver?.setIsLabelVisible(true);
 
     const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
     if (intersection) {

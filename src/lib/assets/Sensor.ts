@@ -54,4 +54,12 @@ export class Sensor extends Point3D {
       this.label.element.style.visibility = 'hidden';
     }
   }
+
+  public setIsLabelVisible(isLabelVisible: boolean) {
+    if (isLabelVisible) {
+      this.label.element.style.visibility = 'visible';
+    } else {
+      this.label.element.style.visibility = 'hidden';
+    }
+  }
 }

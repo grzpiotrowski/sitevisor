@@ -10,6 +10,7 @@
 	import type { Sensor } from '$lib/assets/Sensor';
 	import { selectedSensorStore } from '../../../../stores';
 	import SensorDetails from '$lib/components/SensorDetails.svelte';
+	import HeaderProject from '$lib/components/HeaderProject.svelte';
 	export let data: PageData;
 
     const project: IProject = data.project;
@@ -158,7 +159,7 @@
 </svelte:head>
 
 <div class="flex flex-col h-screen">
-    <Header />
+    <HeaderProject projectid={project.id.toString()}/>
     {#if selectedSensor}
         <SensorDetails on:removeSensor={e => viewer.removeSensorFromScene(e.detail.device_id)} selectedSensor={selectedSensor}/>
     {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Header from "$lib/components/Header.svelte";
+	import HeaderProject from "$lib/components/HeaderProject.svelte";
     import type { PageData } from "../$types";
     import { goto } from "$app/navigation";
 	import { SitevisorService } from "../../../../services/sitevisor-service";
@@ -38,7 +38,7 @@
 
 </script>
 
-<Header />
+<HeaderProject projectid={project.id.toString()}/>
 
 <div class="container mx-auto p-5">
     <div class="card bg-base-100 shadow-xl">

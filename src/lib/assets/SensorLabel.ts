@@ -14,6 +14,7 @@ export class SensorLabel extends CSS2DObject {
     super(sensorDiv);
     this.sensor = sensor;
     this.element.style.marginTop = '-1em';
+    this.element.style.visibility = 'hidden';
     this.sensorName = sensor.userData.name;
     this.element.className = 'sitevisor-sensor-label';
     this.element.id = `sensor-label-${sensor.userData.device_id}`;
@@ -26,9 +27,8 @@ export class SensorLabel extends CSS2DObject {
 
   public update() {
     this.element.innerHTML = `
-        <b> ${this.sensor.userData.name} </b><br>
-        <b> ${this.sensor.userData.data.value} </b>
-`;
+        <b> ${this.sensor.userData.name} </b>
+        `;
   } 
 
 }

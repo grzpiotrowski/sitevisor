@@ -1,7 +1,7 @@
 import { Scene, Vector3 } from 'three';
 import { Room } from '../assets/Room';
 import { Sensor } from '$lib/assets/Sensor';
-import { newSensor, newRoom } from '../../stores';
+import { newRoom } from '../../stores';
 import { get } from "svelte/store";
 import type { IRoom } from '../common/interfaces/IRoom';
 import type { ISensor } from '$lib/common/interfaces/ISensor';
@@ -46,7 +46,7 @@ export class ObjectFactory {
 
   createSensor(options: ISensor): Sensor | undefined {
     if (options.position != null) {
-      const sensor = new Sensor(options.name, options.device_id, options.level, options.position);
+      const sensor = new Sensor(options.id, options.name, options.device_id, options.level, options.position);
       this.scene.add(sensor);
       this.scene.add(sensor.label);
       this.viewer.sensors.set(sensor.userData.device_id, sensor);
@@ -54,13 +54,6 @@ export class ObjectFactory {
     }
     return undefined;
     
-  }
-
-  createSensorAtPoint(sensorPosition: Vector3): ISensor {
-    const sensorData: ISensor = get(newSensor);
-    sensorData.position = sensorPosition;
-    this.createSensor(sensorData);
-    return sensorData;
   }
   
 }

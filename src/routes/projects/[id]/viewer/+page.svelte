@@ -7,6 +7,9 @@
     import AddRoomDialog from '$lib/components/AddRoomDialog.svelte';
     import type { PageData } from "../$types";
     import type { IProject } from "../../../../services/sitevisor-types";
+	import type { Sensor } from '$lib/assets/Sensor';
+	import { selectedSensorStore } from '../../../../stores';
+	import SensorDetails from '$lib/components/SensorDetails.svelte';
 	export let data: PageData;
 
     const project: IProject = data.project;
@@ -20,6 +23,7 @@
     let showWsStatuses: boolean = false;
     let addSensorDialogVisible: boolean = false;
     let addRoomDialogVisible: boolean = false;
+    let selectedSensor: Sensor | null = null;
     
     function getTopicNamesArray() {
         return project.kafka_topics ? project.kafka_topics.split(',') : [];
@@ -112,7 +116,11 @@
     onMount(() => {
         viewer = new Viewer();
         viewer.init(el, viewerContainer, project.id.toString());
-        
+
+        const unsubscribe = selectedSensorStore.subscribe(sensor => {
+            selectedSensor = sensor;
+        });
+
         initializeWebSockets();
     });
 
@@ -120,6 +128,10 @@
         const sensor = viewer.sensors.get(device_id);
         if (sensor) {
             sensor.update(newData);
+            // Reassign selectedSensor to trigger Svelte reactivity
+            if (sensor.userData.device_id === selectedSensor?.userData.device_id) {
+                selectedSensor = sensor;
+            }
         }
     }
 
@@ -147,6 +159,9 @@
 
 <div class="flex flex-col h-screen">
     <Header />
+    {#if selectedSensor}
+        <SensorDetails on:removeSensor={e => viewer.removeSensorFromScene(e.detail.device_id)} selectedSensor={selectedSensor}/>
+    {/if}
     <div class="flex flex-1 overflow-hidden">
         <div class="drawer lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />

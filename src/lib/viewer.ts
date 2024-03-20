@@ -9,10 +9,14 @@ import {
   Raycaster,
   Vector2,
   Vector3,
+  Object3D,
+  type Intersection,
+  type Object3DEventMap,
 } from 'three';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { Room } from './assets/Room';
 import { Sensor } from './assets/Sensor';
+import { selectedSensorStore } from '../stores';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ReferencePlane } from './assets/ReferencePlane';
 import { PointerHelper } from './assets/PointerHelper';
@@ -20,6 +24,9 @@ import { ObjectFactory } from './utils/ObjectFactory';
 
 import { SitevisorService } from '../services/sitevisor-service';
 import { RoomPreview } from './assets/RoomPreview';
+import { get } from 'svelte/store';
+import { newSensor } from '../stores';
+import type { ISensor } from './common/interfaces/ISensor';
 
 export class Viewer {
   private projectId: string;
@@ -32,6 +39,7 @@ export class Viewer {
   private controls: OrbitControls;
   private raycaster: Raycaster;
   private pointer: Vector2;
+  private pointerIntersection: Intersection<Object3D<Object3DEventMap>>[];
   private referencePlane: ReferencePlane;
   private pointerHelper: PointerHelper;
 
@@ -68,7 +76,9 @@ export class Viewer {
     });
     const sensors = await SitevisorService.getSensors(this.projectId);
     sensors.forEach((sensor) => {
-      const newSensor = new Sensor(sensor.name,
+      const newSensor = new Sensor(
+        sensor.id,
+        sensor.name,
         sensor.device_id,
         sensor.level,
         new Vector3(sensor.position?.x, sensor.position?.y, sensor.position?.z));
@@ -172,15 +182,21 @@ export class Viewer {
 
   private checkPointerIntersection() {
     this.raycaster.setFromCamera( this.pointer, this.camera );
-    const intersects = this.raycaster.intersectObjects( this.scene.children, false );
+    this.pointerIntersection = this.raycaster.intersectObjects( this.scene.children, false );
+  }
 
-    if ( intersects.length > 0 ) {
-      const intersected = intersects[0].object;
-      //console.log(intersected);
+  private getIntersectedSensor(): Sensor | null {
+    const sensorIntersect = this.pointerIntersection.find(intersect => intersect.object instanceof Sensor);
+
+    if (sensorIntersect) {
+      const sensorObject = sensorIntersect.object as Sensor;
+      return sensorObject;
+    } else {
+      return null;
     }
   }
 
-private setPointerPosition(event: MouseEvent) {
+  private setPointerPosition(event: MouseEvent) {
     const pos = this.getCanvasRelativePosition(event);
     this.pointer.x = (pos.x / this.canvasElement.clientWidth ) *  2 - 1;
     this.pointer.y = (pos.y / this.canvasElement.clientHeight) * -2 + 1;
@@ -196,6 +212,7 @@ private setPointerPosition(event: MouseEvent) {
 
   private onCanvasClick(event: MouseEvent) {
     if (event.button === 0) { // Left mouse button clicked
+      // Handle interaction with the ReferencePlane
       const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
       if (intersection) {
         // console.log(`Intersection at: ${intersection.x}, ${intersection.y}, ${intersection.z}`);
@@ -217,11 +234,47 @@ private setPointerPosition(event: MouseEvent) {
           }
         }
         if (this.sensorInsertionMode) {
-          const sensor = this.objectFactory.createSensorAtPoint(intersection.clone());
-          SitevisorService.createSensor(sensor, this.projectId);
+          // Create a sensor in the backend and then in the scene
+          const sensorData: ISensor = get(newSensor);
+          sensorData.position = intersection.clone();
+          SitevisorService.createSensor(sensorData, this.projectId)
+          .then(createdSensor => {
+              if (createdSensor) {
+                sensorData.id = createdSensor.id;
+                this.objectFactory.createSensor(sensorData);
+              }
+          })
+          .catch(error => {
+              console.error("Failed to create sensor in backend", error);
+          });
+
           this.setSensorInsertionMode(false);
         }
       }
+
+      // Handle interaction with Sensors
+      const clickedSensor = this.getIntersectedSensor();
+      this.handleSensorSelection(clickedSensor);
+    }
+  }
+
+  private handleSensorSelection(sensor: Sensor | null) {
+    if (sensor) {
+      sensor.setIsSelected(true);
+    }
+    selectedSensorStore.set(sensor);
+  }
+
+  public removeSensorFromScene(device_id: string): void {
+    const sensor = this.sensors.get(device_id);
+    if (sensor) {
+      this.scene.remove(sensor);
+      this.scene.remove(sensor.label);
+  
+      if (sensor.geometry) sensor.geometry.dispose();
+      if (sensor.material) sensor.material.dispose();
+  
+      this.sensors.delete(device_id);
     }
   }
 
@@ -269,7 +322,19 @@ private setPointerPosition(event: MouseEvent) {
   private animate = () => {
     requestAnimationFrame(this.animate);
     this.controls.update();
+
     this.checkPointerIntersection();
+
+    // Update not selected sensors
+    for (const [_, sensor] of this.sensors) {
+      if (sensor != get(selectedSensorStore)){
+        sensor.setIsSelected(false);
+      }
+    }
+
+    // Check Sensor mouseover
+    const sensorHoveredOver = this.getIntersectedSensor();
+    sensorHoveredOver?.setIsLabelVisible(true);
 
     const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
     if (intersection) {

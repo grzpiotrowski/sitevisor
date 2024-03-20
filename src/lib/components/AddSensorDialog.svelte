@@ -5,6 +5,9 @@
 	export let isDialogOpen: boolean;
     export let viewer: Viewer;
 
+    let warningMessage = '';
+    let showWarning = false;
+
     let sensorDetails = {
         name: '',
         device_id: '',
@@ -22,9 +25,18 @@
     }
 
     function handleAddSensorSubmit() {
+        // Ensure device_id is unique
+        if (viewer.sensors.has(sensorDetails.device_id)) {
+            warningMessage = "A sensor with this ID already exists. Please use a unique ID.";
+            showWarning = true;
+            return;
+        } else {
+            showWarning = false;
+        }      
         // Update details in store but temporarily set position to null
         newSensor.update(() => (
-            {
+            {   
+                id: '',
                 name: sensorDetails.name,
                 device_id: sensorDetails.device_id,
                 level: 0,
@@ -42,7 +54,7 @@
 </script>
 
 <div class="modal" class:modal-open={isDialogOpen}>
-  <div class="modal-box">
+    <div class="modal-box">
     <h3 class="font-bold text-lg">Add Sensor</h3>
     <form on:submit|preventDefault={handleAddSensorSubmit}>
         <div class="form-control">
@@ -70,5 +82,13 @@
             <button type="button" class="btn" on:click={handleAddSensorCancelled}>Close</button>
         </div>
     </form>
-  </div>
+    {#if showWarning}
+        <div class="alert alert-warning shadow-lg mt-2">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.268 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span>{warningMessage}</span>
+            </div>
+        </div>
+    {/if}
+    </div>
 </div>

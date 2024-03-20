@@ -12,7 +12,6 @@ export const SitevisorService = {
 		try {
 			const response = await axios.get(this.baseUrl + `/api/kafka-proxy`);
 			//const response = await axios.get("http://localhost:8080" + `/topics`);
-			console.log(response.data)
 			return response.data;
 		} catch (error) {
 			return [];
@@ -22,7 +21,6 @@ export const SitevisorService = {
 	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {
 			const response = await axios.get(this.baseUrl + `/api/rooms/?project_id=${projectId}`);
-			console.log(response.data)
 			return response.data;
 		} catch (error) {
 			return [];
@@ -56,7 +54,7 @@ export const SitevisorService = {
 		}
 	},
 
-	async createSensor(sensor: ISensor, projectId: string) {
+	async createSensor(sensor: ISensor, projectId: string): Promise<ISensor | undefined> {
 		try {
             const sensorData = {
                 name: sensor.name,
@@ -65,11 +63,24 @@ export const SitevisorService = {
                 position: { x: sensor.position?.x, y: sensor.position?.y, z: sensor.position?.z },
 				project: projectId
             };
-            await axios.post(`${this.baseUrl}/api/sensors/`, sensorData);
+            const response = await axios.post(`${this.baseUrl}/api/sensors/`, sensorData);
+			if (response.data) {
+				return response.data as Promise<ISensor>;
+			}
 		} catch (error) {
 			console.error("Error creating a Sensor", error);
+			return undefined;
 		}
-	  },
+	},
+
+	async deleteSensor(id: string): Promise<void> {
+		try {
+			await axios.delete(`${this.baseUrl}/api/sensors/${id}`);
+		} catch (error) {
+			console.error(`Error deleting Sensor with id ${id}`, error);
+			return;
+		}
+	},
 
 	async getProjects(): Promise<IProject[]> {
 		try {

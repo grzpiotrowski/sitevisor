@@ -24,6 +24,7 @@ import { ObjectFactory } from './utils/ObjectFactory';
 
 import { SitevisorService } from '../services/sitevisor-service';
 import { RoomPreview } from './assets/RoomPreview';
+import { get } from 'svelte/store';
 
 export class Viewer {
   private projectId: string;
@@ -208,6 +209,7 @@ export class Viewer {
 
   private onCanvasClick(event: MouseEvent) {
     if (event.button === 0) { // Left mouse button clicked
+      // Handle interaction with the ReferencePlane
       const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
       if (intersection) {
         // console.log(`Intersection at: ${intersection.x}, ${intersection.y}, ${intersection.z}`);
@@ -234,11 +236,15 @@ export class Viewer {
           this.setSensorInsertionMode(false);
         }
       }
+
+      // Handle interaction with Sensors
+      this.getIntersectedSensor();
     }
   }
 
   private handleSensorSelection(sensor: Sensor | null) {
     selectedSensorStore.set(sensor);
+    sensor?.setIsSelected(true);
   }
 
   private updateTempRoomPreview() {
@@ -285,11 +291,15 @@ export class Viewer {
   private animate = () => {
     requestAnimationFrame(this.animate);
     this.controls.update();
+
+    // Update not selected sensors
     for (const [_, sensor] of this.sensors) {
-      sensor.label.element.style.visibility = 'hidden';
+      if (sensor != get(selectedSensorStore)){
+        sensor.setIsSelected(false);
+      }
     }
+
     this.checkPointerIntersection();
-    this.getIntersectedSensor();
 
     const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
     if (intersection) {

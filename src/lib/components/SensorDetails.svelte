@@ -1,12 +1,17 @@
 <script lang="ts">
 	import type { Sensor } from "$lib/assets/Sensor";
+	import { selectedSensorStore } from "../../stores";
 
   export let selectedSensor: Sensor | null;
 
+  function closeSensorDetails() {
+    selectedSensorStore.set(null);
+  }
+
 </script>
 
-<div class="absolute top-0 right-0 mt-[70px] mr-4 p-4 bg-white shadow-md rounded-lg z-10">
-  <button class="absolute top-0 right-0 m-2" on:click={() => selectedSensor = null}>&times;</button>
+<div class="absolute top-0 right-0 mt-[70px] mr-4 p-4 bg-white shadow-md rounded-lg z-10 w-1/5">
+  <button class="absolute top-0 right-0 m-2" on:click={closeSensorDetails}>&times;</button>
   <h3 class="text-lg font-semibold">{selectedSensor?.userData.name}</h3>
   <p>ID: {selectedSensor?.userData.device_id}</p>
   <p>Level: {selectedSensor?.userData.level}</p>

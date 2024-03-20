@@ -27,8 +27,7 @@ export class SensorLabel extends CSS2DObject {
 
   public update() {
     this.element.innerHTML = `
-        <b> ${this.sensor.userData.name} </b><br>
-        <b> ${this.sensor.userData.data.value} </b>
+        <b> ${this.sensor.userData.name} </b>
         `;
   } 
 

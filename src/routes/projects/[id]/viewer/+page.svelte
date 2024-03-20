@@ -128,6 +128,10 @@
         const sensor = viewer.sensors.get(device_id);
         if (sensor) {
             sensor.update(newData);
+            // Reassign selectedSensor to trigger Svelte reactivity
+            if (sensor.userData.device_id === selectedSensor?.userData.device_id) {
+                selectedSensor = sensor;
+            }
         }
     }
 

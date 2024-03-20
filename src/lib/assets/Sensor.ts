@@ -10,6 +10,7 @@ export class Sensor extends Point3D {
   material: MeshStandardMaterial;
   geometry: BoxGeometry;
   label: SensorLabel;
+  isSelected: boolean;
 
   constructor(name: string, device_id: string, level: number, position: Vector3) {
     super(position);
@@ -30,10 +31,27 @@ export class Sensor extends Point3D {
     };
 
     this.label = new SensorLabel(this.position, this);
+
+    this.isSelected = false;
   }
 
   public update(sensorData: { value: number, unit: string } = { value: 0, unit: '' }) {
     this.userData.data = sensorData;
     this.label.update();
+  }
+
+  public setIsSelected(isSelected: boolean) {
+    this.isSelected = isSelected;
+    if (isSelected) {
+      this.material = new MeshStandardMaterial({
+        color: 0x00ff00,
+      });
+      this.label.element.style.visibility = 'visible';
+    } else {
+      this.material = new MeshStandardMaterial({
+        color: 0xff0000,
+      });
+      this.label.element.style.visibility = 'hidden';
+    }
   }
 }

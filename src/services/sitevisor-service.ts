@@ -45,6 +45,27 @@ export const SitevisorService = {
 		}
 	  },
 
+	async getSensor(id: string): Promise<ISensor> {
+		try {
+			const response = await axios.get(this.baseUrl + `/api/sensors/${id}`);
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			throw error;
+		}
+	},
+
+	async updateSensor(id: string, updatedSensorData: Partial<ISensor>): Promise<void> {
+		try {
+			const url = `${this.baseUrl}/api/sensors/${id}/`;
+			await axios.put(url, updatedSensorData);
+	
+			console.log("Sensor updated successfully");
+		} catch (error) {
+			console.error(`Error updating Sensor with id: ${id}`, error);
+		}
+	},
+
 	async getSensors(projectId: string): Promise<ISensor[]> {
 		try {
 			const response = await axios.get(this.baseUrl + `/api/sensors/?project_id=${projectId}`);

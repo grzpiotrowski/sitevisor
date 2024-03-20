@@ -48,6 +48,7 @@
         <th>Level</th>
         <th>Position</th>
         <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -59,6 +60,9 @@
           <td>{sensor.position?.x.toFixed(2)}, {sensor.position?.y.toFixed(2)}, {sensor.position?.z.toFixed(2)}</td>
           <td>
             <button class="btn btn-error btn-xs" on:click={() => confirmDelete(sensor.id)}>Delete</button>
+          </td>
+          <td>
+            <a class="btn btn-xs" href="/sensors/{sensor.id}">Details</a>
           </td>
         </tr>
       {/each}

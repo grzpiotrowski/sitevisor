@@ -27,6 +27,7 @@ import { RoomPreview } from './assets/RoomPreview';
 import { get } from 'svelte/store';
 import type { ISensor } from './common/interfaces/ISensor';
 import type { IRoom } from './common/interfaces/IRoom';
+import { Heatmap } from './assets/Heatmap';
 
 export class Viewer {
   private projectId: string;
@@ -50,6 +51,7 @@ export class Viewer {
 
   public sensors: Map<string, Sensor> = new Map();
   public rooms: Map<string, Room> = new Map();
+  public heatmap: Heatmap;
 
   private tempRoomPreview: RoomPreview | null = null;
 
@@ -135,6 +137,7 @@ export class Viewer {
     this.pointerHelper = new PointerHelper();
     this.scene.add(this.pointerHelper);
     this.loadObjects();
+    this.heatmap = new Heatmap(this.scene, this.referencePlane);
   }
 
   public setCameraAt(x: number, y: number, z: number) {
@@ -430,6 +433,7 @@ export class Viewer {
         console.log("N key pressed");
         // Key presses are active when a modal window is opened.
         // This may cause potential bugs when user is typing into an input field.
+        this.heatmap.updateHeatmap(this.sensors);
       }
   }
 

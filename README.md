@@ -34,6 +34,7 @@ You can preview the production build with `npm run preview`.
 - [Typescript Classes](https://www.typescriptlang.org/docs/handbook/2/classes.html)
 - [Refactoring Guru - Design Patterns - Factory Method](https://refactoring.guru/design-patterns/factory-method)
 - [Svelte-awesome-color-picker](https://svelte-awesome-color-picker.vercel.app/)
+- [MDN Web Docs - Drawing shapes with canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes)
 
 ## Documentation
 - [MkDocs - static site generator for project documentation](https://www.mkdocs.org/)

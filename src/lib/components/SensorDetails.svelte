@@ -97,6 +97,17 @@
       chart.data.datasets.forEach((dataset) => {
         dataset.data.push(newData);
       });
+
+      // Ensure only the last 30 readings are kept
+      if (chart.data.labels?.length) {
+        if (chart.data.labels.length > 30) {
+          chart.data.labels.shift();
+          chart.data.datasets.forEach((dataset) => {
+            dataset.data.shift();
+          });
+        }
+      }
+
       chart.update();
     }
   }

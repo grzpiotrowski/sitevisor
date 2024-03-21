@@ -13,6 +13,32 @@
   const dispatch = createEventDispatcher();
 
   $: selectedSensor = $selectedSensorStore, updateChart(selectedSensor?.userData?.data?.value);
+  $: selectedSensor, handleSensorChange($selectedSensorStore);
+
+  // Track the last selected sensor device_id
+  let lastDeviceId: string = ''; 
+
+  function handleSensorChange(selectedSensor: Sensor | null) {
+    if (selectedSensor) {
+      if (selectedSensor.userData.device_id !== lastDeviceId) {
+        // If the sensor device_id has changed, reset the chart
+        resetChartData();
+        lastDeviceId = selectedSensor.userData.device_id;
+      }
+    }
+  }
+
+  // Function triggered when the user selects another sensor
+  // While having the SensorDetails window opened
+  function resetChartData() {
+    if (chart) {
+      chart.data.labels = [];
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data = [];
+      });
+      chart.update();
+    }
+  }
 
   function closeSensorDetails() {
     selectedSensorStore.set(null);
@@ -37,7 +63,7 @@
             datasets: [{
               label: 'Sensor Reading',
               data: [],
-              fill: false,
+              fill: true,
               borderColor: 'rgb(75, 192, 192)',
               tension: 0.1
             }]
@@ -47,7 +73,12 @@
               y: {
                 beginAtZero: true
               }
-            }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
           }
         });
       }
@@ -82,7 +113,6 @@
     <p>Reading: {selectedSensor?.userData.data.value} {selectedSensor?.userData.data.unit}</p>
   {/if}
   <button class="btn btn-error btn-sm" on:click={() => showSensorDeleteModal = true}>Delete Sensor</button>
-
   {#if showSensorDeleteModal}
     <div class="modal modal-open">
       <div class="modal-box relative">

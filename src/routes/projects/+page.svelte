@@ -32,7 +32,7 @@
   <div class="p-4">
     <div class="grid grid-cols-4 gap-10 p-4">
       {#each projects as project}
-        <div class="card w-96 bg-base-200 shadow-xl">
+        <div class="card bg-base-200 shadow-xl">
           <figure class="px-10 pt-10"><img src="https://placehold.co/300x400" alt="Project Image" class="rounded-xl"></figure>
           <div class="card-body">
             <h2 class="card-title">{project.name}</h2>
@@ -43,7 +43,7 @@
           </div>
         </div>
       {/each}
-      <div class="card w-96 bg-base-300 shadow-xl cursor-pointer" >
+      <div class="card bg-base-300 shadow-xl cursor-pointer" >
         <div class="card-body">
           <h2 class="card-title">New Project</h2>
           <input type="text" placeholder="Project name" class="input w-full max-w-xs" bind:value={newProjectName}/>

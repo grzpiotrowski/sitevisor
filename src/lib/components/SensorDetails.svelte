@@ -123,6 +123,7 @@
   {#if selectedSensor?.userData.data}
     <p>Reading: {selectedSensor?.userData.data.value} {selectedSensor?.userData.data.unit}</p>
   {/if}
+  <a class="btn btn-sm" href="/sensors/{selectedSensor?.userData.id}">Details</a>
   <button class="btn btn-error btn-sm" on:click={() => showSensorDeleteModal = true}>Delete Sensor</button>
   {#if showSensorDeleteModal}
     <div class="modal modal-open">

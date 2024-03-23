@@ -5,7 +5,7 @@
 	import Header from '$lib/components/Header.svelte';
     import AddSensorDialog from '$lib/components/AddSensorDialog.svelte';
     import AddRoomDialog from '$lib/components/AddRoomDialog.svelte';
-    import type { PageData } from "../$types";
+    import type { PageData } from "./$types";
     import type { IProject } from "../../../../services/sitevisor-types";
 	import type { Sensor } from '$lib/assets/Sensor';
 	import { selectedSensorStore } from '../../../../stores';
@@ -14,6 +14,9 @@
 	export let data: PageData;
 
     const project: IProject = data.project;
+    const posX: number | null = Number(data.posX);
+    const posY: number | null = Number(data.posY);
+    const posZ: number | null = Number(data.posZ);
 
     let el: HTMLCanvasElement;
     let viewer: Viewer;
@@ -123,6 +126,8 @@
         });
 
         initializeWebSockets();
+
+        viewer.setCameraAt(posX, posY, posZ);
     });
 
     function updateSensorData(device_id: string, newData: any) {

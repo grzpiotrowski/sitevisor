@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { PageData } from "../$types";
+  import { goto } from '$app/navigation';
+  import type { PageData } from './$types';
   import type { ISensor } from '../../../../lib/common/interfaces/ISensor';
   import type { IProject } from '../../../../services/sitevisor-types';
   import HeaderProject from '$lib/components/HeaderProject.svelte';
 	import { SitevisorService } from '../../../../services/sitevisor-service';
+	import type { Vector3 } from 'three';
   export let data: PageData;
 
   let project: IProject = data.project;
@@ -35,6 +37,12 @@
       }
     }
   }
+
+  function navigateToSensor(pos: Vector3 | null) {
+    if (pos) {
+      goto(`/projects/${project.id.toString()}/viewer?posX=${pos.x}&posY=${pos.y}&posZ=${pos.z}`);
+    }
+  }
 </script>
 
 <HeaderProject projectid={project.id.toString()}/>
@@ -63,6 +71,9 @@
           </td>
           <td>
             <a class="btn btn-xs" href="/sensors/{sensor.id}">Details</a>
+          </td>
+          <td>
+            <button class="btn btn-xs" on:click={() => navigateToSensor(sensor.position)}>Go to</button>
           </td>
         </tr>
       {/each}

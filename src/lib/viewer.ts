@@ -134,6 +134,12 @@ export class Viewer {
     this.loadObjects();
   }
 
+  public setCameraAt(x: number, y: number, z: number) {
+        this.camera.position.set(x-3, y+5, z-3);
+        this.controls.target.set(x, y, z);
+        this.controls.update();
+  }
+
   public toggleRoomInsertionMode(): boolean {
     this.roomInsertionMode = !this.roomInsertionMode;
     if (this.roomInsertionMode) {

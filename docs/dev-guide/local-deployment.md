@@ -12,6 +12,8 @@ Install dependencies with:
 npm install
 ```
 
+Set `VITE_BASE_URL` and `VITE_WEBSOCKET_URL` in .env file.
+
 Start a development server:
 
 ```bash

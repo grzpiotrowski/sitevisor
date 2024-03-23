@@ -215,7 +215,8 @@
 <AddSensorDialog
     bind:isDialogOpen={addSensorDialogVisible}
     bind:viewer={viewer}
-    />
+    projectId={project.id}
+/>
 
 <AddRoomDialog 
     bind:isDialogOpen={addRoomDialogVisible}

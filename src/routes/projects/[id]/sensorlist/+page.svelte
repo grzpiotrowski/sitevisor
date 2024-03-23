@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import type { PageData } from './$types';
   import type { ISensor } from '../../../../lib/common/interfaces/ISensor';
-  import type { IProject } from '../../../../services/sitevisor-types';
+  import type { IProject, ISensorType } from '../../../../services/sitevisor-types';
   import HeaderProject from '$lib/components/HeaderProject.svelte';
 	import { SitevisorService } from '../../../../services/sitevisor-service';
 	import type { Vector3 } from 'three';
@@ -11,8 +11,8 @@
 
   let project: IProject = data.project;
   let sensors: ISensor[] = [];
-  let sensorTypes: string[] = [];
-  let selectedSensorType: string = "";
+  let sensorTypes: ISensorType[] = [];
+  let selectedSensorTypeId: string = ""
 
   let pendingDeleteSensorId: string | null = null;
   let showSensorDeleteModal: boolean = false;
@@ -23,18 +23,19 @@
   });
 
   async function fetchSensorTypes() {
-    sensorTypes = ['Temperature', 'Humidity'];
+    sensorTypes = await SitevisorService.getSensorTypes(project.id.toString());
   }
 
   async function fetchSensorsByType() {
-    if (selectedSensorType) {
-      sensors = await SitevisorService.getSensors(project.id.toString(), selectedSensorType);
+    if (selectedSensorTypeId) {
+      console.log(selectedSensorTypeId)
+      sensors = await SitevisorService.getSensors(project.id.toString(), selectedSensorTypeId);
     } else {
       sensors = await SitevisorService.getSensors(project.id.toString());
     }
   }
 
-  $: fetchSensorsByType(), selectedSensorType;
+  $: fetchSensorsByType(), selectedSensorTypeId;
 
   function confirmDelete(sensorId: string) {
     pendingDeleteSensorId = sensorId;
@@ -66,10 +67,10 @@
 <div class="container mx-auto p-5">
   <div class="mb-4 flex items-center">
     <label class="label mr-3" for="sensorTypeSelect">Sensor Type: </label>
-    <select id="sensorTypeSelect" class="select select-sm" bind:value={selectedSensorType} required>
+    <select id="sensorTypeSelect" class="select select-sm" bind:value={selectedSensorTypeId} required>
       <option selected value="">All</option>
       {#each sensorTypes as type}
-        <option value={type}>{type}</option>
+        <option value={type.id}>{type.name}</option>
       {/each}
     </select>
   </div>
@@ -78,6 +79,7 @@
       <tr>
         <th>Name</th>
         <th>Device ID</th>
+        <th>Type</th>
         <th>Level</th>
         <th>Position</th>
         <th></th>
@@ -88,6 +90,7 @@
         <tr>
           <td>{sensor.name}</td>
           <td>{sensor.device_id}</td>
+          <td>{sensor.type}</td>
           <td>{sensor.level}</td>
           <td>{sensor.position?.x.toFixed(2)}, {sensor.position?.y.toFixed(2)}, {sensor.position?.z.toFixed(2)}</td>
           <td>

@@ -2,6 +2,7 @@ import axios from "axios";
 import type { ISensor } from "../lib/common/interfaces/ISensor";
 import type { IRoom } from "../lib/common/interfaces/IRoom";
 import type { IProject } from "../services/sitevisor-types";
+import type { ISensorType } from "../services/sitevisor-types";
 import { loggedInUser } from "../stores";
 import { browser } from '$app/environment';
 
@@ -15,6 +16,38 @@ export const SitevisorService = {
 			return response.data;
 		} catch (error) {
 			return [];
+		}
+	},
+
+	async getSensorTypes(projectId: string): Promise<ISensorType[]> {
+		try {
+			const response = await axios.get(this.baseUrl + `/api/sensortypes/?project_id=${projectId}`);
+			return response.data;
+		} catch (error) {
+			return [];
+		}
+	},
+
+	async addSensorType(sensorTypeData: ISensorType): Promise<ISensorType | undefined> {
+		try {
+			const url = `${this.baseUrl}/api/sensortypes/`;
+			const response = await axios.post(url, sensorTypeData);
+	
+			console.log("Sensor Type created successfully");
+			if (response.data) {
+				return response.data as Promise<ISensorType>;
+			}
+		} catch (error) {
+			console.error(`Error creating SensorType: ${sensorTypeData.name}`, error);
+		}
+	},
+
+	async deleteSensorType(id: string): Promise<void> {
+		try {
+			await axios.delete(`${this.baseUrl}/api/sensortypes/${id}`);
+		} catch (error) {
+			console.error(`Error deleting SensorType with id ${id}`, error);
+			return;
 		}
 	},
 
@@ -66,10 +99,10 @@ export const SitevisorService = {
 		}
 	},
 
-	async getSensors(projectId: string, sensorType?: string): Promise<ISensor[]> {
+	async getSensors(projectId: string, sensorTypeId?: string): Promise<ISensor[]> {
 		let url = `${this.baseUrl}/api/sensors/?project_id=${projectId}`;
-		if (sensorType) {
-			url += `&type=${sensorType}`;
+		if (sensorTypeId) {
+			url += `&type=${sensorTypeId}`;
 		}
 	
 		try {

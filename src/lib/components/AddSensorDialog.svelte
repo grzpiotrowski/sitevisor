@@ -2,8 +2,10 @@
     import { Viewer } from '$lib/viewer';
 	import { SitevisorService } from '../../services/sitevisor-service';
     import { newSensor } from '../../stores';
+    import type { ISensorType } from '../../services/sitevisor-types';
 	export let isDialogOpen: boolean;
     export let viewer: Viewer;
+    export let projectId: number;
 
     let warningMessage = '';
     let showWarning = false;
@@ -14,10 +16,10 @@
         type: ''
     };
 
-    let sensorTypes: string[] = [];
+    let sensorTypes: ISensorType[] = [];
 
     async function fetchSensorTypes() {
-        sensorTypes = ['Temperature', 'Humidity'];
+        sensorTypes = await SitevisorService.getSensorTypes(projectId.toString());
     }
 
     $: if (isDialogOpen) {
@@ -73,7 +75,7 @@
             <select id="sensorType" class="select select-bordered" bind:value={sensorDetails.type} required>
                 <option value="" disabled selected>Select type</option>
                 {#each sensorTypes as type}
-                    <option value="{type}">{type}</option>
+                    <option value="{type.name}">{type.name}</option>
                 {/each}
             </select>
         </div>

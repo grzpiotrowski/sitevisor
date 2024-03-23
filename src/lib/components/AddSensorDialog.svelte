@@ -11,17 +11,17 @@
     let sensorDetails = {
         name: '',
         device_id: '',
-        topic: ''
+        type: ''
     };
 
-    let topics: string[] = [];
+    let sensorTypes: string[] = [];
 
-    async function fetchTopics() {
-        topics = await SitevisorService.getTopics();
+    async function fetchSensorTypes() {
+        sensorTypes = ['Temperature', 'Humidity']
     }
 
     $: if (isDialogOpen) {
-        fetchTopics();
+        fetchSensorTypes();
     }
 
     function handleAddSensorSubmit() {
@@ -41,6 +41,7 @@
                 device_id: sensorDetails.device_id,
                 level: 0,
                 position: null,
+                type: sensorDetails.type,
             }
             ));
         isDialogOpen = false;
@@ -68,12 +69,11 @@
             bind:value={sensorDetails.device_id}>
         </div>
         <div class="form-control">
-            <!-- TODO: Sensor fields -->
-            <label class="label" for="sensorTopic">Sensor Topic</label>
-            <select id="sensorType" class="select select-bordered" bind:value={sensorDetails.topic} required>
-                <option value="" disabled selected>Select topic</option>
-                {#each topics as topic}
-                    <option value="{topic}">{topic}</option>
+            <label class="label" for="sensorType">Sensor Type</label>
+            <select id="sensorType" class="select select-bordered" bind:value={sensorDetails.type} required>
+                <option value="" disabled selected>Select type</option>
+                {#each sensorTypes as type}
+                    <option value="{type}">{type}</option>
                 {/each}
             </select>
         </div>

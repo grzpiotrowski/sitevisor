@@ -9,4 +9,5 @@ export interface ISensor {
   device_id: string;
   level: number;
   position: Vector3 | null;
+  type: string;
 }

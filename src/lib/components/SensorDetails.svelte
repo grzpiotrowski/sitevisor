@@ -120,6 +120,7 @@
   <canvas bind:this={chartCanvas}></canvas>
   <p>ID: {selectedSensor?.userData.device_id}</p>
   <p>Level: {selectedSensor?.userData.level}</p>
+  <p>Type: {selectedSensor?.userData.type}</p>
   {#if selectedSensor?.userData.data}
     <p>Reading: {selectedSensor?.userData.data.value} {selectedSensor?.userData.data.unit}</p>
   {/if}

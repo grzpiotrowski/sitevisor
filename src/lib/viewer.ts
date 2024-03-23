@@ -81,6 +81,7 @@ export class Viewer {
         sensor.name,
         sensor.device_id,
         sensor.level,
+        sensor.type,
         new Vector3(sensor.position?.x, sensor.position?.y, sensor.position?.z));
       this.scene.add(newSensor);
       this.scene.add(newSensor.label)

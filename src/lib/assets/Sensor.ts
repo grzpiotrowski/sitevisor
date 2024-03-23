@@ -12,7 +12,7 @@ export class Sensor extends Point3D {
   label: SensorLabel;
   isSelected: boolean;
 
-  constructor(id: string, name: string, device_id: string, level: number, position: Vector3) {
+  constructor(id: string, name: string, device_id: string, level: number, type: string, position: Vector3) {
     super(position);
 
     this.geometry = new BoxGeometry(0.5, 0.5, 0.5);
@@ -28,6 +28,7 @@ export class Sensor extends Point3D {
       name: name,
       device_id: device_id,
       level: level,
+      type: type,
       data: null
     };
 

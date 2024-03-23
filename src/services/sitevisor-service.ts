@@ -81,6 +81,7 @@ export const SitevisorService = {
                 name: sensor.name,
 				device_id: sensor.device_id,
                 level: sensor.level,
+				type: sensor.type,
                 position: { x: sensor.position?.x, y: sensor.position?.y, z: sensor.position?.z },
 				project: projectId
             };

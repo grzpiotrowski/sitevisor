@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Header from "$lib/components/Header.svelte";
     import { SitevisorService } from "../../services/sitevisor-service";
-    import type { IProject } from "../../services/sitevisor-types";
+    import type { IProject, ISensorType } from "../../services/sitevisor-types";
     import { loggedInUser } from "../../stores";
     import type { PageData } from "./$types";
     export let data: PageData;
@@ -21,8 +21,15 @@
             rooms: [],
             sensors: []
         };
-        await SitevisorService.createProject(project);
+        const newProject = await SitevisorService.createProject(project);
         newProjectName = "";
+
+        if (newProject) {
+          const defaultSensorType1: ISensorType = {id: -1, name: "Temperature", project: newProject.id}
+          const defaultSensorType2: ISensorType = {id: -1, name: "Humidity", project: newProject.id}
+          await SitevisorService.addSensorType(defaultSensorType1);
+          await SitevisorService.addSensorType(defaultSensorType2);
+        }
 
         projects = await SitevisorService.getProjects();
     }

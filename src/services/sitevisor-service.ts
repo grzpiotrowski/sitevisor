@@ -182,9 +182,12 @@ export const SitevisorService = {
 		}
 	},
 
-	async createProject(project: IProject) {
+	async createProject(project: IProject): Promise<IProject | undefined> {
 		try {
-			await axios.post(`${this.baseUrl}/api/projects/`, project);
+			const response = await axios.post(`${this.baseUrl}/api/projects/`, project);
+			if (response.data) {
+				return response.data as Promise<IProject>;
+			}
 		} catch (error) {
 			console.error("Error creating a Project", error);
 		}

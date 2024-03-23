@@ -3,7 +3,8 @@
     import type { PageData } from "./$types";
     import { goto } from "$app/navigation";
 	import { SitevisorService } from "../../../../services/sitevisor-service";
-    import type { IProject, ISensorType } from "../../../../services/sitevisor-types";
+    import type { IProject } from "../../../../services/sitevisor-types";
+    import type { ISensorType } from "$lib/common/interfaces/ISensor";
 	export let data: PageData;
 
     let project: IProject = data.project;

@@ -18,9 +18,3 @@ export interface IProject {
     rooms: IRoom[];
     sensors: ISensor[];
 }
-
-export interface ISensorType {
-    id: number;
-    name: string;
-    project: number;
-}

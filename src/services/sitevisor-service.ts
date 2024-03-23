@@ -1,8 +1,7 @@
 import axios from "axios";
-import type { ISensor } from "../lib/common/interfaces/ISensor";
+import type { ISensor, ISensorType } from "../lib/common/interfaces/ISensor";
 import type { IRoom } from "../lib/common/interfaces/IRoom";
 import type { IProject } from "../services/sitevisor-types";
-import type { ISensorType } from "../services/sitevisor-types";
 import { loggedInUser } from "../stores";
 import { browser } from '$app/environment';
 
@@ -120,7 +119,7 @@ export const SitevisorService = {
                 name: sensor.name,
 				device_id: sensor.device_id,
                 level: sensor.level,
-				type: sensor.type,
+				type_id: sensor.type.id,
                 position: { x: sensor.position?.x, y: sensor.position?.y, z: sensor.position?.z },
 				project: projectId
             };

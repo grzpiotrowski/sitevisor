@@ -1,9 +1,11 @@
+import type { Load } from "@sveltejs/kit";
 import { SitevisorService } from "../../../services/sitevisor-service";
 export const ssr = false;
 
-export const load = async ({ params }) => {
+export const load: Load = async ({ params }) => {
   SitevisorService.checkPageRefresh();
-  const sensor = await SitevisorService.getSensor(encodeURI(params.id));
+  const sensorId = params.id ?? ''; 
+  const sensor = await SitevisorService.getSensor(encodeURI(sensorId));
   return {
     sensor: sensor,
   };

@@ -46,7 +46,7 @@
             <h2 class="card-title">{sensor.name}</h2>
             <p>Device ID: {sensor.device_id}</p>
             <p>Level: {sensor.level}</p>
-            <p>Type: {sensor.type}</p>
+            <p>Type: {sensor.type.id}</p>
             <div class="card-actions justify-end">
                 <button class="btn btn-error" on:click={deleteSensor}>Delete</button>
             </div>

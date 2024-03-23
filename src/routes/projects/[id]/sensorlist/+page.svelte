@@ -2,8 +2,8 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import type { PageData } from './$types';
-  import type { ISensor } from '../../../../lib/common/interfaces/ISensor';
-  import type { IProject, ISensorType } from '../../../../services/sitevisor-types';
+  import type { ISensor, ISensorType } from '../../../../lib/common/interfaces/ISensor';
+  import type { IProject } from '../../../../services/sitevisor-types';
   import HeaderProject from '$lib/components/HeaderProject.svelte';
 	import { SitevisorService } from '../../../../services/sitevisor-service';
 	import type { Vector3 } from 'three';
@@ -28,7 +28,6 @@
 
   async function fetchSensorsByType() {
     if (selectedSensorTypeId) {
-      console.log(selectedSensorTypeId)
       sensors = await SitevisorService.getSensors(project.id.toString(), selectedSensorTypeId);
     } else {
       sensors = await SitevisorService.getSensors(project.id.toString());
@@ -90,7 +89,7 @@
         <tr>
           <td>{sensor.name}</td>
           <td>{sensor.device_id}</td>
-          <td>{sensor.type}</td>
+          <td>{sensor.type.name}</td>
           <td>{sensor.level}</td>
           <td>{sensor.position?.x.toFixed(2)}, {sensor.position?.y.toFixed(2)}, {sensor.position?.z.toFixed(2)}</td>
           <td>

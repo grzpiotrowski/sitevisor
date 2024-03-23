@@ -17,7 +17,7 @@
     let sensorTypes: string[] = [];
 
     async function fetchSensorTypes() {
-        sensorTypes = ['Temperature', 'Humidity']
+        sensorTypes = ['Temperature', 'Humidity'];
     }
 
     $: if (isDialogOpen) {

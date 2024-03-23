@@ -66,11 +66,17 @@ export const SitevisorService = {
 		}
 	},
 
-	async getSensors(projectId: string): Promise<ISensor[]> {
+	async getSensors(projectId: string, sensorType?: string): Promise<ISensor[]> {
+		let url = `${this.baseUrl}/api/sensors/?project_id=${projectId}`;
+		if (sensorType) {
+			url += `&type=${sensorType}`;
+		}
+	
 		try {
-			const response = await axios.get(this.baseUrl + `/api/sensors/?project_id=${projectId}`);
+			const response = await axios.get(url);
 			return response.data;
 		} catch (error) {
+			console.error("Error fetching sensors", error);
 			return [];
 		}
 	},

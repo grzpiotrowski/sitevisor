@@ -4,6 +4,7 @@ import { Vector3 } from "three";
  * Interface representing the properties required to create a Room.
  */
 export interface IRoom {
+  id: string;
   name: string;
   level: number;
   color: number;

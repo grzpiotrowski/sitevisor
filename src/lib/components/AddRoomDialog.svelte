@@ -20,7 +20,9 @@
     function handleAddRoomSubmit() {
         // Update details in store but temporarily set position to null
         newRoom.update(() => (
-            { name: roomDetails.name,
+            { 
+                id: '',
+                name: roomDetails.name,
                 level: 0,
                 color: parseInt(hex.replace("#", ""), 16),
                 opacity: 0.5,

@@ -16,7 +16,7 @@ import {
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { Room } from './assets/Room';
 import { Sensor } from './assets/Sensor';
-import { newRoom, selectedSensorStore } from '../stores';
+import { newSensor, newRoom, selectedSensorStore, selectedRoomStore } from '../stores';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ReferencePlane } from './assets/ReferencePlane';
 import { PointerHelper } from './assets/PointerHelper';
@@ -25,7 +25,6 @@ import { ObjectFactory } from './utils/ObjectFactory';
 import { SitevisorService } from '../services/sitevisor-service';
 import { RoomPreview } from './assets/RoomPreview';
 import { get } from 'svelte/store';
-import { newSensor } from '../stores';
 import type { ISensor } from './common/interfaces/ISensor';
 import type { IRoom } from './common/interfaces/IRoom';
 
@@ -204,6 +203,17 @@ export class Viewer {
     }
   }
 
+  private getIntersectedRoom(): Room | null {
+    const roomIntersect = this.pointerIntersection.find(intersect => intersect.object instanceof Room);
+
+    if (roomIntersect) {
+      const roomObject = roomIntersect.object as Room;
+      return roomObject;
+    } else {
+      return null;
+    }
+  }  
+
   private setPointerPosition(event: MouseEvent) {
     const pos = this.getCanvasRelativePosition(event);
     this.pointer.x = (pos.x / this.canvasElement.clientWidth ) *  2 - 1;
@@ -273,6 +283,10 @@ export class Viewer {
       // Handle interaction with Sensors
       const clickedSensor = this.getIntersectedSensor();
       this.handleSensorSelection(clickedSensor);
+
+      // Handle interaction with Rooms
+      const clickedRoom = this.getIntersectedRoom();
+      this.handleRoomSelection(clickedRoom);      
     }
   }
 
@@ -293,6 +307,22 @@ export class Viewer {
       if (sensor.material) sensor.material.dispose();
   
       this.sensors.delete(device_id);
+    }
+  }
+
+  private handleRoomSelection(room: Room | null) {
+    if (room) {
+      room.setIsSelected(true);
+    }
+    selectedRoomStore.set(room);
+  }
+
+  public removeRoomFromScene(id: string): void {
+    const room = this.rooms.get(id);
+    if (room) {
+      this.scene.remove(room);
+      if (room.geometry) room.geometry.dispose();  
+      this.rooms.delete(id);
     }
   }
 
@@ -334,7 +364,6 @@ export class Viewer {
         console.log("N key pressed");
         // Key presses are active when a modal window is opened.
         // This may cause potential bugs when user is typing into an input field.
-        console.log(this.rooms);
       }
   }
 
@@ -348,6 +377,12 @@ export class Viewer {
     for (const [_, sensor] of this.sensors) {
       if (sensor != get(selectedSensorStore)){
         sensor.setIsSelected(false);
+      }
+    }
+
+    for (const [_, room] of this.rooms) {
+      if (room != get(selectedRoomStore)){
+        room.setIsSelected(false);
       }
     }
 

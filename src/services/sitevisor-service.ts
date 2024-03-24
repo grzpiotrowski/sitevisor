@@ -79,7 +79,16 @@ export const SitevisorService = {
 			console.error("Error creating a Room", error);
 			return undefined;
 		}
-	  },
+	},
+
+	async deleteRoom(id: string): Promise<void> {
+		try {
+			await axios.delete(`${this.baseUrl}/api/rooms/${id}`);
+		} catch (error) {
+			console.error(`Error deleting Room with id ${id}`, error);
+			return;
+		}
+	},
 
 	async getSensor(id: string): Promise<ISensor> {
 		try {

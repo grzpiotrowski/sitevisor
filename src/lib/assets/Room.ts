@@ -11,6 +11,9 @@ export class Room extends Volume {
   private height: number;
   private geometryMode: string;
   private flatHeight: number;
+  private materialNormal: MeshStandardMaterial;
+  private materialSelected: MeshStandardMaterial;
+  public isSelected: boolean;
 
   constructor(id: string, color: number, opacity: number, name: string, level: number, point1: Vector3, point2: Vector3) {
 
@@ -34,6 +37,13 @@ export class Room extends Volume {
     this.height = height;
     this.geometryMode = "3D";
     this.flatHeight = 0.01;
+    this.materialNormal = material;
+
+    this.materialSelected = new MeshStandardMaterial({
+      color: 0x00ff00,
+      opacity: opacity,
+      transparent: true
+    });
     
     // Custom object properties
     this.userData = {
@@ -41,6 +51,8 @@ export class Room extends Volume {
       name: name,
       level: level
     };
+
+    this.isSelected = false;
   }
   
   public toggleGeometryMode() {
@@ -64,6 +76,15 @@ export class Room extends Volume {
       this.geometry = new BoxGeometry(this.sizeX, this.height, this.sizeZ);
       this.position.setY(this.position.y + this.height/2 - this.flatHeight/2);
       this.geometryMode = "3D";
+    }
+  }
+
+  public setIsSelected(isSelected: boolean) {
+    this.isSelected = isSelected;
+    if (isSelected) {
+      this.material = this.materialSelected;
+    } else {
+      this.material = this.materialNormal;
     }
   }
 }

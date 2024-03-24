@@ -16,7 +16,7 @@ import {
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { Room } from './assets/Room';
 import { Sensor } from './assets/Sensor';
-import { selectedSensorStore } from '../stores';
+import { newRoom, selectedSensorStore } from '../stores';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ReferencePlane } from './assets/ReferencePlane';
 import { PointerHelper } from './assets/PointerHelper';
@@ -27,6 +27,7 @@ import { RoomPreview } from './assets/RoomPreview';
 import { get } from 'svelte/store';
 import { newSensor } from '../stores';
 import type { ISensor } from './common/interfaces/ISensor';
+import type { IRoom } from './common/interfaces/IRoom';
 
 export class Viewer {
   private projectId: string;
@@ -49,7 +50,7 @@ export class Viewer {
   private roomInsertionPoints: Vector3[] = [];
 
   public sensors: Map<string, Sensor> = new Map();
-  public rooms: Room[] = [];
+  public rooms: Map<string, Room> = new Map();
 
   private tempRoomPreview: RoomPreview | null = null;
 
@@ -67,11 +68,11 @@ export class Viewer {
     const rooms = await SitevisorService.getRooms(this.projectId);
     rooms.forEach((room) => {
       if (room.point1 != null && room.point2 != null) {
-        const newRoom = new Room(room.color, room.opacity, room.name, room.level,
+        const newRoom = new Room(room.id, room.color, room.opacity, room.name, room.level,
           new Vector3(room.point1.x, room.point1.y, room.point1.z),
           new Vector3(room.point2.x, room.point2.y, room.point2.z));
         this.scene.add(newRoom);
-        this.rooms.push(newRoom);
+        this.rooms.set(newRoom.userData.id, newRoom);
       }
     });
     const sensors = await SitevisorService.getSensors(this.projectId);
@@ -222,19 +223,29 @@ export class Viewer {
       // Handle interaction with the ReferencePlane
       const intersection = this.referencePlane.getIntersectionPoint(this.raycaster);
       if (intersection) {
-        // console.log(`Intersection at: ${intersection.x}, ${intersection.y}, ${intersection.z}`);
         this.pointerHelper.position.copy( intersection.clone() );
 
         if (this.roomInsertionMode) {
           this.roomInsertionPoints.push(intersection.clone());
+          const roomData: IRoom = get(newRoom);
+          roomData.point1 = this.roomInsertionPoints[0];
           // Create a Room Preview
           if (this.roomInsertionPoints.length == 1) {
             this.createTempRoomPreview(intersection);
           }
           // Second point should be at (intersection)
           if (this.roomInsertionPoints.length === 2) {
-            const room = this.objectFactory.createRoomFromPoints(this.roomInsertionPoints);
-            SitevisorService.createRoom(room, this.projectId);
+            roomData.point2 = this.roomInsertionPoints[1];
+            SitevisorService.createRoom(roomData, this.projectId).then(
+              createdRoom => {
+                if (createdRoom) {
+                  roomData.id = createdRoom.id;
+                  this.objectFactory.createRoom(roomData);
+                }
+              }
+            ).catch(error => {
+              console.error("Failed to create a room in backend", error);
+            });
             this.setRoomInsertionMode(false);
             this.removeTempRoomPreview();
             this.roomInsertionPoints = [];
@@ -323,6 +334,7 @@ export class Viewer {
         console.log("N key pressed");
         // Key presses are active when a modal window is opened.
         // This may cause potential bugs when user is typing into an input field.
+        console.log(this.rooms);
       }
   }
 

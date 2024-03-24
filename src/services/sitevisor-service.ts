@@ -59,7 +59,7 @@ export const SitevisorService = {
 		}
 	},
 
-	async createRoom(room: IRoom, projectId: string) {
+	async createRoom(room: IRoom, projectId: string): Promise<IRoom | undefined> {
 		try {
             const roomData = {
                 name: room.name,
@@ -71,9 +71,13 @@ export const SitevisorService = {
                 height: 3.0,
 				project: projectId
             };
-            await axios.post(`${this.baseUrl}/api/rooms/`, roomData);
+            const response = await axios.post(`${this.baseUrl}/api/rooms/`, roomData);
+			if (response.data) {
+				return response.data as Promise<IRoom>;
+			}
 		} catch (error) {
 			console.error("Error creating a Room", error);
+			return undefined;
 		}
 	  },
 

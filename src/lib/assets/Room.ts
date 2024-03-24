@@ -12,7 +12,7 @@ export class Room extends Volume {
   private geometryMode: string;
   private flatHeight: number;
 
-  constructor(color: number, opacity: number, name: string, level: number, point1: Vector3, point2: Vector3) {
+  constructor(id: string, color: number, opacity: number, name: string, level: number, point1: Vector3, point2: Vector3) {
 
     const sizeX = Math.abs(point2.x - point1.x);
     const sizeZ = Math.abs(point2.z - point1.z);
@@ -37,6 +37,7 @@ export class Room extends Volume {
     
     // Custom object properties
     this.userData = {
+      id: id,
       name: name,
       level: level
     };

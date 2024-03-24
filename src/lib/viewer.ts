@@ -81,6 +81,7 @@ export class Viewer {
         sensor.name,
         sensor.device_id,
         sensor.level,
+        sensor.type.name,
         new Vector3(sensor.position?.x, sensor.position?.y, sensor.position?.z));
       this.scene.add(newSensor);
       this.scene.add(newSensor.label)
@@ -132,6 +133,12 @@ export class Viewer {
     this.pointerHelper = new PointerHelper();
     this.scene.add(this.pointerHelper);
     this.loadObjects();
+  }
+
+  public setCameraAt(x: number, y: number, z: number) {
+        this.camera.position.set(x-3, y+5, z-3);
+        this.controls.target.set(x, y, z);
+        this.controls.update();
   }
 
   public toggleRoomInsertionMode(): boolean {

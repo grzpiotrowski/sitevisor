@@ -5,14 +5,18 @@
 	import Header from '$lib/components/Header.svelte';
     import AddSensorDialog from '$lib/components/AddSensorDialog.svelte';
     import AddRoomDialog from '$lib/components/AddRoomDialog.svelte';
-    import type { PageData } from "../$types";
+    import type { PageData } from "./$types";
     import type { IProject } from "../../../../services/sitevisor-types";
 	import type { Sensor } from '$lib/assets/Sensor';
 	import { selectedSensorStore } from '../../../../stores';
 	import SensorDetails from '$lib/components/SensorDetails.svelte';
+	import HeaderProject from '$lib/components/HeaderProject.svelte';
 	export let data: PageData;
 
     const project: IProject = data.project;
+    const posX: number | null = Number(data.posX);
+    const posY: number | null = Number(data.posY);
+    const posZ: number | null = Number(data.posZ);
 
     let el: HTMLCanvasElement;
     let viewer: Viewer;
@@ -122,6 +126,8 @@
         });
 
         initializeWebSockets();
+
+        viewer.setCameraAt(posX, posY, posZ);
     });
 
     function updateSensorData(device_id: string, newData: any) {
@@ -158,7 +164,7 @@
 </svelte:head>
 
 <div class="flex flex-col h-screen">
-    <Header />
+    <HeaderProject projectid={project.id.toString()}/>
     {#if selectedSensor}
         <SensorDetails on:removeSensor={e => viewer.removeSensorFromScene(e.detail.device_id)} selectedSensor={selectedSensor}/>
     {/if}
@@ -209,7 +215,8 @@
 <AddSensorDialog
     bind:isDialogOpen={addSensorDialogVisible}
     bind:viewer={viewer}
-    />
+    projectId={project.id}
+/>
 
 <AddRoomDialog 
     bind:isDialogOpen={addRoomDialogVisible}

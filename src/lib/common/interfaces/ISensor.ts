@@ -9,4 +9,11 @@ export interface ISensor {
   device_id: string;
   level: number;
   position: Vector3 | null;
+  type: ISensorType;
+}
+
+export interface ISensorType {
+  id: number;
+  name: string;
+  project: number;
 }

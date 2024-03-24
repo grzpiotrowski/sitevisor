@@ -2,8 +2,11 @@
     import { Viewer } from '$lib/viewer';
 	import { SitevisorService } from '../../services/sitevisor-service';
     import { newSensor } from '../../stores';
+    import type { ISensorType } from '$lib/common/interfaces/ISensor';
+	import { get } from 'svelte/store';
 	export let isDialogOpen: boolean;
     export let viewer: Viewer;
+    export let projectId: number;
 
     let warningMessage = '';
     let showWarning = false;
@@ -11,17 +14,18 @@
     let sensorDetails = {
         name: '',
         device_id: '',
-        topic: ''
+        type_id: -1,
     };
 
-    let topics: string[] = [];
+    let sensorTypes: Map<number, ISensorType> = new Map();
 
-    async function fetchTopics() {
-        topics = await SitevisorService.getTopics();
+    async function fetchSensorTypes() {
+        const sensorTypesArray = await SitevisorService.getSensorTypes(projectId.toString());
+        sensorTypes = new Map(sensorTypesArray.map(type => [type.id, type]));
     }
 
     $: if (isDialogOpen) {
-        fetchTopics();
+        fetchSensorTypes();
     }
 
     function handleAddSensorSubmit() {
@@ -32,7 +36,14 @@
             return;
         } else {
             showWarning = false;
-        }      
+        }
+        const selectedType = sensorTypes.get(sensorDetails.type_id);
+
+        if (!selectedType) {
+            console.error("Selected sensor type is invalid");
+            return;
+        }
+
         // Update details in store but temporarily set position to null
         newSensor.update(() => (
             {   
@@ -41,8 +52,9 @@
                 device_id: sensorDetails.device_id,
                 level: 0,
                 position: null,
+                type: selectedType,
             }
-            ));
+        ));
         isDialogOpen = false;
         viewer.setSensorInsertionMode(true);
     }
@@ -68,12 +80,11 @@
             bind:value={sensorDetails.device_id}>
         </div>
         <div class="form-control">
-            <!-- TODO: Sensor fields -->
-            <label class="label" for="sensorTopic">Sensor Topic</label>
-            <select id="sensorType" class="select select-bordered" bind:value={sensorDetails.topic} required>
-                <option value="" disabled selected>Select topic</option>
-                {#each topics as topic}
-                    <option value="{topic}">{topic}</option>
+            <label class="label" for="sensorType">Sensor Type</label>
+            <select id="sensorType" class="select select-bordered" bind:value={sensorDetails.type_id} required>
+                <option value="" disabled selected>Select type</option>
+                {#each Array.from(sensorTypes.values()) as type}
+                    <option value={type.id}>{type.name}</option>
                 {/each}
             </select>
         </div>

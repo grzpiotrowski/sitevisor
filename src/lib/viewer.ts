@@ -283,10 +283,14 @@ export class Viewer {
       // Handle interaction with Sensors
       const clickedSensor = this.getIntersectedSensor();
       this.handleSensorSelection(clickedSensor);
+      if (clickedSensor) this.handleRoomSelection(null);
 
-      // Handle interaction with Rooms
-      const clickedRoom = this.getIntersectedRoom();
-      this.handleRoomSelection(clickedRoom);      
+      // Prioritise sensor selection
+      if (!clickedSensor) {
+        // Handle interaction with Rooms
+        const clickedRoom = this.getIntersectedRoom();
+        this.handleRoomSelection(clickedRoom);
+      }
     }
   }
 

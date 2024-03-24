@@ -90,7 +90,7 @@ export const SitevisorService = {
 	async updateSensor(id: string, updatedSensorData: Partial<ISensor>): Promise<void> {
 		try {
 			const url = `${this.baseUrl}/api/sensors/${id}/`;
-			await axios.put(url, updatedSensorData);
+			await axios.patch(url, updatedSensorData);
 	
 			console.log("Sensor updated successfully");
 		} catch (error) {

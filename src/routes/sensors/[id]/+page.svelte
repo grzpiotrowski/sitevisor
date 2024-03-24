@@ -21,16 +21,15 @@
 
     // Function to handle form submission
     async function updateSensor() {
-        const updatedSensor = {
-            ...sensor,
+        const updatedSensor: Partial<ISensor> = {
             name: updatedName,
             device_id: updatedDeviceId,
         };
 
         try {
-            await SitevisorService.updateSensor(sensor.id.toString(), updatedSensor);
-            sensor = updatedSensor;
-            console.log("Sensor updated successfully");
+        await SitevisorService.updateSensor(sensor.id.toString(), updatedSensor);
+        sensor = { ...sensor, ...updatedSensor };
+        console.log("Sensor updated successfully");
         } catch (error) {
             console.error("Error updating Sensor:", error);
         }

@@ -30,6 +30,11 @@
     let addRoomDialogVisible: boolean = false;
     let selectedSensor: Sensor | null = null;
     let selectedRoom: Room | null = null;
+    let geometryMode3D: boolean = true;
+
+    $: if (viewer) {
+        viewer.setRoomsGeometryMode(geometryMode3D ? '3D' : '2D');
+    }
     
     function getTopicNamesArray() {
         return project.kafka_topics ? project.kafka_topics.split(',') : [];
@@ -149,9 +154,11 @@
 
     function toggleRoomInsertion() {
         const roomInsertionMode: boolean = viewer.toggleRoomInsertionMode();
+        
         if (roomInsertionMode) {
             addRoomDialogVisible = true;
         }
+        geometryMode3D = roomInsertionMode;
         console.log("Add Room button pressed.")
     }
 
@@ -180,8 +187,16 @@
     <div class="flex flex-1 overflow-hidden">
         <div class="drawer lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
-            <div class="drawer-content flex flex-col items-center justify-center h-[calc(100vh-70px)]" bind:this={viewerContainer}>
+            <div class="drawer-content flex flex-col items-center justify-center h-[calc(100vh-70px)] relative" bind:this={viewerContainer}>
                 <canvas bind:this={el} />
+                <div class="absolute bottom-2 left-2 flex flex-col items-end z-10">
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <input type="checkbox" class="toggle" bind:checked={geometryMode3D} />
+                            <span class="label-text ml-2">2D/3D</span> 
+                        </label>
+                    </div>
+                </div>
             </div> 
 
             <Sidebar

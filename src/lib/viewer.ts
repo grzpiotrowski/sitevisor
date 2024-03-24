@@ -150,6 +150,7 @@ export class Viewer {
     } else {
       this.pointerHelper.setCreateMode(this.roomInsertionMode);
       this.toggleRoomsGeometryMode();
+      this.removeTempRoomPreview();
     }
     return this.roomInsertionMode;
   }
@@ -163,6 +164,7 @@ export class Viewer {
     } else {
       this.pointerHelper.setCreateMode(this.roomInsertionMode);
       this.setRoomsGeometryMode("3D");
+      this.removeTempRoomPreview();
     }
     return this.roomInsertionMode;
   }

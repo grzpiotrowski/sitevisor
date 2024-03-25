@@ -1,16 +1,17 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import type { PageData } from './$types';
   import type { IProject, IIssue } from '../../../../services/sitevisor-types';
   import HeaderProject from '$lib/components/HeaderProject.svelte';
+  import { formatDate } from '$lib/utils/helpers';
   export let data: PageData;
 
   let project: IProject = data.project;
   let issues: IIssue[] = data.issues;
+  let projectId: string = project.id.toString()
 
 </script>
 
-<HeaderProject projectid={project.id.toString()}/>
+<HeaderProject projectid={projectId}/>
 
 <div class="container mx-auto p-5">
   <table class="table w-full table-zebra">
@@ -18,8 +19,12 @@
       <tr>
         <th>Title</th>
         <th>Status</th>
-        <th>Created date</th>
+        <th>Type</th>
         <th>Created by</th>
+        <th>Assigned to</th>
+        <th>Created</th>
+        <th>Updated</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -27,8 +32,16 @@
         <tr>
           <td>{issue.title}</td>
           <td>{issue.status}</td>
-          <td>{issue.created_at}</td>
+          <td>{issue.object_type}</td>
           <td>{issue.creator}</td>
+          <td>{issue.assignee ? issue.assignee : 'Unassigned'}</td>
+          <td>{formatDate(issue.created_at)}</td>
+          <td>{formatDate(issue.updated_at)}</td>
+          <td>
+            <div class="flex justify-end gap-3">
+              <a class="btn btn-xs" href="/projects/{projectId}/issues/{issue.id}">Details</a>
+            </div>
+          </td>
         </tr>
       {/each}
     </tbody>

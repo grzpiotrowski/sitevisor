@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { ISensor, ISensorType } from "../lib/common/interfaces/ISensor";
 import type { IRoom } from "../lib/common/interfaces/IRoom";
-import type { IProject } from "../services/sitevisor-types";
+import type { IIssue, IProject } from "../services/sitevisor-types";
 import { loggedInUser } from "../stores";
 import { browser } from '$app/environment';
 
@@ -202,6 +202,66 @@ export const SitevisorService = {
 			}
 		} catch (error) {
 			console.error("Error creating a Project", error);
+		}
+	},
+
+	async createIssue(issueData: Partial<IIssue>, objectId: string, objectType: string): Promise<IIssue | undefined> {
+		try {
+			const issuePayload = {
+				...issueData,
+				object_id: objectId,
+				object_type: objectType
+			};
+			const response = await axios.post(`${this.baseUrl}/api/issues/`, issuePayload);
+			console.log("Issue created successfully");
+			if (response.data) {
+				return response.data as Promise<IIssue>;
+			}
+		} catch (error) {
+			console.error("Error creating an Issue", error);
+		}
+	},
+	
+	async updateIssue(id: string, updatedIssueData: Partial<IIssue>): Promise<void> {
+		try {
+			const url = `${this.baseUrl}/api/issues/${id}/`;
+			await axios.patch(url, updatedIssueData);
+			console.log("Issue updated successfully");
+		} catch (error) {
+			console.error(`Error updating Issue with id: ${id}`, error);
+		}
+	},
+	
+	async deleteIssue(id: string): Promise<void> {
+		try {
+			await axios.delete(`${this.baseUrl}/api/issues/${id}`);
+			console.log("Issue deleted successfully");
+		} catch (error) {
+			console.error(`Error deleting Issue with id ${id}`, error);
+		}
+	},
+	
+	async getIssueById(id: string): Promise<IIssue> {
+		try {
+			const response = await axios.get(`${this.baseUrl}/api/issues/${id}`);
+			return response.data;
+		} catch (error) {
+			console.error(`Error fetching Issue with id ${id}`, error);
+			throw error;
+		}
+	},
+	
+	async getIssues(projectId?: string): Promise<IIssue[]> {
+		try {
+			let url = `${this.baseUrl}/api/issues/`;
+			if (projectId) {
+				url += `?project_id=${projectId}`;
+			}
+			const response = await axios.get(url);
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching issues", error);
+			return [];
 		}
 	},
 

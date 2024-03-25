@@ -29,5 +29,6 @@ export interface IIssue {
     creator: IUser;
     assignee?: IUser;
     object_id: number;
-    object_type: string; 
+    object_type: string;
+    project: string;
 }

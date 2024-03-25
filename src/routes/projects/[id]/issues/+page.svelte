@@ -6,7 +6,7 @@
   export let data: PageData;
 
   let project: IProject = data.project;
-  let issues: IIssue[] = data.issues;;
+  let issues: IIssue[] = data.issues;
 
 </script>
 

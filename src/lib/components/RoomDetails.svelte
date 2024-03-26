@@ -1,8 +1,10 @@
 <script lang="ts">
-	import type { Room } from "$lib/assets/Room";
 	import { selectedRoomStore } from "../../stores";
   import { createEventDispatcher } from 'svelte';
   import { SitevisorService } from "../../services/sitevisor-service";
+	import AddIssueDialog from "./AddIssueDialog.svelte";
+	import type { IIssue } from "../../services/sitevisor-types";
+  import type { Room } from "$lib/assets/Room";
 
   export let selectedRoom: Room | null;
   let showRoomDeleteModal = false;
@@ -13,9 +15,24 @@
   // Track the last selected room id
   let lastRoomId: string = ''; 
 
+  let addIssueDialogVisible: boolean = false;
+
+  function openAddIssueDialog() {
+    addIssueDialogVisible = true;
+    console.log("Opening Add issue dialog")
+  }
+
+  function closeAddIssueDialog() {
+    addIssueDialogVisible = false;
+    console.log("Closing Add issue dialog")
+  }
+
+  function handleIssueCreated(event: { detail: { issue: IIssue; }; }) {
+    const newIssue: IIssue = event.detail.issue;
+  }  
+
   function handleRoomChange(selectedRoom: Room | null) {
     if (selectedRoom) {
-      console.log(selectedRoom)
       if (selectedRoom.userData.id !== lastRoomId) {
         lastRoomId = selectedRoom.userData.id;
       }
@@ -39,6 +56,7 @@
   <button class="absolute top-0 right-0 m-2" on:click={closeRoomDetails}>&times;</button>
   <h3 class="text-lg font-semibold">Room: {selectedRoom?.userData.name}</h3>
   <p>Level: {selectedRoom?.userData.level}</p>
+  <button class="btn btn-primary btn-sm" on:click={openAddIssueDialog}>Add Issue</button>
   <button class="btn btn-error btn-sm" on:click={() => showRoomDeleteModal = true}>Delete Room</button>
   {#if showRoomDeleteModal}
     <div class="modal modal-open">
@@ -53,3 +71,11 @@
     </div>
   {/if}
 </div>
+{#if addIssueDialogVisible}
+  <AddIssueDialog
+    showObjectSelection={false}
+    predefinedObjectId={selectedRoom?.userData.id}
+    predefinedObjectType='room'
+    on:close={closeAddIssueDialog}
+    on:issueCreated={handleIssueCreated} projectId={selectedRoom?.userData.project}/>
+{/if}

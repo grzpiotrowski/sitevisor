@@ -39,7 +39,6 @@
   function handleSensorChange(selectedSensor: Sensor | null) {
     if (selectedSensor) {
       if (selectedSensor.userData.device_id !== lastDeviceId) {
-        console.log(selectedSensor);
         // If the sensor device_id has changed, reset the chart
         resetChartData();
         lastDeviceId = selectedSensor.userData.device_id;

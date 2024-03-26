@@ -24,7 +24,7 @@
   function handleIssueCreated(event: { detail: { issue: IIssue; }; }) {
     const newIssue: IIssue = event.detail.issue;
     issues = [...issues, newIssue];
-}
+  }
 
 </script>
 

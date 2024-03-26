@@ -29,7 +29,7 @@ export class ObjectFactory {
 
   createSensor(options: ISensor): Sensor | undefined {
     if (options.position != null) {
-      const sensor = new Sensor(options.id, options.name, options.device_id, options.level, options.type.name, options.position);
+      const sensor = new Sensor(options.id, options.name, options.device_id, options.level, options.type.name, options.project, options.position);
       this.scene.add(sensor);
       this.scene.add(sensor.label);
       this.viewer.sensors.set(sensor.userData.device_id, sensor);

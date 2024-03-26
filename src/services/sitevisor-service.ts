@@ -50,6 +50,16 @@ export const SitevisorService = {
 		}
 	},
 
+	async getRoom(id: string): Promise<IRoom> {
+		try {
+			const response = await axios.get(this.baseUrl + `/api/rooms/${id}`);
+			return response.data;
+		} catch (error) {
+			console.log(error);
+			throw error;
+		}
+	},
+
 	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {
 			const response = await axios.get(this.baseUrl + `/api/rooms/?project_id=${projectId}`);

@@ -6,7 +6,15 @@
     import { SitevisorService } from "../../../../../services/sitevisor-service";
     import type { IIssue } from "../../../../../services/sitevisor-types";
     import { formatDate } from '$lib/utils/helpers';
+	import { get } from 'svelte/store';
+	import { objectTypesStore, statusOptionsStore } from '../../../../../stores';
+	import type { ISensor } from '$lib/common/interfaces/ISensor';
+	import type { IRoom } from '$lib/common/interfaces/IRoom';
+	import { onMount } from 'svelte';
     export let data: PageData;
+
+    const statusOptions = get(statusOptionsStore);
+    const objectTypes = get(objectTypesStore);
 
     let issue: IIssue = data.issue;
     let projectId: string = data.projectId;
@@ -16,6 +24,19 @@
 
     // Temporary Issue for edit mode
     let tempIssue = writable({...issue});
+    let object_name = "";
+
+    $: formattedIssue = ({
+        ...issue,
+        status: statusOptions.get(issue.status),
+        object_type: objectTypes.get(issue.object_type),
+        created_at: formatDate(issue.created_at),
+        updated_at: formatDate(issue.updated_at),
+    });
+
+    onMount(() => {
+        getObjectName(issue.object_type, issue.object_id);
+    });
 
     async function saveChanges() {
         const updatedIssueData = $tempIssue;
@@ -37,6 +58,18 @@
             console.error("Error trying to delete Issue: " + issue.id, error);
         }
     }
+
+    async function getObjectName(type: string, id: number) {
+        if (type === 'sensor') {
+            const object: ISensor = await SitevisorService.getSensor(id.toString());
+            object_name = object.name;
+        } else if (type === 'room') {
+            const object: IRoom = await SitevisorService.getRoom(id.toString());
+            object_name = object.name;
+        } else {
+            object_name = "Unknown";
+        }
+    }
 </script>
 
 <HeaderProject projectid={projectId}/>
@@ -46,34 +79,41 @@
         <div class="card-body">
             {#if $isEditMode}
                 <!-- Edit Mode Inputs -->
-                <input class="input input-bordered" bind:value={$tempIssue.title} placeholder="Title"/>
-                <textarea class="textarea textarea-bordered h-24" bind:value={$tempIssue.description} placeholder="Description"></textarea>
-                <select class="select select-bordered" bind:value={$tempIssue.status}>
-                    <option value="opened">Opened</option>
-                    <option value="in progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                </select>                
-                <input class="input input-bordered" bind:value={$tempIssue.assignee} placeholder="Assigned to"/>
-                <input class="input input-bordered" type="number" bind:value={$tempIssue.object_id} placeholder="Object ID"/>
-                <select class="select select-bordered" bind:value={$tempIssue.object_type}>
-                    <option value="sensor">Sensor</option>
-                    <option value="room">Room</option>
-                </select>
+                <div class="form-control">
+                    <label class="label" for="issueTitle">Title</label>
+                    <input type="text" id="issueTitle" class="input input-bordered" required bind:value={$tempIssue.title}>
+                </div>
+                <div class="form-control">
+                    <label class="label" for="issueDescription">Description</label>
+                    <textarea id="issueDescription" class="textarea textarea-bordered" required bind:value={$tempIssue.description}></textarea>
+                </div>
+                <div class="form-control">
+                    <label class="label" for="issueStatus">Status</label>
+                    <select id="issueStatus" class="select select-bordered" required bind:value={$tempIssue.status}>
+                        {#each statusOptions.entries() as [id, statusName]}
+                            <option value={id}>{statusName}</option>
+                        {/each}
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label class="label" for="issueAssignee">Assigned to</label>
+                    <input class="input input-bordered" bind:value={$tempIssue.assignee} placeholder="Assigned to"/>
+                </div>
                 <div class="flex mt-8 gap-2">
                     <button class="btn btn-primary w-20" on:click={saveChanges}>Save</button>
                     <button class="btn w-20" on:click={() => isEditMode.set(false)}>Cancel</button>
                 </div>
             {:else}
                 <!-- View Mode Displays -->
-                <h2 class="card-title">{issue.title}</h2>
-                <p>Description: {issue.description}</p>
-                <p>Status: {issue.status}</p>
-                <p>Created by: {issue.creator}</p>
-                <p>Assigned to: {issue.assignee ? issue.assignee : 'Unassigned'}</p>
-                <p>Created: {formatDate(issue.created_at)}</p>
-                <p>Updated: {formatDate(issue.updated_at)}</p>
-                <p>Object ID: {issue.object_id}</p>
-                <p>Object Type: {issue.object_type}</p>
+                <h2 class="card-title">{formattedIssue.title}</h2>
+                <p>Description: {formattedIssue.description}</p>
+                <p>Status: {formattedIssue.status}</p>
+                <p>Created by: {formattedIssue.creator}</p>
+                <p>Assigned to: {formattedIssue.assignee ? formattedIssue.assignee : 'Unassigned'}</p>
+                <p>Created: {formattedIssue.created_at}</p>
+                <p>Updated: {formattedIssue.updated_at}</p>
+                <p>{formattedIssue.object_type} Name: {object_name}</p>
+                <p>Object Type: {formattedIssue.object_type}</p>
                 <div class="flex mt-8 gap-2">
                     <button class="btn btn-primary w-20" on:click={() => isEditMode.set(true)}>Edit</button>
                     <button class="btn btn-error w-20" on:click={deleteIssue}>Delete</button>

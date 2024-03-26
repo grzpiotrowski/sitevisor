@@ -35,10 +35,11 @@
         }
     });
 
+    // Could possibly have a method in the SitevisorService to resolve that
+    // Ideally ISensor and IRoom would have a parent interface
     async function fetchObjects(type: string) {
         if (type === 'sensor') {
             objects = await SitevisorService.getSensors(projectId);
-            console.log(objects);
         } else if (type === 'room') {
             objects = await SitevisorService.getRooms(projectId);
         }

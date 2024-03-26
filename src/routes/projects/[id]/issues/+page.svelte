@@ -20,6 +20,8 @@
     ...issue,
     status: statusOptions.get(issue.status),
     object_type: objectTypes.get(issue.object_type),
+    created_at: formatDate(issue.created_at),
+    updated_at: formatDate(issue.updated_at)
   }));
 
   function openAddIssueDialog() {
@@ -63,8 +65,8 @@
             <td>{issue.object_type}</td>
             <td>{issue.creator}</td>
             <td>{issue.assignee ? issue.assignee : 'Unassigned'}</td>
-            <td>{formatDate(issue.created_at)}</td>
-            <td>{formatDate(issue.updated_at)}</td>
+            <td>{issue.created_at}</td>
+            <td>{issue.updated_at}</td>
             <td>
               <div class="flex justify-end gap-3">
                 <a class="btn btn-xs" href="/projects/{projectId}/issues/{issue.id}">Details</a>

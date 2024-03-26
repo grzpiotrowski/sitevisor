@@ -59,9 +59,10 @@
                     <option value="sensor">Sensor</option>
                     <option value="room">Room</option>
                 </select>
-
-                <button class="btn btn-primary" on:click={saveChanges}>Save</button>
-                <button class="btn" on:click={() => isEditMode.set(false)}>Cancel</button>
+                <div class="flex mt-8 gap-2">
+                    <button class="btn btn-primary w-20" on:click={saveChanges}>Save</button>
+                    <button class="btn w-20" on:click={() => isEditMode.set(false)}>Cancel</button>
+                </div>
             {:else}
                 <!-- View Mode Displays -->
                 <h2 class="card-title">{issue.title}</h2>
@@ -73,9 +74,10 @@
                 <p>Updated: {formatDate(issue.updated_at)}</p>
                 <p>Object ID: {issue.object_id}</p>
                 <p>Object Type: {issue.object_type}</p>
-
-                <button class="btn btn-secondary" on:click={() => isEditMode.set(true)}>Edit</button>
-                <button class="btn btn-error" on:click={deleteIssue}>Delete</button>
+                <div class="flex mt-8 gap-2">
+                    <button class="btn btn-primary w-20" on:click={() => isEditMode.set(true)}>Edit</button>
+                    <button class="btn btn-error w-20" on:click={deleteIssue}>Delete</button>
+                </div>
             {/if}
         </div>
     </div>

@@ -5,11 +5,22 @@
   import AddIssueDialog from '$lib/components/AddIssueDialog.svelte';
   import { formatDate } from '$lib/utils/helpers';
   export let data: PageData;
+  import { get } from 'svelte/store';
+	import { objectTypesStore, statusOptionsStore } from '../../../../stores';
 
   let project: IProject = data.project;
   let issues: IIssue[] = data.issues;
   let projectId: string = project.id.toString()
   let addIssueDialogVisible: boolean = false;
+
+  const statusOptions = get(statusOptionsStore);
+  const objectTypes = get(objectTypesStore);
+
+  $: formattedIssues = issues.map(issue => ({
+    ...issue,
+    status: statusOptions.get(issue.status),
+    object_type: objectTypes.get(issue.object_type),
+  }));
 
   function openAddIssueDialog() {
     addIssueDialogVisible = true;
@@ -45,7 +56,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each issues as issue}
+        {#each formattedIssues as issue}
           <tr>
             <td>{issue.title}</td>
             <td>{issue.status}</td>

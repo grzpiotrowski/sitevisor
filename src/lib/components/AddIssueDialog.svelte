@@ -4,13 +4,16 @@
     import type { IIssue } from '../../services/sitevisor-types';
 	import type { ISensor } from '$lib/common/interfaces/ISensor';
 	import type { IRoom } from '$lib/common/interfaces/IRoom';
+	import { get } from 'svelte/store';
+	import { objectTypesStore, statusOptionsStore } from '../../stores';
     export let projectId: string;
     export let showObjectSelection: boolean = true; // Controls the visibility of object selection fields
     export let predefinedObjectType: string | undefined = undefined;
     export let predefinedObjectId: number | undefined = undefined; 
 
-    const statusOptions = ['opened', 'in progress', 'resolved'];
-    const objectTypes = [{ id: 'sensor', name: 'Sensor' }, { id: 'room', name: 'Room' }];
+    const statusOptions = get(statusOptionsStore);
+    const objectTypes = get(objectTypesStore);
+    const defaultObjectType: string[] = objectTypes.entries().next().value;
     let objects: Array<ISensor | IRoom> = [];
 
     const dispatch = createEventDispatcher();
@@ -28,7 +31,7 @@
             fetchObjects(predefinedObjectType);
         }
         else {
-            fetchObjects(objectTypes[0].id)
+            fetchObjects(defaultObjectType[0])
         }
     });
 
@@ -82,8 +85,8 @@
             <div class="form-control">
                 <label class="label" for="issueStatus">Status</label>
                 <select id="issueStatus" class="select select-bordered" required bind:value={issueDetails.status}>
-                    {#each statusOptions as status}
-                        <option value={status}>{status}</option>
+                    {#each statusOptions.entries() as [id, statusName]}
+                        <option value={id}>{statusName}</option>
                     {/each}
                 </select>
             </div>
@@ -94,8 +97,8 @@
                     <label class="label" for="objectType">Object Type</label>
                     <select id="objectType" class="select select-bordered"
                             bind:value={issueDetails.object_type}
-                            on:change="{() => fetchObjects(issueDetails.object_type ?? objectTypes[0].id)}">
-                        {#each objectTypes as {id, name}}
+                            on:change="{() => fetchObjects(issueDetails.object_type ?? defaultObjectType[0])}">
+                        {#each objectTypes.entries() as [id, name]}
                             <option value={id}>{name}</option>
                         {/each}
                     </select>

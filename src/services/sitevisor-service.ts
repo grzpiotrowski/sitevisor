@@ -205,12 +205,10 @@ export const SitevisorService = {
 		}
 	},
 
-	async createIssue(issueData: Partial<IIssue>, objectId: string, objectType: string, projectId: string): Promise<IIssue | undefined> {
+	async createIssue(issueData: Partial<IIssue>, projectId: string): Promise<IIssue | undefined> {
 		try {
 			const issuePayload = {
 				...issueData,
-				object_id: objectId,
-				object_type: objectType,
 				project: projectId
 			};
 			const response = await axios.post(`${this.baseUrl}/api/issues/`, issuePayload);

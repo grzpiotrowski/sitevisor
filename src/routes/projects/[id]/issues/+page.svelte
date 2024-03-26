@@ -29,45 +29,46 @@
 </script>
 
 <HeaderProject projectid={projectId}/>
-
-<div class="container mx-auto p-5">
-  <table class="table w-full table-zebra">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Status</th>
-        <th>Type</th>
-        <th>Created by</th>
-        <th>Assigned to</th>
-        <th>Created</th>
-        <th>Updated</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each issues as issue}
+<div class="container mx-auto">
+  <div class="container mx-auto overflow-y-scroll h-[calc(100vh-170px)] p-5 pt-0">
+    <table class="table w-full table-zebra table-pin-rows">
+      <thead>
         <tr>
-          <td>{issue.title}</td>
-          <td>{issue.status}</td>
-          <td>{issue.object_type}</td>
-          <td>{issue.creator}</td>
-          <td>{issue.assignee ? issue.assignee : 'Unassigned'}</td>
-          <td>{formatDate(issue.created_at)}</td>
-          <td>{formatDate(issue.updated_at)}</td>
-          <td>
-            <div class="flex justify-end gap-3">
-              <a class="btn btn-xs" href="/projects/{projectId}/issues/{issue.id}">Details</a>
-            </div>
-          </td>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Type</th>
+          <th>Created by</th>
+          <th>Assigned to</th>
+          <th>Created</th>
+          <th>Updated</th>
+          <th></th>
         </tr>
-      {/each}
-    </tbody>
-  </table>
-  <div class="flex justify-end mt-4">
+      </thead>
+      <tbody>
+        {#each issues as issue}
+          <tr>
+            <td>{issue.title}</td>
+            <td>{issue.status}</td>
+            <td>{issue.object_type}</td>
+            <td>{issue.creator}</td>
+            <td>{issue.assignee ? issue.assignee : 'Unassigned'}</td>
+            <td>{formatDate(issue.created_at)}</td>
+            <td>{formatDate(issue.updated_at)}</td>
+            <td>
+              <div class="flex justify-end gap-3">
+                <a class="btn btn-xs" href="/projects/{projectId}/issues/{issue.id}">Details</a>
+              </div>
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+
+  </div>
+  <div class="flex justify-end mt-8">
     <button class="btn btn-primary" on:click={openAddIssueDialog}>Add New Issue</button>
   </div>
 </div>
-
 {#if addIssueDialogVisible}
   <AddIssueDialog on:close={closeAddIssueDialog} on:issueCreated={handleIssueCreated} projectId={projectId}/>
 {/if}

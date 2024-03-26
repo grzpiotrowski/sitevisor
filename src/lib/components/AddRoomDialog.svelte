@@ -5,7 +5,7 @@
     import ColorPicker from 'svelte-awesome-color-picker';
 	export let isDialogOpen: boolean;
     export let viewer: Viewer;
-
+    export let projectId: number;
 
     let hex = "#eab507";
     $: if (isDialogOpen) {
@@ -26,6 +26,7 @@
                 level: 0,
                 color: parseInt(hex.replace("#", ""), 16),
                 opacity: 0.5,
+                project: projectId,
                 point1: null,
                 point2: null
             }

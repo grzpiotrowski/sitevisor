@@ -15,7 +15,7 @@ export class Room extends Volume {
   private materialSelected: MeshStandardMaterial;
   public isSelected: boolean;
 
-  constructor(id: string, color: number, opacity: number, name: string, level: number, point1: Vector3, point2: Vector3) {
+  constructor(id: string, color: number, opacity: number, name: string, level: number, project: number, point1: Vector3, point2: Vector3) {
 
     const sizeX = Math.abs(point2.x - point1.x);
     const sizeZ = Math.abs(point2.z - point1.z);
@@ -49,7 +49,8 @@ export class Room extends Volume {
     this.userData = {
       id: id,
       name: name,
-      level: level
+      level: level,
+      project: project,
     };
 
     this.isSelected = false;

@@ -15,6 +15,7 @@
 
   function handleRoomChange(selectedRoom: Room | null) {
     if (selectedRoom) {
+      console.log(selectedRoom)
       if (selectedRoom.userData.id !== lastRoomId) {
         lastRoomId = selectedRoom.userData.id;
       }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import type { PageData } from './$types';
+  import type { PageData } from '../sensorlist/$types';
   import type { ISensor, ISensorType } from '../../../../lib/common/interfaces/ISensor';
   import type { IProject } from '../../../../services/sitevisor-types';
   import HeaderProject from '$lib/components/HeaderProject.svelte';
@@ -95,7 +95,7 @@
           <td>
             <div class="flex justify-end gap-3">
               <button class="btn btn-error btn-xs" on:click={() => confirmDelete(sensor.id)}>Delete</button>
-              <a class="btn btn-xs" href="/sensors/{sensor.id}">Details</a>
+              <a class="btn btn-xs" href="/projects/{project.id}/sensors/{sensor.id}">Details</a>
               <button class="btn btn-xs" on:click={() => navigateToSensor(sensor.position)}>Go to</button>
             </div>
           </td>

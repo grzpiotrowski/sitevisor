@@ -1,10 +1,10 @@
 <script lang="ts">
 	import HeaderProject from "$lib/components/HeaderProject.svelte";
-    import type { PageData } from "./$types";
+    import type { PageData } from "../[id]/$types";
     import { goto } from "$app/navigation";
-	import { SitevisorService } from "../../../services/sitevisor-service";
+	import { SitevisorService } from "../../../../../services/sitevisor-service";
     import type { ISensor } from "$lib/common/interfaces/ISensor";
-	import type { IIssue } from "../../../services/sitevisor-types";
+	import type { IIssue } from "../../../../../services/sitevisor-types";
 	import IssuesTable from "$lib/components/IssuesTable.svelte";
 	export let data: PageData;
 
@@ -40,7 +40,7 @@
 
 </script>
 
-<HeaderProject projectid={"1"}/>
+<HeaderProject projectid={sensor.project.toString()}/>
 
 <div class="container mx-auto p-5">
     <div class="card bg-base-100 shadow-xl">

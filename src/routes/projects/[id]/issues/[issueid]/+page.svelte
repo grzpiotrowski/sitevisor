@@ -115,6 +115,7 @@
                 <p>{formattedIssue.object_type} Name: {object_name}</p>
                 <p>Object Type: {formattedIssue.object_type}</p>
                 <div class="flex mt-8 gap-2">
+                    <a class="btn w-20" href="/projects/{projectId}/{issue.object_type}s/{issue.object_id}">{formattedIssue.object_type} Details</a>
                     <button class="btn btn-primary w-20" on:click={() => isEditMode.set(true)}>Edit</button>
                     <button class="btn btn-error w-20" on:click={deleteIssue}>Delete</button>
                 </div>

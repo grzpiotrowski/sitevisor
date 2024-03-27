@@ -179,7 +179,7 @@
 <div class="flex flex-col h-screen">
     <HeaderProject projectid={project.id.toString()}/>
     {#if selectedSensor}
-        <SensorDetails on:removeSensor={e => viewer.removeSensorFromScene(e.detail.device_id)} selectedSensor={selectedSensor}/>
+        <SensorDetails on:removeSensor={e => viewer.removeSensorFromScene(e.detail.device_id)} selectedSensor={selectedSensor} rooms={viewer.rooms}/>
     {/if}
     {#if selectedRoom}
         <RoomDetails on:removeRoom={e => viewer.removeRoomFromScene(e.detail.id)} selectedRoom={selectedRoom}/>

@@ -6,12 +6,25 @@
     import type { ISensor } from "$lib/common/interfaces/ISensor";
 	import type { IIssue } from "../../../../../services/sitevisor-types";
 	import IssuesTable from "$lib/components/IssuesTable.svelte";
+	import { onMount } from "svelte";
 	export let data: PageData;
 
     let sensor: ISensor = data.sensor;
-    let issues: IIssue[] = data.issues;
+    let issues: IIssue[] = [];
     let updatedName = sensor.name;
     let updatedDeviceId = sensor.device_id;
+
+    onMount(async () => {
+        await fetchIssues();
+    });
+
+    async function fetchIssues() {
+    try {
+      issues = await SitevisorService.getIssues({object_type: "sensor", object_id: sensor.id.toString()});
+    } catch (error) {
+      console.error("Failed to fetch issues:", error);
+    }
+  }
 
     async function deleteSensor() {
         try {

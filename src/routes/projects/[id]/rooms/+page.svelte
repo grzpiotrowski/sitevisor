@@ -41,7 +41,7 @@
     }
   }
 
-  function navigateToSensor(pos: Vector3 | null) {
+  function navigateToRoom(pos: Vector3 | null) {
     if (pos) {
       goto(`/projects/${project.id.toString()}/viewer?posX=${pos.x}&posY=${pos.y}&posZ=${pos.z}`);
     }
@@ -66,6 +66,7 @@
           <td>{room.level}</td>
           <td>
             <div class="flex justify-end gap-3">
+              <a class="btn btn-xs" href="/projects/{project.id}/rooms/{room.id}">Details</a>
               <button class="btn btn-error btn-xs" on:click={() => confirmDelete(room.id)}>Delete</button>
             </div>
           </td>

@@ -29,7 +29,7 @@
     async function deleteSensor() {
         try {
             await SitevisorService.deleteSensor(sensor.id.toString());
-            goto("/projects");
+            goto(`/projects/${sensor.project}/sensors`);
         } catch (error) {
             console.log("Error trying to delete Sensor: " + sensor.id);
         }

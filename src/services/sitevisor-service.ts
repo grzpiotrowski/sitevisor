@@ -60,6 +60,17 @@ export const SitevisorService = {
 		}
 	},
 
+	async updateRoom(id: string, updatedRoomData: Partial<IRoom>): Promise<void> {
+		try {
+			const url = `${this.baseUrl}/api/rooms/${id}/`;
+			await axios.patch(url, updatedRoomData);
+	
+			console.log("Room updated successfully");
+		} catch (error) {
+			console.error(`Error updating Room with id: ${id}`, error);
+		}
+	},
+
 	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {
 			const response = await axios.get(this.baseUrl + `/api/rooms/?project_id=${projectId}`);

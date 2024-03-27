@@ -39,7 +39,7 @@
     // Ideally ISensor and IRoom would have a parent interface
     async function fetchObjects(type: string) {
         if (type === 'sensor') {
-            objects = await SitevisorService.getSensors(projectId);
+            objects = await SitevisorService.getSensors({project_id: projectId});
         } else if (type === 'room') {
             objects = await SitevisorService.getRooms(projectId);
         }

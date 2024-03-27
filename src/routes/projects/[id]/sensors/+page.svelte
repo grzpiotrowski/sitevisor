@@ -28,9 +28,9 @@
 
   async function fetchSensorsByType() {
     if (selectedSensorTypeId) {
-      sensors = await SitevisorService.getSensors(project.id.toString(), selectedSensorTypeId);
+      sensors = await SitevisorService.getSensors( {project_id: project.id.toString(), type: selectedSensorTypeId });
     } else {
-      sensors = await SitevisorService.getSensors(project.id.toString());
+      sensors = await SitevisorService.getSensors( {project_id: project.id.toString()} );
     }
   }
 

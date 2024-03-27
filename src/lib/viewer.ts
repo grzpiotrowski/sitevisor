@@ -74,7 +74,7 @@ export class Viewer {
         this.rooms.set(newRoom.userData.id, newRoom);
       }
     });
-    const sensors = await SitevisorService.getSensors(this.projectId);
+    const sensors = await SitevisorService.getSensors( {project_id: this.projectId} );
     sensors.forEach((sensor) => {
       const newSensor = new Sensor(
         sensor.id,

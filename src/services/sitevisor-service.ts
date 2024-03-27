@@ -260,12 +260,23 @@ export const SitevisorService = {
 		}
 	},
 	
-	async getIssues(projectId?: string): Promise<IIssue[]> {
+	async getIssues(queryParams: Record<string, string | undefined>): Promise<IIssue[]> {
 		try {
 			let url = `${this.baseUrl}/api/issues/`;
-			if (projectId) {
-				url += `?project_id=${projectId}`;
+	
+			// Convert queryParams object to URL search parameters
+			const searchParams = new URLSearchParams();
+			Object.keys(queryParams).forEach(key => {
+				if (queryParams[key] !== undefined) {
+					searchParams.append(key, queryParams[key]!);
+				}
+			});
+	
+			// Append search parameters to the URL if any exist
+			if (Array.from(searchParams).length > 0) {
+				url += `?${searchParams.toString()}`;
 			}
+	
 			const response = await axios.get(url);
 			return response.data;
 		} catch (error) {

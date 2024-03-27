@@ -8,7 +8,7 @@ export const load: Load = async ({ params }) => {
 	SitevisorService.checkPageRefresh();
 	const projectId = params.id ?? ''; 
 	const project: IProject = await SitevisorService.getProjectById(encodeURI(projectId));
-	const issues: IIssue[] = await SitevisorService.getIssues(projectId);
+	const issues: IIssue[] = await SitevisorService.getIssues({project_id: projectId});
 	return {
 	  project: project,
 	  issues: issues,

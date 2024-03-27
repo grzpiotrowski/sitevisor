@@ -69,9 +69,15 @@ export class Sensor extends Point3D {
   }
 
   public checkIsInsideRoom(rooms: Map<string, Room>): Room | undefined {
+    // Add a small height (skin width) for the detection purposes
+    // Sensor is exactly on the floor of the room so it could happen that its not detected inside due to float
+    const skinWidth: number = 0.01;
+    const sensorPosition = this.position.clone();
+    sensorPosition.setY(sensorPosition.y + skinWidth);
+
     for (const [room_id, room] of rooms) {
       room.geometry.computeBoundingBox();
-      if (room.geometry.boundingBox?.translate(room.position).containsPoint(this.position)) {
+      if (room.geometry.boundingBox?.translate(room.position).containsPoint(sensorPosition)) {
         return room;
       }
     }

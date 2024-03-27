@@ -92,6 +92,10 @@ export class Room extends Volume {
   }
 
   public checkSensorsWithin(sensors: Map<string, Sensor>): Map<string, Sensor> {
+    // Add a small height (skin width) for the detection purposes
+    // Sensor is exactly on the floor of the room so it could happen that its not detected inside due to float
+    const skinWidth: number = 0.01;
+
     const sensorsInRoom: Map<string, Sensor> = new Map();
     this.geometry.computeBoundingBox();
     // Bounding box has only min max values, needs to be shifted to objects location
@@ -99,7 +103,10 @@ export class Room extends Volume {
     const bbox = this.geometry.boundingBox?.clone()
     bbox?.translate(this.position);
     for (const [device_id, sensor] of sensors) {
-      if (bbox?.containsPoint(sensor.position)) {
+      
+      const sensorPosition = sensor.position.clone();
+      sensorPosition.setY(sensorPosition.y + skinWidth);
+      if (bbox?.containsPoint(sensorPosition)) {
         sensorsInRoom.set(device_id, sensor);
       }
     }

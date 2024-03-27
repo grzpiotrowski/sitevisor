@@ -5,6 +5,7 @@ import {
   } from 'three';
 import { Point3D } from './BaseTypes/Point3D';
 import { SensorLabel } from './SensorLabel';
+import type { Room } from './Room';
   
 export class Sensor extends Point3D {
   material: MeshStandardMaterial;
@@ -63,6 +64,15 @@ export class Sensor extends Point3D {
       this.label.element.style.visibility = 'visible';
     } else {
       this.label.element.style.visibility = 'hidden';
+    }
+  }
+
+  public checkIsInsideRoom(rooms: Map<string, Room>): Room | undefined {
+    for (const [room_id, room] of rooms) {
+      room.geometry.computeBoundingBox();
+      if (room.geometry.boundingBox?.translate(room.position).containsPoint(this.position)) {
+        return room;
+      }
     }
   }
 }

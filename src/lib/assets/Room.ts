@@ -4,6 +4,7 @@ import {
   Vector3,
 } from 'three';
 import { Volume } from './BaseTypes/Volume';
+import type { Sensor } from './Sensor';
 
 export class Room extends Volume {
   private sizeX: number;
@@ -87,5 +88,16 @@ export class Room extends Volume {
     } else {
       this.material = this.materialNormal;
     }
+  }
+
+  public checkSensorsWithin(sensors: Map<string, Sensor>): Map<string, Sensor> {
+    const sensorsInRoom: Map<string, Sensor> = new Map();
+    this.geometry.computeBoundingBox();
+    for (const [device_id, sensor] of sensors) {
+      if (this.geometry.boundingBox?.translate(this.position).containsPoint(sensor.position)) {
+        sensorsInRoom.set(device_id, sensor);
+      }
+    }
+    return sensorsInRoom;
   }
 }

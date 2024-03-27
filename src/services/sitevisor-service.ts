@@ -60,6 +60,17 @@ export const SitevisorService = {
 		}
 	},
 
+	async updateRoom(id: string, updatedRoomData: Partial<IRoom>): Promise<void> {
+		try {
+			const url = `${this.baseUrl}/api/rooms/${id}/`;
+			await axios.patch(url, updatedRoomData);
+	
+			console.log("Room updated successfully");
+		} catch (error) {
+			console.error(`Error updating Room with id: ${id}`, error);
+		}
+	},
+
 	async getRooms(projectId: string): Promise<IRoom[]> {
 		try {
 			const response = await axios.get(this.baseUrl + `/api/rooms/?project_id=${projectId}`);
@@ -121,13 +132,21 @@ export const SitevisorService = {
 		}
 	},
 
-	async getSensors(projectId: string, sensorTypeId?: string): Promise<ISensor[]> {
-		let url = `${this.baseUrl}/api/sensors/?project_id=${projectId}`;
-		if (sensorTypeId) {
-			url += `&type=${sensorTypeId}`;
-		}
-	
+	async getSensors(queryParams: Record<string, string | undefined>): Promise<ISensor[]> {
 		try {
+			let url = `${this.baseUrl}/api/sensors/`;
+	
+			const searchParams = new URLSearchParams();
+			Object.keys(queryParams).forEach(key => {
+				if (queryParams[key] !== undefined) {
+					searchParams.append(key, queryParams[key]!);
+				}
+			});
+	
+			if (Array.from(searchParams).length > 0) {
+				url += `?${searchParams.toString()}`;
+			}
+	
 			const response = await axios.get(url);
 			return response.data;
 		} catch (error) {

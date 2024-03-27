@@ -7,6 +7,7 @@
 	import type { IIssue } from "../../../../../services/sitevisor-types";
 	import IssuesTable from "$lib/components/IssuesTable.svelte";
 	import { onMount } from "svelte";
+	import type { Vector3 } from "three";
 	export let data: PageData;
 
     let sensor: ISensor = data.sensor;
@@ -29,7 +30,7 @@
     async function deleteSensor() {
         try {
             await SitevisorService.deleteSensor(sensor.id.toString());
-            goto("/projects");
+            goto(`/projects/${sensor.project}/sensors`);
         } catch (error) {
             console.log("Error trying to delete Sensor: " + sensor.id);
         }
@@ -51,6 +52,12 @@
         }
     }
 
+    function navigateToSensor(pos: Vector3 | null) {
+        if (pos) {
+            goto(`/projects/${sensor.project}/viewer?posX=${pos.x}&posY=${pos.y}&posZ=${pos.z}`);
+        }
+  }
+
 </script>
 
 <HeaderProject projectid={sensor.project.toString()}/>
@@ -63,6 +70,7 @@
             <p>Level: {sensor.level}</p>
             <p>Type: {sensor.type.name}</p>
             <div class="card-actions justify-end">
+                <button class="btn" on:click={() => navigateToSensor(sensor.position)}>Go to</button>
                 <button class="btn btn-error" on:click={deleteSensor}>Delete</button>
             </div>
         </div>

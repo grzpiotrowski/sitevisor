@@ -56,6 +56,8 @@
   <button class="absolute top-0 right-0 m-2" on:click={closeRoomDetails}>&times;</button>
   <h3 class="text-lg font-semibold">Room: {selectedRoom?.userData.name}</h3>
   <p>Level: {selectedRoom?.userData.level}</p>
+  <p>Sensors: {selectedRoom?.userData.sensors.length}</p>
+  <a class="btn btn-sm" href="/projects/{selectedRoom?.userData.project}/rooms/{selectedRoom?.userData.id}">Details</a>
   <button class="btn btn-primary btn-sm" on:click={openAddIssueDialog}>Add Issue</button>
   <button class="btn btn-error btn-sm" on:click={() => showRoomDeleteModal = true}>Delete Room</button>
   {#if showRoomDeleteModal}

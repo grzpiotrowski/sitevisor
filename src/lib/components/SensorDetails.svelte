@@ -7,8 +7,11 @@
   import { SitevisorService } from "../../services/sitevisor-service";
   import Chart from 'chart.js/auto';
 	import type { IIssue } from '../../services/sitevisor-types';
+	import type { Room } from '$lib/assets/Room';
 
   export let selectedSensor: Sensor | null;
+  export let rooms: Map<string, Room>;
+  
   let showSensorDeleteModal = false;
   let chart: Chart | null = null;
   let chartCanvas: HTMLCanvasElement;
@@ -138,6 +141,7 @@
   <canvas bind:this={chartCanvas}></canvas>
   <p>ID: {selectedSensor?.userData.device_id}</p>
   <p>Level: {selectedSensor?.userData.level}</p>
+  <p>Room: {rooms.get(selectedSensor?.userData.room)?.userData.name ?? 'Not assigned'}</p>
   <p>Type: {selectedSensor?.userData.type}</p>
   {#if selectedSensor?.userData.data}
     <p>Reading: {selectedSensor?.userData.data.value} {selectedSensor?.userData.data.unit}</p>

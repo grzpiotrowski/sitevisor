@@ -5,6 +5,7 @@ import {
   } from 'three';
 import { Point3D } from './BaseTypes/Point3D';
 import { SensorLabel } from './SensorLabel';
+import type { Room } from './Room';
   
 export class Sensor extends Point3D {
   material: MeshStandardMaterial;
@@ -12,7 +13,7 @@ export class Sensor extends Point3D {
   label: SensorLabel;
   isSelected: boolean;
 
-  constructor(id: string, name: string, device_id: string, level: number, type: string, project: number, position: Vector3) {
+  constructor(id: string, name: string, device_id: string, level: number, type: string, project: number, position: Vector3, room: string | null) {
     super(position);
 
     this.geometry = new BoxGeometry(0.5, 0.5, 0.5);
@@ -30,6 +31,7 @@ export class Sensor extends Point3D {
       level: level,
       type: type,
       project: project,
+      room: room,
       data: null
     };
 
@@ -64,5 +66,24 @@ export class Sensor extends Point3D {
     } else {
       this.label.element.style.visibility = 'hidden';
     }
+  }
+
+  public checkIsInsideRoom(rooms: Map<string, Room>): Room | undefined {
+    // Add a small height (skin width) for the detection purposes
+    // Sensor is exactly on the floor of the room so it could happen that its not detected inside due to float
+    const skinWidth: number = 0.01;
+    const sensorPosition = this.position.clone();
+    sensorPosition.setY(sensorPosition.y + skinWidth);
+
+    for (const [room_id, room] of rooms) {
+      room.geometry.computeBoundingBox();
+      if (room.geometry.boundingBox?.translate(room.position).containsPoint(sensorPosition)) {
+        return room;
+      }
+    }
+  }
+
+  public setRoomEntry(roomId: string | null) {
+    this.userData.room = roomId;
   }
 }

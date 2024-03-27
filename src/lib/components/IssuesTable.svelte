@@ -36,8 +36,8 @@
       {/each}
     </select>
     {#if showTypeFilter}
-    <label class="label text-sm mr-3" for="sensorTypeSelect">Sensor Type: </label>
-    <select id="sensorTypeSelect" class="select select-sm" bind:value={objectTypeFilter}>
+    <label class="label text-sm mr-3" for="objectTypeSelect">Object Type: </label>
+    <select id="objectTypeSelect" class="select select-sm" bind:value={objectTypeFilter}>
       <option value="">All</option>
       {#each Array.from(objectTypes.values()) as objectType}
         <option value={objectType}>{objectType}</option>

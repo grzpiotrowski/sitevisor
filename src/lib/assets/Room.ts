@@ -4,6 +4,7 @@ import {
   Vector3,
 } from 'three';
 import { Volume } from './BaseTypes/Volume';
+import type { Sensor } from './Sensor';
 
 export class Room extends Volume {
   private sizeX: number;
@@ -15,7 +16,7 @@ export class Room extends Volume {
   private materialSelected: MeshStandardMaterial;
   public isSelected: boolean;
 
-  constructor(id: string, color: number, opacity: number, name: string, level: number, project: number, point1: Vector3, point2: Vector3) {
+  constructor(id: string, color: number, opacity: number, name: string, level: number, project: number, sensors: string[], point1: Vector3, point2: Vector3) {
 
     const sizeX = Math.abs(point2.x - point1.x);
     const sizeZ = Math.abs(point2.z - point1.z);
@@ -51,6 +52,7 @@ export class Room extends Volume {
       name: name,
       level: level,
       project: project,
+      sensors: sensors,
     };
 
     this.isSelected = false;
@@ -86,6 +88,41 @@ export class Room extends Volume {
       this.material = this.materialSelected;
     } else {
       this.material = this.materialNormal;
+    }
+  }
+
+  public checkSensorsWithin(sensors: Map<string, Sensor>): Map<string, Sensor> {
+    // Add a small height (skin width) for the detection purposes
+    // Sensor is exactly on the floor of the room so it could happen that its not detected inside due to float
+    const skinWidth: number = 0.01;
+
+    const sensorsInRoom: Map<string, Sensor> = new Map();
+    this.geometry.computeBoundingBox();
+    // Bounding box has only min max values, needs to be shifted to objects location
+    // Creating a copy of the bounding box so it is not shifted into far far away
+    const bbox = this.geometry.boundingBox?.clone()
+    bbox?.translate(this.position);
+    for (const [device_id, sensor] of sensors) {
+      
+      const sensorPosition = sensor.position.clone();
+      sensorPosition.setY(sensorPosition.y + skinWidth);
+      if (bbox?.containsPoint(sensorPosition)) {
+        sensorsInRoom.set(device_id, sensor);
+      }
+    }
+    return sensorsInRoom;
+  }
+
+  public removeSensorEntry(sensorId: string) {
+    let index: number = this.userData.sensors.indexOf(sensorId);
+    if (index !== -1) {
+      this.userData.sensors.splice(index, 1);
+    }
+  }
+
+  public addSensorEntry(sensorId: string) {
+    if (this.userData.sensors.indexOf(sensorId) === -1) {
+    this.userData.sensors.push(sensorId);
     }
   }
 }

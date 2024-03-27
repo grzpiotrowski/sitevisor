@@ -43,7 +43,7 @@
             return;
         }
 
-        // Update details in store but temporarily set position to null
+        // Update details in store but temporarily set position and room to null
         newSensor.update(() => (
             {   
                 id: '',
@@ -53,6 +53,7 @@
                 position: null,
                 type: selectedType,
                 project: projectId,
+                room: null,
             }
         ));
         isDialogOpen = false;

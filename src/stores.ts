@@ -17,7 +17,8 @@ export const selectedRoomStore = writable<Room | null>(null);
 export const statusOptionsStore = readable(new Map<string, string>([
     ['opened', 'Opened'],
     ['in_progress', 'In Progress'],
-    ['resolved', 'Resolved']
+    ['resolved', 'Resolved'],
+    ['closed', 'Closed']
   ]));
   
   export const objectTypesStore = readable(new Map<string, string>([

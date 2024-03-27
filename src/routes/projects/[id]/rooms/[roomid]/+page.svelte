@@ -8,23 +8,37 @@
 	import IssuesTable from "$lib/components/IssuesTable.svelte";
 	import { onMount } from "svelte";
 	import type { Vector3 } from "three";
+	import type { ISensor, ISensorType } from "$lib/common/interfaces/ISensor";
+	import SensorTable from "$lib/components/SensorTable.svelte";
 	export let data: PageData;
 
     let room: IRoom = data.room;
     let issues: IIssue[] = [];
+    let sensors: ISensor[] = [];
+    let sensorTypes: ISensorType[] = [];
     let updatedName = room.name;
 
     onMount(async () => {
         await fetchIssues();
+        await fetchSensorTypes();
+        await fetchSensors();
     });
 
     async function fetchIssues() {
-    try {
-      issues = await SitevisorService.getIssues({object_type: "room", object_id: room.id.toString()});
-    } catch (error) {
-      console.error("Failed to fetch issues:", error);
+        try {
+            issues = await SitevisorService.getIssues({object_type: "room", object_id: room.id.toString()});
+        } catch (error) {
+            console.error("Failed to fetch issues:", error);
+        }
     }
-  }
+
+    async function fetchSensorTypes() {
+        sensorTypes = await SitevisorService.getSensorTypes(room.project.toString());
+    }
+
+    async function fetchSensors() {
+        sensors = await SitevisorService.getSensors( {project_id: room.project.toString(), room_id: room.id} );
+    }
 
     async function deleteRoom() {
         try {
@@ -42,22 +56,22 @@
         };
 
         try {
-        await SitevisorService.updateRoom(room.id.toString(), updatedRoom);
-        room = { ...room, ...updatedRoom };
-        console.log("Room updated successfully");
+            await SitevisorService.updateRoom(room.id.toString(), updatedRoom);
+            room = { ...room, ...updatedRoom };
+            console.log("Room updated successfully");
         } catch (error) {
             console.error("Error updating Room:", error);
         }
     }
 
     function navigateToRoom(point1: Vector3 | null, point2: Vector3 | null) {
-    if (point1 && point2) {
-        const x: number = (point1.x + point2.x) / 2
-        const y: number = (point1.y + point2.y) / 2
-        const z: number = (point1.z + point2.z) / 2
-        goto(`/projects/${room.project}/viewer?posX=${x}&posY=${y}&posZ=${z}`);
+        if (point1 && point2) {
+            const x: number = (point1.x + point2.x) / 2
+            const y: number = (point1.y + point2.y) / 2
+            const z: number = (point1.z + point2.z) / 2
+            goto(`/projects/${room.project}/viewer?posX=${x}&posY=${y}&posZ=${z}`);
+        }
     }
-  }
 
 </script>
 
@@ -91,6 +105,16 @@
         <div class="card-body">
             <h2 class="card-title">Issues</h2>
             <IssuesTable issues={issues} showTypeFilter={false} showTypeColumn={false}/>
+        </div>
+    </div>
+    <div class="card bg-base-100 mt-4 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Sensors</h2>
+            <SensorTable
+                projectId={room.project.toString()}
+                sensors={sensors}
+                sensorTypes={sensorTypes}
+            />
         </div>
     </div>
 </div>

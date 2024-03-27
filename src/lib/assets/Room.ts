@@ -51,7 +51,7 @@ export class Room extends Volume {
       id: id,
       name: name,
       level: level,
-      project: project,
+      project: project
     };
 
     this.isSelected = false;
@@ -93,8 +93,12 @@ export class Room extends Volume {
   public checkSensorsWithin(sensors: Map<string, Sensor>): Map<string, Sensor> {
     const sensorsInRoom: Map<string, Sensor> = new Map();
     this.geometry.computeBoundingBox();
+    // Bounding box has only min max values, needs to be shifted to objects location
+    // Creating a copy of the bounding box so it is not shifted into far far away
+    const bbox = this.geometry.boundingBox?.clone()
+    bbox?.translate(this.position);
     for (const [device_id, sensor] of sensors) {
-      if (this.geometry.boundingBox?.translate(this.position).containsPoint(sensor.position)) {
+      if (bbox?.containsPoint(sensor.position)) {
         sensorsInRoom.set(device_id, sensor);
       }
     }

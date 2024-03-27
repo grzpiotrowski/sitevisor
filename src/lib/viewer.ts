@@ -253,7 +253,10 @@ export class Viewer {
               createdRoom => {
                 if (createdRoom) {
                   roomData.id = createdRoom.id;
-                  this.objectFactory.createRoom(roomData);
+                  const newRoom = this.objectFactory.createRoom(roomData);
+                  if (newRoom) {
+                    this.updateRoomContent(newRoom);
+                  }
                 }
               }
             ).catch(error => {
@@ -272,8 +275,12 @@ export class Viewer {
           .then(createdSensor => {
               if (createdSensor) {
                 sensorData.id = createdSensor.id;
-                this.objectFactory.createSensor(sensorData);
+                const sensor = this.objectFactory.createSensor(sensorData);
+                if (sensor) {
+                  this.updateSensorRoom(sensor);
+                }
               }
+              
           })
           .catch(error => {
               console.error("Failed to create sensor in backend", error);
@@ -351,6 +358,39 @@ export class Viewer {
         this.scene.remove(this.tempRoomPreview.label);
         this.scene.remove(this.tempRoomPreview);
         this.tempRoomPreview = null;
+    }
+  }
+
+  private async updateRoomContent(room: Room) {
+    const sensorsWithin = room.checkSensorsWithin(this.sensors);
+    console.log(sensorsWithin)
+    for (let [sensorId, sensor] of sensorsWithin) {  
+      // Update properties locally
+      sensor.userData.room = room.userData.id;
+      room.userData.sensors.push(sensor.userData.id);
+  
+      // Backend update
+      const updatedSensorData: Partial<ISensor> = {
+        room: room.userData.id
+      };
+
+      try {
+        await SitevisorService.updateSensor(sensor.userData.id, updatedSensorData);
+        console.log("Sensor updated successfully with new room assignment");
+      } catch (error) {
+        console.error(`Error updating Sensor with id: ${sensor.userData.id}`, error);
+      }
+    }
+    
+  }
+
+  private updateSensorRoom(sensor: Sensor) {
+    const room = sensor.checkIsInsideRoom(this.rooms);
+    if (room) {
+      // Update properties locally
+      sensor.userData.room = room.userData.id;
+      // Backend update
+      SitevisorService.updateSensor(sensor.userData.id, { room: room.userData.id });
     }
   }
 

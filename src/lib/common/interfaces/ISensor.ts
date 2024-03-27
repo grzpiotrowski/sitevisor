@@ -1,4 +1,5 @@
 import { Vector3 } from "three";
+import type { IRoom } from "./IRoom";
 
 /**
  * Interface representing the properties required to create a Sensor.
@@ -11,6 +12,7 @@ export interface ISensor {
   position: Vector3 | null;
   type: ISensorType;
   project: number;
+  room: IRoom | null;
 }
 
 export interface ISensorType {

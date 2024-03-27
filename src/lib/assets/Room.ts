@@ -51,7 +51,8 @@ export class Room extends Volume {
       id: id,
       name: name,
       level: level,
-      project: project
+      project: project,
+      sensors: [],
     };
 
     this.isSelected = false;

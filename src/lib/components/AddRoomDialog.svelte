@@ -18,7 +18,7 @@
     };
 
     function handleAddRoomSubmit() {
-        // Update details in store but temporarily set position to null
+        // Update details in store but temporarily set position and sensors to null
         newRoom.update(() => (
             { 
                 id: '',
@@ -28,7 +28,8 @@
                 opacity: 0.5,
                 project: projectId,
                 point1: null,
-                point2: null
+                point2: null,
+                sensors: null,
             }
             ));
         isDialogOpen = false;

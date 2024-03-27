@@ -31,6 +31,7 @@ export class Sensor extends Point3D {
       level: level,
       type: type,
       project: project,
+      room: null,
       data: null
     };
 

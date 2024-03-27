@@ -87,7 +87,7 @@
     <div class="card bg-base-100 mt-4 shadow-xl">
         <div class="card-body">
             <h2 class="card-title">Issues</h2>
-            <IssuesTable issues={issues} />
+            <IssuesTable issues={issues} showTypeFilter={false} showTypeColumn={false}/>
         </div>
     </div>
 </div>

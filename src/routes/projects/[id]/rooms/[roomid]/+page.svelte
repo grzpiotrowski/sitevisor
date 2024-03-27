@@ -7,6 +7,7 @@
 	import type { IIssue } from "../../../../../services/sitevisor-types";
 	import IssuesTable from "$lib/components/IssuesTable.svelte";
 	import { onMount } from "svelte";
+	import type { Vector3 } from "three";
 	export let data: PageData;
 
     let room: IRoom = data.room;
@@ -49,6 +50,15 @@
         }
     }
 
+    function navigateToRoom(point1: Vector3 | null, point2: Vector3 | null) {
+    if (point1 && point2) {
+        const x: number = (point1.x + point2.x) / 2
+        const y: number = (point1.y + point2.y) / 2
+        const z: number = (point1.z + point2.z) / 2
+        goto(`/projects/${room.project}/viewer?posX=${x}&posY=${y}&posZ=${z}`);
+    }
+  }
+
 </script>
 
 <HeaderProject projectid={room.project.toString()}/>
@@ -59,6 +69,7 @@
             <h2 class="card-title">{room.name}</h2>
             <p>Level: {room.level}</p>
             <div class="card-actions justify-end">
+                <button class="btn" on:click={() => navigateToRoom(room.point1, room.point2)}>Go to</button>
                 <button class="btn btn-error" on:click={deleteRoom}>Delete</button>
             </div>
         </div>

@@ -41,9 +41,12 @@
     }
   }
 
-  function navigateToRoom(pos: Vector3 | null) {
-    if (pos) {
-      goto(`/projects/${project.id.toString()}/viewer?posX=${pos.x}&posY=${pos.y}&posZ=${pos.z}`);
+  function navigateToRoom(point1: Vector3 | null, point2: Vector3 | null) {
+    if (point1 && point2) {
+      const x: number = (point1.x + point2.x) / 2
+      const y: number = (point1.y + point2.y) / 2
+      const z: number = (point1.z + point2.z) / 2
+      goto(`/projects/${project.id.toString()}/viewer?posX=${x}&posY=${y}&posZ=${z}`);
     }
   }
 </script>
@@ -66,8 +69,9 @@
           <td>{room.level}</td>
           <td>
             <div class="flex justify-end gap-3">
-              <a class="btn btn-xs" href="/projects/{project.id}/rooms/{room.id}">Details</a>
               <button class="btn btn-error btn-xs" on:click={() => confirmDelete(room.id)}>Delete</button>
+              <a class="btn btn-xs" href="/projects/{project.id}/rooms/{room.id}">Details</a>
+              <button class="btn btn-xs" on:click={() => navigateToRoom(room.point1, room.point2)}>Go to</button>
             </div>
           </td>
         </tr>

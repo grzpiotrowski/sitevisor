@@ -12,7 +12,7 @@ export interface ISensor {
   position: Vector3 | null;
   type: ISensorType;
   project: number;
-  room: IRoom | null;
+  room: string | null;
 }
 
 export interface ISensorType {

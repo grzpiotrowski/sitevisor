@@ -29,7 +29,7 @@
                 project: projectId,
                 point1: null,
                 point2: null,
-                sensors: null,
+                sensors: [],
             }
             ));
         isDialogOpen = false;

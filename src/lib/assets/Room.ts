@@ -16,7 +16,7 @@ export class Room extends Volume {
   private materialSelected: MeshStandardMaterial;
   public isSelected: boolean;
 
-  constructor(id: string, color: number, opacity: number, name: string, level: number, project: number, point1: Vector3, point2: Vector3) {
+  constructor(id: string, color: number, opacity: number, name: string, level: number, project: number, sensors: string[], point1: Vector3, point2: Vector3) {
 
     const sizeX = Math.abs(point2.x - point1.x);
     const sizeZ = Math.abs(point2.z - point1.z);
@@ -52,7 +52,7 @@ export class Room extends Volume {
       name: name,
       level: level,
       project: project,
-      sensors: [],
+      sensors: sensors,
     };
 
     this.isSelected = false;
@@ -104,5 +104,18 @@ export class Room extends Volume {
       }
     }
     return sensorsInRoom;
+  }
+
+  public removeSensorEntry(sensorId: string) {
+    let index: number = this.userData.sensors.indexOf(sensorId);
+    if (index !== -1) {
+      this.userData.sensors.splice(index, 1);
+    }
+  }
+
+  public addSensorEntry(sensorId: string) {
+    if (this.userData.sensors.indexOf(sensorId) === -1) {
+    this.userData.sensors.push(sensorId);
+    }
   }
 }

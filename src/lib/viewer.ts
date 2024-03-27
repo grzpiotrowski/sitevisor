@@ -67,7 +67,7 @@ export class Viewer {
     const rooms = await SitevisorService.getRooms(this.projectId);
     rooms.forEach((room) => {
       if (room.point1 != null && room.point2 != null) {
-        const newRoom = new Room(room.id, room.color, room.opacity, room.name, room.level, room.project,
+        const newRoom = new Room(room.id, room.color, room.opacity, room.name, room.level, room.project, room.sensors,
           new Vector3(room.point1.x, room.point1.y, room.point1.z),
           new Vector3(room.point2.x, room.point2.y, room.point2.z));
         this.scene.add(newRoom);
@@ -83,7 +83,8 @@ export class Viewer {
         sensor.level,
         sensor.type.name,
         sensor.project,
-        new Vector3(sensor.position?.x, sensor.position?.y, sensor.position?.z));
+        new Vector3(sensor.position?.x, sensor.position?.y, sensor.position?.z),
+        sensor.room);
       this.scene.add(newSensor);
       this.scene.add(newSensor.label)
       this.sensors.set(newSensor.userData.device_id, newSensor);
@@ -314,6 +315,11 @@ export class Viewer {
   public removeSensorFromScene(device_id: string): void {
     const sensor = this.sensors.get(device_id);
     if (sensor) {
+      // Update room related to the sensor
+      if (sensor.userData.room) {
+        this.rooms.get(sensor.userData.room)?.removeSensorEntry(sensor.userData.id);
+      }
+      // Proceed with removing the sensor
       this.scene.remove(sensor);
       this.scene.remove(sensor.label);
   
@@ -334,10 +340,23 @@ export class Viewer {
   public removeRoomFromScene(id: string): void {
     const room = this.rooms.get(id);
     if (room) {
+      // Remove Room entry from related Sensors
+      if (room.userData.sensors) {
+        // Iterating this way around due to device_id and id mismatch
+        // Could fix that. This is bad O(n) surely
+        for (const [device_id, sensor] of this.sensors) {
+          if (room.userData.sensors.indexOf(sensor.userData.id) !== -1) {
+            sensor.setRoomEntry(null);
+          }
+        }
+      }
+
+      // Proceed with removing the room
       this.scene.remove(room);
       if (room.geometry) room.geometry.dispose();  
       this.rooms.delete(id);
     }
+    console.log(this.sensors)
   }
 
   private updateTempRoomPreview() {
@@ -363,11 +382,10 @@ export class Viewer {
 
   private async updateRoomContent(room: Room) {
     const sensorsWithin = room.checkSensorsWithin(this.sensors);
-    console.log(sensorsWithin)
     for (let [sensorId, sensor] of sensorsWithin) {  
       // Update properties locally
-      sensor.userData.room = room.userData.id;
-      room.userData.sensors.push(sensor.userData.id);
+      this.sensors.get(sensorId)?.setRoomEntry(room.userData.id);
+      this.rooms.get(room.userData.id)?.addSensorEntry(sensor.userData.id);
   
       // Backend update
       const updatedSensorData: Partial<ISensor> = {
@@ -388,7 +406,8 @@ export class Viewer {
     const room = sensor.checkIsInsideRoom(this.rooms);
     if (room) {
       // Update properties locally
-      sensor.userData.room = room.userData.id;
+      this.sensors.get(sensor.userData.device_id)?.setRoomEntry(room.userData.id);
+      this.rooms.get(room.userData.id)?.addSensorEntry(sensor.userData.id);
       // Backend update
       SitevisorService.updateSensor(sensor.userData.id, { room: room.userData.id });
     }

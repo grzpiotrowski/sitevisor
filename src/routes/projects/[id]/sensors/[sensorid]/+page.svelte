@@ -2,13 +2,29 @@
 	import HeaderProject from "$lib/components/HeaderProject.svelte";
     import type { PageData } from "./$types";
     import { goto } from "$app/navigation";
-	import { SitevisorService } from "../../../services/sitevisor-service";
+	import { SitevisorService } from "../../../../../services/sitevisor-service";
     import type { ISensor } from "$lib/common/interfaces/ISensor";
+	import type { IIssue } from "../../../../../services/sitevisor-types";
+	import IssuesTable from "$lib/components/IssuesTable.svelte";
+	import { onMount } from "svelte";
 	export let data: PageData;
 
     let sensor: ISensor = data.sensor;
+    let issues: IIssue[] = [];
     let updatedName = sensor.name;
     let updatedDeviceId = sensor.device_id;
+
+    onMount(async () => {
+        await fetchIssues();
+    });
+
+    async function fetchIssues() {
+    try {
+      issues = await SitevisorService.getIssues({object_type: "sensor", object_id: sensor.id.toString()});
+    } catch (error) {
+      console.error("Failed to fetch issues:", error);
+    }
+  }
 
     async function deleteSensor() {
         try {
@@ -37,7 +53,7 @@
 
 </script>
 
-<HeaderProject projectid={"1"}/>
+<HeaderProject projectid={sensor.project.toString()}/>
 
 <div class="container mx-auto p-5">
     <div class="card bg-base-100 shadow-xl">
@@ -66,6 +82,12 @@
                     <button type="submit" class="btn btn-primary">Update Sensor</button>
                 </div>
             </form>
+        </div>
+    </div>
+    <div class="card bg-base-100 mt-4 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Issues</h2>
+            <IssuesTable issues={issues} showTypeFilter={false} showTypeColumn={false}/>
         </div>
     </div>
 </div>

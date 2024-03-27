@@ -3,7 +3,6 @@
 	import { SitevisorService } from '../../services/sitevisor-service';
     import { newSensor } from '../../stores';
     import type { ISensorType } from '$lib/common/interfaces/ISensor';
-	import { get } from 'svelte/store';
 	export let isDialogOpen: boolean;
     export let viewer: Viewer;
     export let projectId: number;
@@ -53,6 +52,7 @@
                 level: 0,
                 position: null,
                 type: selectedType,
+                project: projectId,
             }
         ));
         isDialogOpen = false;

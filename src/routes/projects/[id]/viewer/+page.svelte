@@ -245,4 +245,5 @@
 <AddRoomDialog 
     bind:isDialogOpen={addRoomDialogVisible}
     bind:viewer={viewer}
+    projectId={project.id}
 />

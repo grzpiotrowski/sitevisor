@@ -18,3 +18,17 @@ export interface IProject {
     rooms: IRoom[];
     sensors: ISensor[];
 }
+
+export interface IIssue {
+    id: number;
+    title: string;
+    description: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    creator: IUser;
+    assignee?: IUser;
+    object_id: number;
+    object_type: string;
+    project: string;
+}

@@ -10,6 +10,7 @@ export interface ISensor {
   level: number;
   position: Vector3 | null;
   type: ISensorType;
+  project: number;
 }
 
 export interface ISensorType {

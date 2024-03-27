@@ -11,4 +11,5 @@ export interface IRoom {
   opacity: number;
   point1: Vector3 | null;
   point2: Vector3 | null;
+  project: number;
 }

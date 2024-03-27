@@ -95,7 +95,7 @@
           <td>
             <div class="flex justify-end gap-3">
               <button class="btn btn-error btn-xs" on:click={() => confirmDelete(sensor.id)}>Delete</button>
-              <a class="btn btn-xs" href="/sensors/{sensor.id}">Details</a>
+              <a class="btn btn-xs" href="/projects/{project.id}/sensors/{sensor.id}">Details</a>
               <button class="btn btn-xs" on:click={() => navigateToSensor(sensor.position)}>Go to</button>
             </div>
           </td>

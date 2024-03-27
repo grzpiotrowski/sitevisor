@@ -19,7 +19,7 @@ export class ObjectFactory {
 
   createRoom(options: IRoom): Room | undefined {
     if (options.point1 != null && options.point2 != null) {
-      const room = new Room(options.id, options.color, options.opacity, options.name, options.level, options.point1, options.point2);
+      const room = new Room(options.id, options.color, options.opacity, options.name, options.level, options.project, options.point1, options.point2);
       this.scene.add(room);
       this.viewer.rooms.set(room.userData.id, room);
       return room;
@@ -29,7 +29,7 @@ export class ObjectFactory {
 
   createSensor(options: ISensor): Sensor | undefined {
     if (options.position != null) {
-      const sensor = new Sensor(options.id, options.name, options.device_id, options.level, options.type.name, options.position);
+      const sensor = new Sensor(options.id, options.name, options.device_id, options.level, options.type.name, options.project, options.position);
       this.scene.add(sensor);
       this.scene.add(sensor.label);
       this.viewer.sensors.set(sensor.userData.device_id, sensor);

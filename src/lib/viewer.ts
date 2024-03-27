@@ -67,7 +67,7 @@ export class Viewer {
     const rooms = await SitevisorService.getRooms(this.projectId);
     rooms.forEach((room) => {
       if (room.point1 != null && room.point2 != null) {
-        const newRoom = new Room(room.id, room.color, room.opacity, room.name, room.level,
+        const newRoom = new Room(room.id, room.color, room.opacity, room.name, room.level, room.project,
           new Vector3(room.point1.x, room.point1.y, room.point1.z),
           new Vector3(room.point2.x, room.point2.y, room.point2.z));
         this.scene.add(newRoom);
@@ -82,6 +82,7 @@ export class Viewer {
         sensor.device_id,
         sensor.level,
         sensor.type.name,
+        sensor.project,
         new Vector3(sensor.position?.x, sensor.position?.y, sensor.position?.z));
       this.scene.add(newSensor);
       this.scene.add(newSensor.label)

@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
 	import type { Sensor } from "$lib/assets/Sensor";
+  import AddIssueDialog from './AddIssueDialog.svelte';
 	import { selectedSensorStore } from "../../stores";
   import { createEventDispatcher } from 'svelte';
   import { SitevisorService } from "../../services/sitevisor-service";
   import Chart from 'chart.js/auto';
+	import type { IIssue } from '../../services/sitevisor-types';
 
   export let selectedSensor: Sensor | null;
   let showSensorDeleteModal = false;
@@ -17,6 +19,22 @@
 
   // Track the last selected sensor device_id
   let lastDeviceId: string = ''; 
+
+  let addIssueDialogVisible: boolean = false;
+
+  function openAddIssueDialog() {
+    addIssueDialogVisible = true;
+    console.log("Opening Add issue dialog")
+  }
+
+  function closeAddIssueDialog() {
+    addIssueDialogVisible = false;
+    console.log("Closing Add issue dialog")
+  }
+
+  function handleIssueCreated(event: { detail: { issue: IIssue; }; }) {
+    const newIssue: IIssue = event.detail.issue;
+  }
 
   function handleSensorChange(selectedSensor: Sensor | null) {
     if (selectedSensor) {
@@ -124,7 +142,8 @@
   {#if selectedSensor?.userData.data}
     <p>Reading: {selectedSensor?.userData.data.value} {selectedSensor?.userData.data.unit}</p>
   {/if}
-  <a class="btn btn-sm" href="/sensors/{selectedSensor?.userData.id}">Details</a>
+  <a class="btn btn-sm" href="/projects/{selectedSensor?.userData.project}/sensors/{selectedSensor?.userData.id}">Details</a>
+  <button class="btn btn-primary btn-sm" on:click={openAddIssueDialog}>Add Issue</button>
   <button class="btn btn-error btn-sm" on:click={() => showSensorDeleteModal = true}>Delete Sensor</button>
   {#if showSensorDeleteModal}
     <div class="modal modal-open">
@@ -139,3 +158,11 @@
     </div>
   {/if}
 </div>
+{#if addIssueDialogVisible}
+  <AddIssueDialog
+    showObjectSelection={false}
+    predefinedObjectId={selectedSensor?.userData.id}
+    predefinedObjectType='sensor'
+    on:close={closeAddIssueDialog}
+    on:issueCreated={handleIssueCreated} projectId={selectedSensor?.userData.project}/>
+{/if}

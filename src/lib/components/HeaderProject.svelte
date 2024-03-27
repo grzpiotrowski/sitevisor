@@ -10,7 +10,8 @@
       <ul class="menu menu-horizontal px-1">
         <li><a href="/projects">Projects</a></li>
         <li><a href="/projects/{projectid}/viewer">Digital Twin</a></li>
-        <li><a href="/projects/{projectid}/sensorlist">Sensors</a></li>
+        <li><a href="/projects/{projectid}/sensors">Sensors</a></li>
+        <li><a href="/projects/{projectid}/issues">Issues</a></li>
         <li><a href="/logout">Logout</a></li>
       </ul>
     </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import HeaderProject from "$lib/components/HeaderProject.svelte";
-    import type { PageData } from "../[id]/$types";
+    import type { PageData } from "./$types";
     import { goto } from "$app/navigation";
 	import { SitevisorService } from "../../../../../services/sitevisor-service";
     import type { ISensor } from "$lib/common/interfaces/ISensor";

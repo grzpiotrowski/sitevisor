@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import type { PageData } from '../sensorlist/$types';
+  import type { PageData } from './$types';
   import type { ISensor, ISensorType } from '../../../../lib/common/interfaces/ISensor';
   import type { IProject } from '../../../../services/sitevisor-types';
   import HeaderProject from '$lib/components/HeaderProject.svelte';

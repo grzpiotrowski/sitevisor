@@ -28,6 +28,7 @@ import { get } from 'svelte/store';
 import type { ISensor } from './common/interfaces/ISensor';
 import type { IRoom } from './common/interfaces/IRoom';
 import { Heatmap } from './assets/Heatmap';
+import { sensorMapToReadingPositionArray } from './utils/helpers';
 
 export class Viewer {
   private projectId: string;
@@ -138,6 +139,7 @@ export class Viewer {
     this.scene.add(this.pointerHelper);
     this.loadObjects();
     this.heatmap = new Heatmap(this.scene, this.referencePlane);
+    this.heatmap.minHue = 0; this.heatmap.maxHue = 120; this.heatmap.minValue = 15; this.heatmap.maxValue = 30;
   }
 
   public setCameraAt(x: number, y: number, z: number) {
@@ -433,7 +435,7 @@ export class Viewer {
         console.log("N key pressed");
         // Key presses are active when a modal window is opened.
         // This may cause potential bugs when user is typing into an input field.
-        this.heatmap.updateHeatmap(this.sensors);
+        this.heatmap.updateHeatmap(sensorMapToReadingPositionArray(this.sensors));
       }
   }
 

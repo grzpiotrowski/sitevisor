@@ -12,6 +12,7 @@
 	import SensorDetails from '$lib/components/SensorDetails.svelte';
     import RoomDetails from '$lib/components/RoomDetails.svelte';
 	import HeaderProject from '$lib/components/HeaderProject.svelte';
+    import { sensorMapToReadingPositionArray } from '$lib/utils/helpers';
 	export let data: PageData;
 
     const project: IProject = data.project;
@@ -91,7 +92,7 @@
                 const message = JSON.parse(event.data);
                 const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
                 updateSensorData(sensorData.sensor_id, sensorData.data);
-                viewer.heatmap.updateHeatmap(viewer.sensors);
+                viewer.heatmap.updateHeatmap(sensorMapToReadingPositionArray(viewer.sensors));
             });
 
             socket.addEventListener('close', (event) => {

@@ -77,7 +77,10 @@ export class Sensor extends Point3D {
 
     for (const [room_id, room] of rooms) {
       room.geometry.computeBoundingBox();
-      if (room.geometry.boundingBox?.translate(room.position).containsPoint(sensorPosition)) {
+      // Creating a copy of the bounding box so it is not mutated with each check
+      const bbox = room.geometry.boundingBox?.clone()
+      bbox?.translate(room.position);
+      if (bbox?.containsPoint(sensorPosition)) {
         return room;
       }
     }

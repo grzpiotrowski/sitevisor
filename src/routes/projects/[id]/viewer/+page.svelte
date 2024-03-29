@@ -11,6 +11,7 @@
 	import { selectedSensorStore, selectedRoomStore } from '../../../../stores';
 	import SensorDetails from '$lib/components/SensorDetails.svelte';
     import RoomDetails from '$lib/components/RoomDetails.svelte';
+    import GradientBar from '$lib/components/GradientBar.svelte'
 	import HeaderProject from '$lib/components/HeaderProject.svelte';
     import { sensorMapToReadingPositionArray } from '$lib/utils/helpers';
 	export let data: PageData;
@@ -32,13 +33,20 @@
     let selectedSensor: Sensor | null = null;
     let selectedRoom: Room | null = null;
     let geometryMode3D: boolean = true;
+
     let heatmapVisibility: boolean = false;
+    let minValue: number = 15;
+    let maxValue: number = 30;
 
     $: if (viewer) {
         viewer.setRoomsGeometryMode(geometryMode3D ? '3D' : '2D');
         viewer.heatmap.setVisibility(heatmapVisibility);
+        if (viewer.heatmap) {
+            viewer.heatmap.minValue = minValue;
+            viewer.heatmap.maxValue = maxValue;
+        }
     }
-    
+
     function getTopicNamesArray() {
         return project.kafka_topics ? project.kafka_topics.split(',') : [];
     }
@@ -201,6 +209,16 @@
                         </label>
                     </div>
                 </div>
+                {#if heatmapVisibility}
+                <div class="absolute top-2 left-2 flex flex-col items-end z-10">
+                    <GradientBar
+                        minHue={0}
+                        maxHue={120}
+                        bind:minValue={minValue}
+                        bind:maxValue={maxValue}
+                    />
+                </div>
+                {/if}
             </div> 
 
             <Sidebar

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import { Viewer } from '$lib/viewer';
     import Sidebar from '$lib/components/Sidebar.svelte';
     import AddSensorDialog from '$lib/components/AddSensorDialog.svelte';
@@ -16,7 +16,12 @@
     import { sensorMapToReadingPositionArray } from '$lib/utils/helpers';
 	import type { ISensorType } from '$lib/common/interfaces/ISensor';
 	import { SitevisorService } from '../../../../services/sitevisor-service';
+    import { loggedInUser } from '../../../../stores';
+	import { get } from 'svelte/store';
+    import { webSocketStore, addWebSocketConnection, removeWebSocketConnection, updateWebSocketStatus} from '../../../../websocket-store';
 	export let data: PageData;
+
+    const user = get(loggedInUser);
 
     const project: IProject = data.project;
     const posX: number | null = Number(data.posX);
@@ -26,8 +31,6 @@
     let el: HTMLCanvasElement;
     let viewer: Viewer;
     let viewerContainer: HTMLElement;
-    let sockets: Map<string, WebSocket> = new Map();
-    let socketsStatus: Map<string, boolean> = new Map();
     let overallWsStatus = 'red'; // red, yellow, green
     let showWsStatuses: boolean = false;
     let addSensorDialogVisible: boolean = false;
@@ -41,6 +44,15 @@
     let minValue: number = 15;
     let maxValue: number = 25;
 
+    let webSockets = new Map<string, WebSocket>();
+    let webSocketStatuses = new Map<string, boolean>();
+
+    webSocketStore.subscribe(({ connections, statuses }) => {
+        webSockets = connections;
+        webSocketStatuses = statuses;
+        updateOverallWsStatus();
+    });
+
     $: if (viewer) {
         viewer.setRoomsGeometryMode(geometryMode3D ? '3D' : '2D');
         viewer.setHeatmapVisibility(heatmapVisibility);
@@ -50,10 +62,6 @@
         }
     }
     $: sensorTypeFilter = "";
-
-    onMount(() => {
-        fetchSensorTypes();
-    });
 
     async function fetchSensorTypes() {
         sensorTypes = await SitevisorService.getSensorTypes(project.id.toString());
@@ -66,27 +74,18 @@
     }
 
     function reconnectWebSocket(topic: string) {
-        let socket: WebSocket | undefined = sockets.get(topic);
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close(); // This alone won't update the UI
-        }
-
-        // Triggers Svelte reactivity
-        sockets.delete(topic);
-        socketsStatus.set(topic, false);
-        socketsStatus = new Map(socketsStatus);
+        removeWebSocketConnection(topic);
 
         setTimeout(() => {
             let newSocket = initializeWebSocket(topic);
             if (newSocket) {
-                sockets.set(topic, newSocket);
+                addWebSocketConnection(topic, newSocket);
             }
-            updateOverallWsStatus();
         }, 1000);
     }
 
     function updateOverallWsStatus() {
-        const statuses = Array.from(socketsStatus.values());
+        const statuses = Array.from($webSocketStore.statuses.values());
         if (statuses.every(status => status)) {
             overallWsStatus = 'green';
         } else if (statuses.some(status => status)) {
@@ -98,37 +97,32 @@
 
     function initializeWebSocket(topic: string): WebSocket | undefined {
         try {
-            const uniqueClientId = `sitevisor_consumer_${Date.now()}_${topic}`;
+            const uniqueClientId = `sitevisor_consumer_${user.username}_${topic}`;
             const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=${uniqueClientId}&topic=${topic}`;
             
             let socket = new WebSocket(wsUrl);
 
             socket.addEventListener('open', (event) => {
                 console.log(`WebSocket connection to topic: "${topic}" opened:`, event);
-                // Triggers Svelte reactivity
-                sockets.delete(topic);
-                socketsStatus.set(topic, true);
-                socketsStatus = new Map(socketsStatus);
-                updateOverallWsStatus();
+                addWebSocketConnection(topic, socket);
+                updateWebSocketStatus(topic, true);
             });
 
             socket.addEventListener('message', (event) => {
                 const message = JSON.parse(event.data);
-                const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
+                const sensorData = JSON.parse(message.value.value);
                 updateSensorData(sensorData.sensor_id, sensorData.data);
                 viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
             });
 
             socket.addEventListener('close', (event) => {
                 console.log(`WebSocket connection to topic: "${topic}" closed:`, event);
-                socketsStatus.set(topic, false);
-                updateOverallWsStatus();
+                updateWebSocketStatus(topic, false);
             });
 
             socket.addEventListener('error', (event) => {
                 console.error(`WebSocket "${topic}" error:`, event);
-                socketsStatus.set(topic, false);
-                updateOverallWsStatus();
+                updateWebSocketStatus(topic, false);
             });
             return socket;
         }
@@ -146,7 +140,7 @@
         const topics = getTopicNamesArray();
         topics.forEach((topic) => {
             let socket = initializeWebSocket(topic);
-            if (socket) { sockets.set(topic, socket); }
+            if (socket) { webSockets.set(topic, socket); }
         });
     }
 
@@ -165,7 +159,15 @@
         initializeWebSockets();
 
         viewer.setCameraAt(posX, posY, posZ);
+
+        fetchSensorTypes();
     });
+
+    onDestroy(() => {
+        webSockets.forEach((socket: WebSocket, topic: string) => {
+            //socket.close();
+        });
+    })
 
     function updateSensorData(device_id: string, newData: any) {
         const sensor = viewer.sensors.get(device_id);
@@ -248,8 +250,8 @@
         <div class="w-full">
             {#if showWsStatuses}
             <div class="mb-2 p-4 bg-base-100 shadow-lg rounded-lg w-full">
-                {#if socketsStatus.size > 0}
-                {#each Array.from(socketsStatus.entries()) as [topic, status]}
+                {#if $webSocketStore.statuses.size > 0}
+                {#each Array.from($webSocketStore.statuses.entries()) as [topic, status]}
                     <button class="flex justify-between w-full text-left p-2 hover:bg-gray-100 rounded-md"
                             on:click={() => reconnectWebSocket(topic)}>
                         <span class="mr-2">{topic}</span>

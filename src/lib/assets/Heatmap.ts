@@ -36,6 +36,7 @@ export class Heatmap {
     this.planeGeometry.translate(0,0.01,0)
     this.planeMaterial = new MeshBasicMaterial({ map: this.texture, transparent: true, opacity: 0.9, alphaHash: true });
     this.plane = new Mesh(this.planeGeometry, this.planeMaterial);
+    this.plane.visible = false; // Hidden by default
     this.scene.add(this.plane);
 
     // Resolution of the heatmap
@@ -99,5 +100,9 @@ export class Heatmap {
       this.plane.position.setY(this.plane.position.y + roomHeight);
       this.geometryMode = "3D";
     }
+  }
+
+  public setVisibility(visibility: boolean) {
+    this.plane.visible = visibility;
   }
 }

@@ -32,9 +32,11 @@
     let selectedSensor: Sensor | null = null;
     let selectedRoom: Room | null = null;
     let geometryMode3D: boolean = true;
+    let heatmapVisibility: boolean = false;
 
     $: if (viewer) {
         viewer.setRoomsGeometryMode(geometryMode3D ? '3D' : '2D');
+        viewer.heatmap.setVisibility(heatmapVisibility);
     }
     
     function getTopicNamesArray() {
@@ -204,6 +206,7 @@
             <Sidebar
                 onToggleRoomInsertion={toggleRoomInsertion}
                 onToggleSensorInsertion={toggleSensorInsertion}
+                bind:isHeatmapActive={heatmapVisibility}
             />
         </div>
     </div>

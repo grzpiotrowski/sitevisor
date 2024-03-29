@@ -267,6 +267,8 @@ export class Viewer {
                   const newRoom = this.objectFactory.createRoom(roomData);
                   if (newRoom) {
                     this.updateRoomContent(newRoom);
+                    const boxHelper = newRoom.boxHelper = new BoxHelper(newRoom, 0xffff00 );
+                    this.scene.add(boxHelper);
                   }
                 }
               }

@@ -135,8 +135,8 @@ export class Viewer {
     this.referencePlane = new ReferencePlane();
     this.scene.add(this.referencePlane);
 
-    const axesHelper = new AxesHelper(5);
-    this.scene.add(axesHelper);
+    //const axesHelper = new AxesHelper(5);
+    //this.scene.add(axesHelper);
     this.pointerHelper = new PointerHelper();
     this.scene.add(this.pointerHelper);
     this.loadObjects();

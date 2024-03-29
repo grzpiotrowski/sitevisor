@@ -37,7 +37,7 @@ export class Room extends Volume {
     this.sizeZ = sizeZ;
     this.height = height;
     this.geometryMode = "3D";
-    this.flatHeight = 0.01;
+    this.flatHeight = 0.005;
     this.materialNormal = material;
 
     this.materialSelected = new MeshStandardMaterial({

@@ -17,7 +17,8 @@ export class Heatmap {
   private referencePlane: ReferencePlane;
   private planeGeometry: PlaneGeometry;
   private planeMaterial: MeshBasicMaterial;
-  private plane: Mesh;
+  public plane: Mesh;
+  private geometryMode: string;
 
   public minValue: number;
   public maxValue: number;
@@ -32,7 +33,7 @@ export class Heatmap {
     this.referencePlane = referencePlane;
     this.planeGeometry = new PlaneGeometry(referencePlane.size, referencePlane.size);
     this.planeGeometry.rotateX( - Math.PI / 2 );
-    this.planeGeometry.translate(0,3.05,0)
+    this.planeGeometry.translate(0,0.01,0)
     this.planeMaterial = new MeshBasicMaterial({ map: this.texture, transparent: true, opacity: 0.9, alphaHash: true });
     this.plane = new Mesh(this.planeGeometry, this.planeMaterial);
     this.scene.add(this.plane);
@@ -88,5 +89,15 @@ export class Heatmap {
 
     // Convert HSL to RGB
     return heatColour.getStyle();
+  }
+
+  public setGeometryMode(geometryMode: string, roomHeight: number) {
+    if (geometryMode === "2D" && this.geometryMode != "2D") {
+      this.plane.position.setY(this.plane.position.y - roomHeight);
+      this.geometryMode = "2D";
+    } else if (geometryMode === "3D" && this.geometryMode != "3D") {
+      this.plane.position.setY(this.plane.position.y + roomHeight);
+      this.geometryMode = "3D";
+    }
   }
 }

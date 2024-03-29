@@ -428,6 +428,7 @@ export class Viewer {
     this.rooms.forEach((room) => {
       room.setGeometryMode(geometryMode);
     });
+    this.heatmap.setGeometryMode(geometryMode, 3.0);
   }
 
   private onKeyPress(event: KeyboardEvent) {

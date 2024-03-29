@@ -115,7 +115,6 @@ export class Viewer {
     window.addEventListener('resize', this.resize.bind(this));
     this.labelRenderer.domElement.addEventListener('mousemove', this.setPointerPosition.bind(this));
     this.labelRenderer.domElement.addEventListener('click', this.onCanvasClick.bind(this));
-    window.addEventListener('keypress', this.onKeyPress.bind(this));
 
     this.resize();
     this.animate();
@@ -268,6 +267,8 @@ export class Viewer {
                   const newRoom = this.objectFactory.createRoom(roomData);
                   if (newRoom) {
                     this.updateRoomContent(newRoom);
+                    const boxHelper = newRoom.boxHelper = new BoxHelper(newRoom, 0xffff00 );
+                    this.scene.add(boxHelper);
                   }
                 }
               }
@@ -435,14 +436,6 @@ export class Viewer {
       room.setGeometryMode(geometryMode);
     });
     this.heatmap.setGeometryMode(geometryMode, 3.0);
-  }
-
-  private onKeyPress(event: KeyboardEvent) {
-      if (event.key === 'n' || event.key === 'N') {
-        console.log("N key pressed");
-        // Key presses are active when a modal window is opened.
-        // This may cause potential bugs when user is typing into an input field.
-      }
   }
 
   private animate = () => {

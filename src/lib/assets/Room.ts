@@ -102,7 +102,7 @@ export class Room extends Volume {
   public checkSensorsWithin(sensors: Map<string, Sensor>): Map<string, Sensor> {
     // Add a small height (skin width) for the detection purposes
     // Sensor is exactly on the floor of the room so it could happen that its not detected inside due to float
-    const skinWidth: number = 0.01;
+    const skinWidth: number = 0.001;
 
     const sensorsInRoom: Map<string, Sensor> = new Map();
     this.geometry.computeBoundingBox();

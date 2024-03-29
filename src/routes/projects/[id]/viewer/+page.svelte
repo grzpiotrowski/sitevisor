@@ -11,7 +11,11 @@
 	import { selectedSensorStore, selectedRoomStore } from '../../../../stores';
 	import SensorDetails from '$lib/components/SensorDetails.svelte';
     import RoomDetails from '$lib/components/RoomDetails.svelte';
+    import GradientBar from '$lib/components/GradientBar.svelte'
 	import HeaderProject from '$lib/components/HeaderProject.svelte';
+    import { sensorMapToReadingPositionArray } from '$lib/utils/helpers';
+	import type { ISensorType } from '$lib/common/interfaces/ISensor';
+	import { SitevisorService } from '../../../../services/sitevisor-service';
 	export let data: PageData;
 
     const project: IProject = data.project;
@@ -31,11 +35,32 @@
     let selectedSensor: Sensor | null = null;
     let selectedRoom: Room | null = null;
     let geometryMode3D: boolean = true;
+    let sensorTypes: ISensorType[] = [];
+
+    let heatmapVisibility: boolean = false;
+    let minValue: number = 15;
+    let maxValue: number = 25;
 
     $: if (viewer) {
         viewer.setRoomsGeometryMode(geometryMode3D ? '3D' : '2D');
+        viewer.setHeatmapVisibility(heatmapVisibility);
+        if (viewer.heatmap) {
+            viewer.heatmap.minValue = minValue;
+            viewer.heatmap.maxValue = maxValue;
+        }
     }
-    
+    $: sensorTypeFilter = "";
+
+    onMount(() => {
+        fetchSensorTypes();
+    });
+
+    async function fetchSensorTypes() {
+        sensorTypes = await SitevisorService.getSensorTypes(project.id.toString());
+        sensorTypeFilter = sensorTypes[0].name;
+        console.log(sensorTypeFilter);
+    }
+
     function getTopicNamesArray() {
         return project.kafka_topics ? project.kafka_topics.split(',') : [];
     }
@@ -91,6 +116,7 @@
                 const message = JSON.parse(event.data);
                 const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
                 updateSensorData(sensorData.sensor_id, sensorData.data);
+                viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
             });
 
             socket.addEventListener('close', (event) => {
@@ -197,11 +223,24 @@
                         </label>
                     </div>
                 </div>
+                {#if heatmapVisibility}
+                <div class="absolute top-2 left-2 flex flex-col items-end z-10">
+                    <GradientBar
+                        minHue={0}
+                        maxHue={120}
+                        bind:minValue={minValue}
+                        bind:maxValue={maxValue}
+                        sensorTypes={sensorTypes}
+                        bind:sensorTypeFilter={sensorTypeFilter}
+                    />
+                </div>
+                {/if}
             </div> 
 
             <Sidebar
                 onToggleRoomInsertion={toggleRoomInsertion}
                 onToggleSensorInsertion={toggleSensorInsertion}
+                bind:isHeatmapActive={heatmapVisibility}
             />
         </div>
     </div>

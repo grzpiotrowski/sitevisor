@@ -102,7 +102,7 @@
                 const message = JSON.parse(event.data);
                 const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
                 updateSensorData(sensorData.sensor_id, sensorData.data);
-                viewer.heatmap.updateHeatmap(sensorMapToReadingPositionArray(viewer.sensors));
+                viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors));
             });
 
             socket.addEventListener('close', (event) => {

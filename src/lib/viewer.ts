@@ -436,7 +436,6 @@ export class Viewer {
         console.log("N key pressed");
         // Key presses are active when a modal window is opened.
         // This may cause potential bugs when user is typing into an input field.
-        this.heatmap.updateHeatmap(sensorMapToReadingPositionArray(this.sensors));
       }
   }
 

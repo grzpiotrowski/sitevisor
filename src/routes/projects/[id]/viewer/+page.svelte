@@ -36,11 +36,11 @@
 
     let heatmapVisibility: boolean = false;
     let minValue: number = 15;
-    let maxValue: number = 30;
+    let maxValue: number = 25;
 
     $: if (viewer) {
         viewer.setRoomsGeometryMode(geometryMode3D ? '3D' : '2D');
-        viewer.heatmap.setVisibility(heatmapVisibility);
+        viewer.setHeatmapVisibility(heatmapVisibility);
         if (viewer.heatmap) {
             viewer.heatmap.minValue = minValue;
             viewer.heatmap.maxValue = maxValue;

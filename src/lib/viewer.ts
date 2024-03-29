@@ -12,6 +12,7 @@ import {
   Object3D,
   type Intersection,
   type Object3DEventMap,
+  BoxHelper,
 } from 'three';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { Room } from './assets/Room';
@@ -28,7 +29,6 @@ import { get } from 'svelte/store';
 import type { ISensor } from './common/interfaces/ISensor';
 import type { IRoom } from './common/interfaces/IRoom';
 import { Heatmap } from './assets/Heatmap';
-import { sensorMapToReadingPositionArray } from './utils/helpers';
 
 export class Viewer {
   private projectId: string;
@@ -74,6 +74,8 @@ export class Viewer {
           new Vector3(room.point1.x, room.point1.y, room.point1.z),
           new Vector3(room.point2.x, room.point2.y, room.point2.z));
         this.scene.add(newRoom);
+        const boxHelper = newRoom.boxHelper = new BoxHelper(newRoom, 0xffff00 );
+        this.scene.add(boxHelper);
         this.rooms.set(newRoom.userData.id, newRoom);
       }
     });
@@ -194,6 +196,10 @@ export class Viewer {
       this.pointerHelper.setCreateMode(this.sensorInsertionMode);
     }
     return this.sensorInsertionMode;
+  }
+
+  public setHeatmapVisibility(visibility: boolean) {
+    this.heatmap.setVisibility(visibility);
   }
 
   private checkPointerIntersection() {
@@ -357,11 +363,11 @@ export class Viewer {
       }
 
       // Proceed with removing the room
+      this.scene.remove(room.boxHelper);
       this.scene.remove(room);
       if (room.geometry) room.geometry.dispose();  
       this.rooms.delete(id);
     }
-    console.log(this.sensors)
   }
 
   private updateTempRoomPreview() {

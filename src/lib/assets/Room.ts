@@ -1,5 +1,6 @@
 import {
   BoxGeometry,
+  BoxHelper,
   MeshStandardMaterial,
   Vector3,
 } from 'three';
@@ -14,6 +15,7 @@ export class Room extends Volume {
   private flatHeight: number;
   private materialNormal: MeshStandardMaterial;
   private materialSelected: MeshStandardMaterial;
+  public boxHelper: BoxHelper;
   public isSelected: boolean;
 
   constructor(id: string, color: number, opacity: number, name: string, level: number, project: number, sensors: string[], point1: Vector3, point2: Vector3) {
@@ -82,12 +84,18 @@ export class Room extends Volume {
     }
   }
 
+  public setBoxHelperVisibility(boxHelperVisibility: boolean) {
+    this.boxHelper.visible = boxHelperVisibility;
+  }
+
   public setIsSelected(isSelected: boolean) {
     this.isSelected = isSelected;
     if (isSelected) {
       this.material = this.materialSelected;
+      this.setBoxHelperVisibility(isSelected);
     } else {
       this.material = this.materialNormal;
+      this.setBoxHelperVisibility(isSelected);
     }
   }
 

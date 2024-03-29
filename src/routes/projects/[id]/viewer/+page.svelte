@@ -18,7 +18,7 @@
 	import { SitevisorService } from '../../../../services/sitevisor-service';
     import { loggedInUser } from '../../../../stores';
 	import { get } from 'svelte/store';
-    import { webSocketStore, addWebSocketConnection, removeWebSocketConnection, updateWebSocketStatus} from '../../../../websocket-store';
+    import { webSocketStore, addWebSocketConnection, removeWebSocketConnection, updateWebSocketStatus, removeWebSocketListener} from '../../../../websocket-store';
 	export let data: PageData;
 
     const user = get(loggedInUser);
@@ -96,50 +96,30 @@
     }
 
     function initializeWebSocket(topic: string): WebSocket | undefined {
-        // Check if an existing connection for this topic already exists and is open
-        const existingSocket = webSockets.get(topic);
-        if (existingSocket && existingSocket.readyState === WebSocket.OPEN) {
-            console.log(`WebSocket connection for topic "${topic}" already exists and is open.`);
-            return existingSocket; // Return the existing WebSocket if it's already open
+        // Check if WebSocket connection already exists
+        if (webSockets.has(topic)) {
+            console.log(`WebSocket for topic "${topic}" already exists.`);
+            return webSockets.get(topic); // Return the existing WebSocket
         }
-
-        // Proceed to create a new WebSocket connection if no open connection exists
         try {
             const uniqueClientId = `sitevisor_consumer_${user.username}_${topic}`;
             const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=${uniqueClientId}&topic=${topic}`;
 
             let socket = new WebSocket(wsUrl);
 
-            socket.addEventListener('open', (event) => {
-                console.log(`WebSocket connection to topic: "${topic}" opened:`, event);
-                addWebSocketConnection(topic, socket);
-                updateWebSocketStatus(topic, true);
-            });
+            // Setup event listeners
+            setupWebSocketListeners(socket, topic);
 
-            socket.addEventListener('message', (event) => {
-                const message = JSON.parse(event.data);
-                const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
-                updateSensorData(sensorData.sensor_id, sensorData.data);
-                viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
-            });
-
-            socket.addEventListener('close', (event) => {
-                console.log(`WebSocket connection to topic: "${topic}" closed:`, event);
-                updateWebSocketStatus(topic, false);
-            });
-
-            socket.addEventListener('error', (event) => {
-                console.error(`WebSocket "${topic}" error:`, event);
-                updateWebSocketStatus(topic, false);
-            });
-
+            // Store the websocket connection
+            addWebSocketConnection(topic, socket);
             return socket;
         } catch (error) {
-            console.log(`Unable to connect to topic: ${topic}`, error);
+            console.error(`Unable to initialize WebSocket for topic: ${topic}`, error);
             return undefined;
         }
     }
 
+    // Initialise all websocket connection based on kafka_topics specified in the project
     function initializeWebSockets() {
         if (!project.kafka_topics) {
             console.log("No topics configured.");
@@ -147,9 +127,53 @@
         }
         const topics = getTopicNamesArray();
         topics.forEach((topic) => {
-            let socket = initializeWebSocket(topic);
-            if (socket) { webSockets.set(topic, socket); }
+            // Check if a connection already exists
+            if (!webSockets.has(topic)) {
+                initializeWebSocket(topic);
+                console.log(`Created a WebSocket for topic ${topic}`)
+            } else {
+                const existingSocket = webSockets.get(topic);
+                if (existingSocket) {
+                    setupWebSocketListeners(existingSocket, topic);
+                }
+                console.log(`WebSocket for topic ${topic} already exists.`);
+            }
         });
+    }
+
+    // Handler for WebSocket message event
+    function handleMessage(topic: string, event: MessageEvent) {
+        console.log(`Processing data from topic: ${topic}`);
+        const message = JSON.parse(event.data);
+            const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
+            updateSensorData(sensorData.sensor_id, sensorData.data);
+            viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
+    }
+
+    // Handler for WebSocket error event
+    function handleError(topic: string, event: Event) {
+        updateWebSocketStatus(topic, false);
+        updateOverallWsStatus();
+    }
+
+    // Handler for WebSocket open event
+    function handleOpen(topic: string) {
+        console.log(`WebSocket connection opened for topic: ${topic}`);
+        updateWebSocketStatus(topic, true);
+    }
+
+    // Handler for WebSocket close event
+    function handleClose(topic: string) {
+        console.log(`WebSocket connection closed for topic: ${topic}`);
+        updateWebSocketStatus(topic, false);
+    }
+
+    // Attaches listeners to handlers 
+    function setupWebSocketListeners(socket: WebSocket, topic: string) {
+        socket.addEventListener('open', () => handleOpen(topic));
+        socket.addEventListener('message', (event) => handleMessage(topic, event));
+        socket.addEventListener('close', () => handleClose(topic));
+        socket.addEventListener('error', (event) => handleError(topic, event));
     }
 
     onMount(() => {
@@ -170,12 +194,6 @@
 
         fetchSensorTypes();
     });
-
-    onDestroy(() => {
-        webSockets.forEach((socket: WebSocket, topic: string) => {
-            //socket.close();
-        });
-    })
 
     function updateSensorData(device_id: string, newData: any) {
         const sensor = viewer.sensors.get(device_id);

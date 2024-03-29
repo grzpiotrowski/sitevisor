@@ -14,6 +14,8 @@
     import GradientBar from '$lib/components/GradientBar.svelte'
 	import HeaderProject from '$lib/components/HeaderProject.svelte';
     import { sensorMapToReadingPositionArray } from '$lib/utils/helpers';
+	import type { ISensorType } from '$lib/common/interfaces/ISensor';
+	import { SitevisorService } from '../../../../services/sitevisor-service';
 	export let data: PageData;
 
     const project: IProject = data.project;
@@ -33,6 +35,7 @@
     let selectedSensor: Sensor | null = null;
     let selectedRoom: Room | null = null;
     let geometryMode3D: boolean = true;
+    let sensorTypes: ISensorType[] = [];
 
     let heatmapVisibility: boolean = false;
     let minValue: number = 15;
@@ -45,6 +48,17 @@
             viewer.heatmap.minValue = minValue;
             viewer.heatmap.maxValue = maxValue;
         }
+    }
+    $: sensorTypeFilter = "";
+
+    onMount(() => {
+        fetchSensorTypes();
+    });
+
+    async function fetchSensorTypes() {
+        sensorTypes = await SitevisorService.getSensorTypes(project.id.toString());
+        sensorTypeFilter = sensorTypes[0].name;
+        console.log(sensorTypeFilter);
     }
 
     function getTopicNamesArray() {
@@ -102,7 +116,7 @@
                 const message = JSON.parse(event.data);
                 const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
                 updateSensorData(sensorData.sensor_id, sensorData.data);
-                viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors));
+                viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
             });
 
             socket.addEventListener('close', (event) => {
@@ -216,6 +230,8 @@
                         maxHue={120}
                         bind:minValue={minValue}
                         bind:maxValue={maxValue}
+                        sensorTypes={sensorTypes}
+                        bind:sensorTypeFilter={sensorTypeFilter}
                     />
                 </div>
                 {/if}

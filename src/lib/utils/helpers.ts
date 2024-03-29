@@ -16,9 +16,11 @@ export function formatDate(dateString: string): string {
   return date.toLocaleTimeString('en-IE', options);
 }
 
-export function sensorMapToReadingPositionArray(sensorMap: Map<string, Sensor>): Array<[Vector3, number]> {
-  return Array.from(sensorMap.values()).map(sensor => [
-    sensor.position,
-    sensor.userData.data?.value
-  ]);
+export function sensorMapToReadingPositionArray(sensorMap: Map<string, Sensor>, sensorTypeName: string): Array<[Vector3, number]> {
+  return Array.from(sensorMap.values())
+    .filter(sensor => sensor.userData.type === sensorTypeName)
+    .map(sensor => [
+      sensor.position,
+      sensor.userData.data?.value
+    ]);
 }

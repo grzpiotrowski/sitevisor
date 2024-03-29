@@ -96,10 +96,18 @@
     }
 
     function initializeWebSocket(topic: string): WebSocket | undefined {
+        // Check if an existing connection for this topic already exists and is open
+        const existingSocket = webSockets.get(topic);
+        if (existingSocket && existingSocket.readyState === WebSocket.OPEN) {
+            console.log(`WebSocket connection for topic "${topic}" already exists and is open.`);
+            return existingSocket; // Return the existing WebSocket if it's already open
+        }
+
+        // Proceed to create a new WebSocket connection if no open connection exists
         try {
             const uniqueClientId = `sitevisor_consumer_${user.username}_${topic}`;
             const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=${uniqueClientId}&topic=${topic}`;
-            
+
             let socket = new WebSocket(wsUrl);
 
             socket.addEventListener('open', (event) => {
@@ -110,7 +118,7 @@
 
             socket.addEventListener('message', (event) => {
                 const message = JSON.parse(event.data);
-                const sensorData = JSON.parse(message.value.value);
+                const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
                 updateSensorData(sensorData.sensor_id, sensorData.data);
                 viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
             });
@@ -124,10 +132,10 @@
                 console.error(`WebSocket "${topic}" error:`, event);
                 updateWebSocketStatus(topic, false);
             });
+
             return socket;
-        }
-        catch (error) {
-            console.log(`Unable to connect to topic: ${topic}`);
+        } catch (error) {
+            console.log(`Unable to connect to topic: ${topic}`, error);
             return undefined;
         }
     }

@@ -6,8 +6,9 @@
     import type { ISensor } from "$lib/common/interfaces/ISensor";
 	import type { IIssue } from "../../../../../services/sitevisor-types";
 	import IssuesTable from "$lib/components/IssuesTable.svelte";
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import type { Vector3 } from "three";
+	import { addWebSocketListener, removeWebSocketConnection, removeWebSocketListener } from "../../../../../websocket-store";
 	export let data: PageData;
 
     let sensor: ISensor = data.sensor;
@@ -15,8 +16,21 @@
     let updatedName = sensor.name;
     let updatedDeviceId = sensor.device_id;
 
+    // Testing listener
+    function handleMessage(event: any) {
+        console.log('New message:', event.data);
+    }    
+
     onMount(async () => {
         await fetchIssues();
+
+        // Add a message listener to the WebSocket connection
+        addWebSocketListener('my-topic', 'message', handleMessage);
+        
+    });
+
+    onDestroy(() => {
+        removeWebSocketListener('my-topic', 'message', handleMessage);
     });
 
     async function fetchIssues() {

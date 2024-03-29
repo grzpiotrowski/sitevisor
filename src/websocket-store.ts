@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 
-interface WebSocketListener {
+export interface WebSocketListener {
     [key: string]: ((this: WebSocket, ev: Event) => any)[];
 }
 

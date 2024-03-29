@@ -18,7 +18,13 @@
 	import { SitevisorService } from '../../../../services/sitevisor-service';
     import { loggedInUser } from '../../../../stores';
 	import { get } from 'svelte/store';
-    import { webSocketStore, addWebSocketConnection, removeWebSocketConnection, updateWebSocketStatus, removeWebSocketListener} from '../../../../websocket-store';
+    import { webSocketStore,
+        addWebSocketConnection,
+        removeWebSocketConnection,
+        updateWebSocketStatus,
+        removeWebSocketListener,
+        type WebSocketListener
+    } from '../../../../websocket-store';
 	export let data: PageData;
 
     const user = get(loggedInUser);
@@ -31,7 +37,7 @@
     let el: HTMLCanvasElement;
     let viewer: Viewer;
     let viewerContainer: HTMLElement;
-    let overallWsStatus = 'red'; // red, yellow, green
+    let overallWsStatus = 'red'; // red, yellow, green, none
     let showWsStatuses: boolean = false;
     let addSensorDialogVisible: boolean = false;
     let addRoomDialogVisible: boolean = false;
@@ -46,10 +52,12 @@
 
     let webSockets = new Map<string, WebSocket>();
     let webSocketStatuses = new Map<string, boolean>();
+    let webSocketListeners: Map<string, WebSocketListener>;
 
-    webSocketStore.subscribe(({ connections, statuses }) => {
+    webSocketStore.subscribe(({ connections, statuses, listeners }) => {
         webSockets = connections;
         webSocketStatuses = statuses;
+        webSocketListeners = listeners;
         updateOverallWsStatus();
     });
 
@@ -86,7 +94,9 @@
 
     function updateOverallWsStatus() {
         const statuses = Array.from($webSocketStore.statuses.values());
-        if (statuses.every(status => status)) {
+        if (statuses.length === 0) {
+            overallWsStatus = 'none';
+        } else if (statuses.every(status => status)) {
             overallWsStatus = 'green';
         } else if (statuses.some(status => status)) {
             overallWsStatus = 'yellow';
@@ -141,39 +151,43 @@
         });
     }
 
-    // Handler for WebSocket message event
-    function handleMessage(topic: string, event: MessageEvent) {
-        console.log(`Processing data from topic: ${topic}`);
-        const message = JSON.parse(event.data);
-            const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
-            updateSensorData(sensorData.sensor_id, sensorData.data);
-            viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
-    }
-
-    // Handler for WebSocket error event
-    function handleError(topic: string, event: Event) {
-        updateWebSocketStatus(topic, false);
-        updateOverallWsStatus();
-    }
-
-    // Handler for WebSocket open event
-    function handleOpen(topic: string) {
+    const handleOpenEvent = (topic: any) => () => {
         console.log(`WebSocket connection opened for topic: ${topic}`);
         updateWebSocketStatus(topic, true);
-    }
+    };
 
-    // Handler for WebSocket close event
-    function handleClose(topic: string) {
+    const handleMessageEvent = (topic: any) => (event: any) => {
+        const message = JSON.parse(event.data);
+        console.log(`Processing data from topic: ${message.topic}`);
+        const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
+        updateSensorData(sensorData.sensor_id, sensorData.data);
+        viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
+    };
+
+    const handleCloseEvent = (topic: any) => () => {
         console.log(`WebSocket connection closed for topic: ${topic}`);
         updateWebSocketStatus(topic, false);
-    }
+    };
+
+    const handleErrorEvent = (topic: any) => (event: any) => {
+        console.error(`WebSocket error for topic: ${topic}`, event);
+    };
 
     // Attaches listeners to handlers 
     function setupWebSocketListeners(socket: WebSocket, topic: string) {
-        socket.addEventListener('open', () => handleOpen(topic));
-        socket.addEventListener('message', (event) => handleMessage(topic, event));
-        socket.addEventListener('close', () => handleClose(topic));
-        socket.addEventListener('error', (event) => handleError(topic, event));
+
+        // Add event listeners to the WebSocket connection
+        socket.addEventListener('open', handleOpenEvent(topic));
+        socket.addEventListener('message', handleMessageEvent(topic));
+        socket.addEventListener('close', handleCloseEvent(topic));
+        socket.addEventListener('error', handleErrorEvent(topic));
+    }
+
+    function clearExistingWebSockets() {
+        // Iterate over existing connections and close each one
+        webSockets.forEach((_, topic) => {
+            removeWebSocketConnection(topic);
+        });
     }
 
     onMount(() => {
@@ -188,11 +202,25 @@
             selectedRoom = room;
         });
 
+        // Preventing the connections existing when switching to a different project
+        clearExistingWebSockets();
+
         initializeWebSockets();
 
         viewer.setCameraAt(posX, posY, posZ);
 
         fetchSensorTypes();
+    });
+
+    onDestroy(() => {
+        // Remove event listeners
+        const topics = getTopicNamesArray();
+        topics.forEach((topic) => {
+            removeWebSocketListener(topic, 'open', handleOpenEvent);
+            removeWebSocketListener(topic, 'message', handleMessageEvent);
+            removeWebSocketListener(topic, 'close', handleCloseEvent);
+            removeWebSocketListener(topic, 'error', handleErrorEvent);
+        });
     });
 
     function updateSensorData(device_id: string, newData: any) {
@@ -297,7 +325,7 @@
         <button 
             class={`btn bg-base-100/20 border-base-100/30`}  
             on:click={() => showWsStatuses = !showWsStatuses}>
-            <span class={`badge ${overallWsStatus === 'green' ? 'badge-success' : overallWsStatus === 'yellow' ? 'badge-warning' : 'badge-error'}`}></span>
+            <span class={`badge ${overallWsStatus === 'green' ? 'badge-success' : overallWsStatus === 'yellow' ? 'badge-warning' : overallWsStatus === 'none' ? 'badge-dark' : 'badge-error'}`}></span>
             Realtime Data Status
         </button>
     </div>

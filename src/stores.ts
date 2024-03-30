@@ -15,14 +15,13 @@ export const selectedRoomStore = writable<Room | null>(null);
 
 // Used globally in the app, simpler than enums in the database
 export const statusOptionsStore = readable(new Map<string, string>([
-    ['opened', 'Opened'],
-    ['in_progress', 'In Progress'],
-    ['resolved', 'Resolved'],
-    ['closed', 'Closed']
-  ]));
+  ['opened', 'Opened'],
+  ['in_progress', 'In Progress'],
+  ['resolved', 'Resolved'],
+  ['closed', 'Closed']
+]));
   
-  export const objectTypesStore = readable(new Map<string, string>([
-    ['sensor', 'Sensor'],
-    ['room', 'Room']
-  ]));
-  
+export const objectTypesStore = readable(new Map<string, string>([
+  ['sensor', 'Sensor'],
+  ['room', 'Room']
+]));

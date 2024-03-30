@@ -36,7 +36,7 @@ export class Viewer {
   private containerElement: HTMLElement;
   private scene: Scene;
   private camera: PerspectiveCamera;
-  private renderer: WebGLRenderer;
+  public renderer: WebGLRenderer;
   private labelRenderer: CSS2DRenderer;
   private controls: OrbitControls;
   private raycaster: Raycaster;
@@ -469,13 +469,29 @@ export class Viewer {
     if (this.roomInsertionMode) {
       this.updateTempRoomPreview();
     }
+
+    // Sensor glowing on data update
+    const currentTime = performance.now();
+    for (const [_, sensor] of this.sensors) {
+      if (sensor.isGlowing) {
+        const elapsed = currentTime - sensor.glowStartTime;
+        if (elapsed < sensor.glowDuration) {
+          const intensity = 1 - (elapsed / sensor.glowDuration);
+          sensor.material.emissive.setHex(0xffff00 * intensity);
+        } else {
+          sensor.isGlowing = false;
+          sensor.material.emissive.setHex(0x000000);
+        }
+      }
+    }
     
     this.render();
-    this.labelRenderer.render( this.scene, this.camera );
+    
   };
 
   private render = () => {
     this.renderer.render(this.scene, this.camera);
+    this.labelRenderer.render( this.scene, this.camera );
   }
 
   private resize = () => {

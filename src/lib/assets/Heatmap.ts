@@ -73,11 +73,14 @@ export class Heatmap {
     this.texture.needsUpdate = true;
   }
 
-  updateHeatmapAdvanced(sensors: Array<[Vector3, number]>) {
+  updateHeatmapAdvanced(values: Array<[Vector3, number]>) {
     // This is a more advanced heatmap generation algorithm.
     // It divides the canvas into a grid and colours the cells
     // Normalised (0 to 1) Value of the cell is interpolated based on the value of all data points
     // Each data point affects the cell value inversely proportional to the square of the distance
+
+    // Filter out dead sensors:
+    values = values.filter(reading => reading[1] !== undefined);
 
     if (!this.ctx) return;
   
@@ -92,7 +95,7 @@ export class Heatmap {
         const x = i * cellSize + cellSize / 2;
         const y = j * cellSize + cellSize / 2;
   
-        const value = this.calculateGridValue(x - this.canvas.width / 2, y - this.canvas.height / 2, sensors);
+        const value = this.calculateGridValue(x - this.canvas.width / 2, y - this.canvas.height / 2, values);
         const color = this.mapValueToColour(value, this.minValue, this.maxValue, this.minHue, this.maxHue);
   
         this.ctx.fillStyle = color;

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import { Viewer } from '$lib/viewer';
     import Sidebar from '$lib/components/Sidebar.svelte';
     import AddSensorDialog from '$lib/components/AddSensorDialog.svelte';
@@ -16,7 +16,18 @@
     import { sensorMapToReadingPositionArray } from '$lib/utils/helpers';
 	import type { ISensorType } from '$lib/common/interfaces/ISensor';
 	import { SitevisorService } from '../../../../services/sitevisor-service';
+    import { loggedInUser } from '../../../../stores';
+	import { get } from 'svelte/store';
+    import { webSocketStore,
+        addWebSocketConnection,
+        removeWebSocketConnection,
+        updateWebSocketStatus,
+        removeWebSocketListener,
+        type WebSocketListener
+    } from '../../../../websocket-store';
 	export let data: PageData;
+
+    const user = get(loggedInUser);
 
     const project: IProject = data.project;
     const posX: number | null = Number(data.posX);
@@ -26,9 +37,7 @@
     let el: HTMLCanvasElement;
     let viewer: Viewer;
     let viewerContainer: HTMLElement;
-    let sockets: Map<string, WebSocket> = new Map();
-    let socketsStatus: Map<string, boolean> = new Map();
-    let overallWsStatus = 'red'; // red, yellow, green
+    let overallWsStatus = 'red'; // red, yellow, green, none
     let showWsStatuses: boolean = false;
     let addSensorDialogVisible: boolean = false;
     let addRoomDialogVisible: boolean = false;
@@ -41,6 +50,17 @@
     let minValue: number = 15;
     let maxValue: number = 25;
 
+    let webSockets = new Map<string, WebSocket>();
+    let webSocketStatuses = new Map<string, boolean>();
+    let webSocketListeners: Map<string, WebSocketListener>;
+
+    webSocketStore.subscribe(({ connections, statuses, listeners }) => {
+        webSockets = connections;
+        webSocketStatuses = statuses;
+        webSocketListeners = listeners;
+        updateOverallWsStatus();
+    });
+
     $: if (viewer) {
         viewer.setRoomsGeometryMode(geometryMode3D ? '3D' : '2D');
         viewer.setHeatmapVisibility(heatmapVisibility);
@@ -50,10 +70,6 @@
         }
     }
     $: sensorTypeFilter = "";
-
-    onMount(() => {
-        fetchSensorTypes();
-    });
 
     async function fetchSensorTypes() {
         sensorTypes = await SitevisorService.getSensorTypes(project.id.toString());
@@ -66,28 +82,21 @@
     }
 
     function reconnectWebSocket(topic: string) {
-        let socket: WebSocket | undefined = sockets.get(topic);
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.close(); // This alone won't update the UI
-        }
-
-        // Triggers Svelte reactivity
-        sockets.delete(topic);
-        socketsStatus.set(topic, false);
-        socketsStatus = new Map(socketsStatus);
+        removeWebSocketConnection(topic);
 
         setTimeout(() => {
             let newSocket = initializeWebSocket(topic);
             if (newSocket) {
-                sockets.set(topic, newSocket);
+                addWebSocketConnection(topic, newSocket);
             }
-            updateOverallWsStatus();
         }, 1000);
     }
 
     function updateOverallWsStatus() {
-        const statuses = Array.from(socketsStatus.values());
-        if (statuses.every(status => status)) {
+        const statuses = Array.from($webSocketStore.statuses.values());
+        if (statuses.length === 0) {
+            overallWsStatus = 'none';
+        } else if (statuses.every(status => status)) {
             overallWsStatus = 'green';
         } else if (statuses.some(status => status)) {
             overallWsStatus = 'yellow';
@@ -97,47 +106,30 @@
     }
 
     function initializeWebSocket(topic: string): WebSocket | undefined {
+        // Check if WebSocket connection already exists
+        if (webSockets.has(topic)) {
+            console.log(`WebSocket for topic "${topic}" already exists.`);
+            return webSockets.get(topic); // Return the existing WebSocket
+        }
         try {
-            const uniqueClientId = `sitevisor_consumer_${Date.now()}_${topic}`;
+            const uniqueClientId = `sitevisor_consumer_${user.username}_${topic}`;
             const wsUrl = `${import.meta.env.VITE_WEBSOCKET_URL}?clientId=${uniqueClientId}&topic=${topic}`;
-            
+
             let socket = new WebSocket(wsUrl);
 
-            socket.addEventListener('open', (event) => {
-                console.log(`WebSocket connection to topic: "${topic}" opened:`, event);
-                // Triggers Svelte reactivity
-                sockets.delete(topic);
-                socketsStatus.set(topic, true);
-                socketsStatus = new Map(socketsStatus);
-                updateOverallWsStatus();
-            });
+            // Setup event listeners
+            setupWebSocketListeners(socket, topic);
 
-            socket.addEventListener('message', (event) => {
-                const message = JSON.parse(event.data);
-                const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
-                updateSensorData(sensorData.sensor_id, sensorData.data);
-                viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
-            });
-
-            socket.addEventListener('close', (event) => {
-                console.log(`WebSocket connection to topic: "${topic}" closed:`, event);
-                socketsStatus.set(topic, false);
-                updateOverallWsStatus();
-            });
-
-            socket.addEventListener('error', (event) => {
-                console.error(`WebSocket "${topic}" error:`, event);
-                socketsStatus.set(topic, false);
-                updateOverallWsStatus();
-            });
+            // Store the websocket connection
+            addWebSocketConnection(topic, socket);
             return socket;
-        }
-        catch (error) {
-            console.log(`Unable to connect to topic: ${topic}`);
+        } catch (error) {
+            console.error(`Unable to initialize WebSocket for topic: ${topic}`, error);
             return undefined;
         }
     }
 
+    // Initialise all websocket connection based on kafka_topics specified in the project
     function initializeWebSockets() {
         if (!project.kafka_topics) {
             console.log("No topics configured.");
@@ -145,8 +137,56 @@
         }
         const topics = getTopicNamesArray();
         topics.forEach((topic) => {
-            let socket = initializeWebSocket(topic);
-            if (socket) { sockets.set(topic, socket); }
+            // Check if a connection already exists
+            if (!webSockets.has(topic)) {
+                initializeWebSocket(topic);
+                console.log(`Created a WebSocket for topic ${topic}`)
+            } else {
+                const existingSocket = webSockets.get(topic);
+                if (existingSocket) {
+                    setupWebSocketListeners(existingSocket, topic);
+                }
+                console.log(`WebSocket for topic ${topic} already exists.`);
+            }
+        });
+    }
+
+    const handleOpenEvent = (topic: any) => () => {
+        console.log(`WebSocket connection opened for topic: ${topic}`);
+        updateWebSocketStatus(topic, true);
+    };
+
+    const handleMessageEvent = (topic: any) => (event: any) => {
+        const message = JSON.parse(event.data);
+        console.log(`Processing data from topic: ${message.topic}`);
+        const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
+        updateSensorData(sensorData.sensor_id, sensorData.data);
+        viewer.heatmap.updateHeatmapAdvanced(sensorMapToReadingPositionArray(viewer.sensors, sensorTypeFilter));
+    };
+
+    const handleCloseEvent = (topic: any) => () => {
+        console.log(`WebSocket connection closed for topic: ${topic}`);
+        updateWebSocketStatus(topic, false);
+    };
+
+    const handleErrorEvent = (topic: any) => (event: any) => {
+        console.error(`WebSocket error for topic: ${topic}`, event);
+    };
+
+    // Attaches listeners to handlers 
+    function setupWebSocketListeners(socket: WebSocket, topic: string) {
+
+        // Add event listeners to the WebSocket connection
+        socket.addEventListener('open', handleOpenEvent(topic));
+        socket.addEventListener('message', handleMessageEvent(topic));
+        socket.addEventListener('close', handleCloseEvent(topic));
+        socket.addEventListener('error', handleErrorEvent(topic));
+    }
+
+    function clearExistingWebSockets() {
+        // Iterate over existing connections and close each one
+        webSockets.forEach((_, topic) => {
+            removeWebSocketConnection(topic);
         });
     }
 
@@ -162,9 +202,27 @@
             selectedRoom = room;
         });
 
+        // Preventing the connections existing when switching to a different project
+        clearExistingWebSockets();
+
         initializeWebSockets();
 
         viewer.setCameraAt(posX, posY, posZ);
+
+        fetchSensorTypes();
+    });
+
+    onDestroy(() => {
+        // Remove event listeners
+        const topics = getTopicNamesArray();
+        topics.forEach((topic) => {
+            removeWebSocketListener(topic, 'open', handleOpenEvent);
+            removeWebSocketListener(topic, 'message', handleMessageEvent);
+            removeWebSocketListener(topic, 'close', handleCloseEvent);
+            removeWebSocketListener(topic, 'error', handleErrorEvent);
+        });
+        // Dispose of the rendered to avoid too many WebGL contexts bug
+        viewer.renderer.dispose();
     });
 
     function updateSensorData(device_id: string, newData: any) {
@@ -248,8 +306,8 @@
         <div class="w-full">
             {#if showWsStatuses}
             <div class="mb-2 p-4 bg-base-100 shadow-lg rounded-lg w-full">
-                {#if socketsStatus.size > 0}
-                {#each Array.from(socketsStatus.entries()) as [topic, status]}
+                {#if $webSocketStore.statuses.size > 0}
+                {#each Array.from($webSocketStore.statuses.entries()) as [topic, status]}
                     <button class="flex justify-between w-full text-left p-2 hover:bg-gray-100 rounded-md"
                             on:click={() => reconnectWebSocket(topic)}>
                         <span class="mr-2">{topic}</span>
@@ -269,7 +327,7 @@
         <button 
             class={`btn bg-base-100/20 border-base-100/30`}  
             on:click={() => showWsStatuses = !showWsStatuses}>
-            <span class={`badge ${overallWsStatus === 'green' ? 'badge-success' : overallWsStatus === 'yellow' ? 'badge-warning' : 'badge-error'}`}></span>
+            <span class={`badge ${overallWsStatus === 'green' ? 'badge-success' : overallWsStatus === 'yellow' ? 'badge-warning' : overallWsStatus === 'none' ? 'badge-dark' : 'badge-error'}`}></span>
             Realtime Data Status
         </button>
     </div>

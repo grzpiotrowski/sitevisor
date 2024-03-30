@@ -109,6 +109,7 @@
   onDestroy(() => {
     if (chart) {
       chart.destroy();
+      chart = null;
     }
   });
 
@@ -138,7 +139,7 @@
 <div class="absolute top-0 right-0 mt-[70px] mr-4 p-4 bg-white shadow-md rounded-lg z-10 w-1/5">
   <button class="absolute top-0 right-0 m-2" on:click={closeSensorDetails}>&times;</button>
   <h3 class="text-lg font-semibold">{selectedSensor?.userData.name}</h3>
-  <canvas bind:this={chartCanvas}></canvas>
+  <canvas bind:this={chartCanvas} id="sensor-chart"></canvas>
   <p>ID: {selectedSensor?.userData.device_id}</p>
   <p>Level: {selectedSensor?.userData.level}</p>
   <p>Room: {rooms.get(selectedSensor?.userData.room)?.userData.name ?? 'Not assigned'}</p>

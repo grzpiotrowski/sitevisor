@@ -36,6 +36,11 @@ You can preview the production build with `npm run preview`.
 - [Svelte-awesome-color-picker](https://svelte-awesome-color-picker.vercel.app/)
 - [MDN Web Docs - Drawing shapes with canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes)
 - [HSL Gradient Canvas](https://codepen.io/acoreyj/pen/emLPwe)
+- [Wesley Mutwiri - Create Beautiful Charts with Svelte and Chart js](https://dev.to/wesleymutwiri/create-beautiful-charts-with-svelte-and-chart-js-512n)
+- [Emil Hein - Svelte and WebSocket](https://javascript.plainenglish.io/svelte-and-websocket-4a690dc3f66c)
+
+### Web Workers (only researched)
+- [David Dal Busco - SvelteKit Web Worker](https://medium.com/geekculture/sveltekit-web-worker-8cfc0c86abf6)
 
 ## Documentation
 - [MkDocs - static site generator for project documentation](https://www.mkdocs.org/)

@@ -4,42 +4,51 @@
     import { goto } from "$app/navigation";
 	import { SitevisorService } from "../../../../../services/sitevisor-service";
     import type { ISensor } from "$lib/common/interfaces/ISensor";
-	import type { IIssue } from "../../../../../services/sitevisor-types";
+	import type { IIssue, IProject } from "../../../../../services/sitevisor-types";
 	import IssuesTable from "$lib/components/IssuesTable.svelte";
 	import { onDestroy, onMount } from "svelte";
 	import type { Vector3 } from "three";
-	import { addWebSocketListener, removeWebSocketConnection, removeWebSocketListener } from "../../../../../websocket-store";
+	import { addWebSocketListener, removeWebSocketListener } from "../../../../../websocket-store";
 	export let data: PageData;
 
     let sensor: ISensor = data.sensor;
     let issues: IIssue[] = [];
+    let project: IProject = data.project;
+    const topics: string[] = project.kafka_topics ? project.kafka_topics.split(',') : [];
     let updatedName = sensor.name;
     let updatedDeviceId = sensor.device_id;
 
     // Testing listener
     function handleMessage(event: any) {
-        console.log('New message:', event.data);
+        const message = JSON.parse(event.data);
+        const sensorData = JSON.parse(message.value.value); // Double parse due to the structure
+        if (sensorData.sensor_id === sensor.device_id) {
+            console.log(`${sensorData.sensor_id} reading: ${sensorData.data.value}`)
+        }
     }    
 
     onMount(async () => {
         await fetchIssues();
-
-        // Add a message listener to the WebSocket connection
-        addWebSocketListener('my-topic', 'message', handleMessage);
         
+        // Add a message listener to the WebSocket connection
+        topics.forEach((topic) => {
+            addWebSocketListener(topic, 'message', handleMessage);
+        });
     });
 
     onDestroy(() => {
-        removeWebSocketListener('my-topic', 'message', handleMessage);
+        topics.forEach((topic) => {
+            removeWebSocketListener(topic, 'message', handleMessage);
+        });
     });
 
     async function fetchIssues() {
-    try {
-      issues = await SitevisorService.getIssues({object_type: "sensor", object_id: sensor.id.toString()});
-    } catch (error) {
-      console.error("Failed to fetch issues:", error);
+        try {
+            issues = await SitevisorService.getIssues({object_type: "sensor", object_id: sensor.id.toString()});
+        } catch (error) {
+            console.error("Failed to fetch issues:", error);
+        }
     }
-  }
 
     async function deleteSensor() {
         try {

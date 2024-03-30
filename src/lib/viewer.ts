@@ -36,7 +36,7 @@ export class Viewer {
   private containerElement: HTMLElement;
   private scene: Scene;
   private camera: PerspectiveCamera;
-  private renderer: WebGLRenderer;
+  public renderer: WebGLRenderer;
   private labelRenderer: CSS2DRenderer;
   private controls: OrbitControls;
   private raycaster: Raycaster;

@@ -28,8 +28,6 @@ export class Heatmap {
   constructor(scene: Scene, referencePlane: ReferencePlane) {
     this.scene = scene;
     this.canvas = document.createElement('canvas');
-    //this.canvas.setAttribute('id', 'heatmap-canvas');
-    //this.ctx = (document.getElementById('heatmap-canvas') as HTMLCanvasElement).getContext('2d');
     this.ctx = this.canvas.getContext('2d');
     this.texture = new CanvasTexture(this.canvas);
     this.referencePlane = referencePlane;

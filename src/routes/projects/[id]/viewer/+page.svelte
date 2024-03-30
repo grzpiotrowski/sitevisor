@@ -221,6 +221,8 @@
             removeWebSocketListener(topic, 'close', handleCloseEvent);
             removeWebSocketListener(topic, 'error', handleErrorEvent);
         });
+        // Dispose of the rendered to avoid too many WebGL contexts bug
+        viewer.renderer.dispose();
     });
 
     function updateSensorData(device_id: string, newData: any) {

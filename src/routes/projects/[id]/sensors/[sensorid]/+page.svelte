@@ -24,7 +24,6 @@
         const message = JSON.parse(event.data);
         const sensorData = JSON.parse(message.value.value);
         if (sensorData.sensor_id === sensor.device_id) {
-            console.log(`${sensorData.sensor_id} reading: ${sensorData.data.value}`);
             sensorReadings = [...sensorReadings, sensorData.data.value].slice(-30); // Keep only the last 30 readings
         }
     }

@@ -4,25 +4,46 @@
     import { goto } from "$app/navigation";
 	import { SitevisorService } from "../../../../../services/sitevisor-service";
     import type { IRoom } from "$lib/common/interfaces/IRoom";
-	import type { IIssue } from "../../../../../services/sitevisor-types";
+	import type { IIssue, IProject } from "../../../../../services/sitevisor-types";
 	import IssuesTable from "$lib/components/IssuesTable.svelte";
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import type { Vector3 } from "three";
 	import type { ISensor, ISensorType } from "$lib/common/interfaces/ISensor";
 	import SensorTable from "$lib/components/SensorTable.svelte";
+	import { addWebSocketListener, removeWebSocketListener } from "../../../../../websocket-store";
 	export let data: PageData;
 
     let room: IRoom = data.room;
+    let project: IProject = data.project;
     let issues: IIssue[] = [];
     let sensors: ISensor[] = [];
     let sensorTypes: ISensorType[] = [];
     let updatedName = room.name;
 
+    const topics: string[] = project.kafka_topics ? project.kafka_topics.split(',') : [];
+    let sensorReadings: Map<string, number[]> = new Map<string, number[]>();
+
     onMount(async () => {
         await fetchIssues();
         await fetchSensorTypes();
         await fetchSensors();
+
+        // Add a message listener to the WebSocket connection
+        topics.forEach((topic) => {
+            addWebSocketListener(topic, 'message', handleMessage);
+        });
     });
+
+    onDestroy(() => {
+        topics.forEach((topic) => {
+            removeWebSocketListener(topic, 'message', handleMessage);
+        });
+    });
+
+    function handleMessage(event: any) {
+        const message = JSON.parse(event.data);
+        const sensorData = JSON.parse(message.value.value);
+    }
 
     async function fetchIssues() {
         try {

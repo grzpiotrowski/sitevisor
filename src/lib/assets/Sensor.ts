@@ -13,6 +13,10 @@ export class Sensor extends Point3D {
   label: SensorLabel;
   isSelected: boolean;
 
+  isGlowing: boolean = false;
+  glowStartTime: number = 0;
+  glowDuration: number = 500;
+
   constructor(id: string, name: string, device_id: string, level: number, type: string, project: number, position: Vector3, room: string | null) {
     super(position);
 
@@ -42,7 +46,9 @@ export class Sensor extends Point3D {
 
   public update(sensorData: { value: number, unit: string } = { value: 0, unit: '' }) {
     this.userData.data = sensorData;
-    this.label.update();
+
+    this.isGlowing = true;
+    this.glowStartTime = performance.now();
   }
 
   public setIsSelected(isSelected: boolean) {

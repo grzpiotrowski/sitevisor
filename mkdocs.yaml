@@ -20,7 +20,8 @@ plugins:
 
 nav:
   - Overview: index.md
-  - User Guide: user-guide/
+  - User Guide:
+    - Project Management: user-guide/project-management.md
   - Developer Guide:
     - Local deployment: dev-guide/local-deployment.md
     - Docker deployment: dev-guide/docker-deployment.md

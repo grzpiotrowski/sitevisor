@@ -65,6 +65,7 @@ spec:
 ```
 
 **Ingress for SiteVisor frontend:**
+Alternatively you can use a [combined Ingress](./ingress-config.md) resource for both frontend and backend services.
 ```bash
 echo "
 apiVersion: networking.k8s.io/v1

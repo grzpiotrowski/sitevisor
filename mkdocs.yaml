@@ -20,7 +20,8 @@ plugins:
 
 nav:
   - Overview: index.md
-  - User Guide: user-guide/
+  - User Guide:
+    - Project Management: user-guide/project-management.md
   - Developer Guide:
     - Local deployment: dev-guide/local-deployment.md
     - Docker deployment: dev-guide/docker-deployment.md
@@ -31,6 +32,7 @@ nav:
       - Frontend deployment: dev-guide/kind-deployment.md
       - Kafka deployment: sitevisor-backend/docs/deployment/kafka-deployment.md
       - Kafka Websocket Proxy deployment: sitevisor-backend/docs/deployment/kafka-websocket-proxy-deployment.md
+      - Ingress configuration: dev-guide/ingress-config.md
   - Architecture:
     - Architecture Overview: architecture/architecture-overview.md
     - Frontend Overview: architecture/architecture-frontend.md

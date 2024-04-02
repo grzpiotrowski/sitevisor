@@ -32,6 +32,7 @@ nav:
       - Frontend deployment: dev-guide/kind-deployment.md
       - Kafka deployment: sitevisor-backend/docs/deployment/kafka-deployment.md
       - Kafka Websocket Proxy deployment: sitevisor-backend/docs/deployment/kafka-websocket-proxy-deployment.md
+      - Ingress configuration: dev-guide/ingress-config.md
   - Architecture:
     - Architecture Overview: architecture/architecture-overview.md
     - Frontend Overview: architecture/architecture-frontend.md
